@@ -1,0 +1,15 @@
+
+
+openni-git will want to use -mfloat-abi=soft. We need to use -mfloat-abi=hard. To do so:
+	* Try and fail to install openni-git. It will ask if you wish to restart the build. Say yes.
+	* Edit /var/abs/local/yaourtbuild/openni-git/src/openni-build/Platform/Linux/Build/Common/Platform.Arm to include -mfloat-abi=hard instead of -mfloat-abi=softfp.
+	* Edit /var/abs/local/yaourtbuild/openni-git/src/openni-build/Platform/Linux/Build/Makefile to not build any of the Java modules or samples.
+	* Edit PKGBUILD to set _platform='Arm' and to not git clone the repository again to prevent it from overwriting the above changes.
+	* Rebuild.
+
+pcl source does not check for the arm architecture when determining endianness in /tmp/yaourt-tmp-root/aur-pcl/src/PCL-1.6.0-Source/common/include/sensor_msgs/PointCloud2.h. The ODROID is little-endian (so says 'gcc -dumpspecs'). Just remove the necessary lines and #define PCL_LITTLE_ENDIAN so it doesn't error out. Note that pacman will untar the source and overwrite your changes, so edit the PKGBUILD appropriately.
+
+
+
+TODO: Many of these packages ran make single-threaded. Try multithreading make to take advantage of the four cores.
+
