@@ -7,12 +7,21 @@ openni-git will want to use -mfloat-abi=soft. We need to use -mfloat-abi=hard. T
 	* Edit PKGBUILD to set _platform='Arm' and to not git clone the repository again to prevent it from overwriting the above changes. Also, in package(), instead of installing Linux-x86, install Linux-Arm.
 	* Rebuild.
 
+
+
+
 pcl-ros source does not check for the ARM architecture when determining endianness or the host byte order. The ODROID is little-endian (so says 'gcc -dumpspecs'). So pause the installation after configuration is complete and edit the following two files to simply #define PCL_LITTLE_ENDIAN and PLY_LITTLE_ENDIAN before continuing:
 	/tmp/yaourt-tmp-root/aur-pcl-ros/src/PCL-1.6.0-Source/common/include/sensor_msgs/PointCloud2.h
 	/tmp/yaourt-tmp-root/aur-pcl-ros/src/PCL-1.6.0-Source/io/include/pcl/io/ply/byte_order.h
 
 
+
+
 Many of these packages ran make single-threaded. Try multithreading make to take advantage of the four cores.
+
+
+
+
 
 
 The following happens because the build runs out of memory:
@@ -39,6 +48,25 @@ make: *** [all] Error 2
 ============================================
 
 So add some swap space.
+
+
+
+
+SETTING UP DISTCC:
+	SERVER (i.e., fast machine):
+		* Create user distcc
+		* Edit /etc/rc.d/distccd and put after the functions line:
+			export PATH=/opt/x-tools7h/arm-unknown-linux-gnueabi/bin:$PATH
+		* Edit /etc/conf.d/distccd to set:
+			DISTCC_ARGS="--user distcc --allow 192.168.0.0/24"
+	CLIENT:
+		* Edit /etc/distcc/hosts and /etc/default/distcc
+		* export CC='distcc gcc'
+		* export CXX='distcc g++'
+		* Make sure cmake knows about the above two variables.
+
+Problems:
+	cmake/pcl_find_sse.cmake sets -march=native, which means that distcc cannot distribute the compilation processes to other machines. I tried changing this to armv7-a, but distcc still refused to distribute the work.
 
 
 
