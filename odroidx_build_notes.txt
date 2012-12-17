@@ -4,12 +4,46 @@ openni-git will want to use -mfloat-abi=soft. We need to use -mfloat-abi=hard. T
 	* Try and fail to install openni-git. It will ask if you wish to restart the build. Say yes.
 	* Edit /var/abs/local/yaourtbuild/openni-git/src/openni-build/Platform/Linux/Build/Common/Platform.Arm to include -mfloat-abi=hard instead of -mfloat-abi=softfp.
 	* Edit /var/abs/local/yaourtbuild/openni-git/src/openni-build/Platform/Linux/Build/Makefile to not build any of the Java modules or samples.
-	* Edit PKGBUILD to set _platform='Arm' and to not git clone the repository again to prevent it from overwriting the above changes.
+	* Edit PKGBUILD to set _platform='Arm' and to not git clone the repository again to prevent it from overwriting the above changes. Also, in package(), instead of installing Linux-x86, install Linux-Arm.
 	* Rebuild.
 
-pcl source does not check for the arm architecture when determining endianness in /tmp/yaourt-tmp-root/aur-pcl/src/PCL-1.6.0-Source/common/include/sensor_msgs/PointCloud2.h. The ODROID is little-endian (so says 'gcc -dumpspecs'). Just remove the necessary lines and #define PCL_LITTLE_ENDIAN so it doesn't error out. Note that pacman will untar the source and overwrite your changes, so edit the PKGBUILD appropriately.
+pcl-ros source does not check for the ARM architecture when determining endianness or the host byte order. The ODROID is little-endian (so says 'gcc -dumpspecs'). So pause the installation after configuration is complete and edit the following two files to simply #define PCL_LITTLE_ENDIAN and PLY_LITTLE_ENDIAN before continuing:
+	/tmp/yaourt-tmp-root/aur-pcl-ros/src/PCL-1.6.0-Source/common/include/sensor_msgs/PointCloud2.h
+	/tmp/yaourt-tmp-root/aur-pcl-ros/src/PCL-1.6.0-Source/io/include/pcl/io/ply/byte_order.h
+
+
+Many of these packages ran make single-threaded. Try multithreading make to take advantage of the four cores.
+
+
+The following happens because the build runs out of memory:
+
+============================================
+
+[ 41%] /bin/sh: warning: setlocale: LC_ALL: cannot change locale (en_US.UTF-8)
+Building CXX object segmentation/CMakeFiles/pcl_segmentation.dir/src/sac_segmentation.cpp.o
+/bin/sh: warning: setlocale: LC_ALL: cannot change locale (en_US.UTF-8)
+In file included from /tmp/yaourt-tmp-root/aur-pcl-ros/src/PCL-1.6.0-Source/common/include/pcl/point_types.h:301:0,
+                 from /tmp/yaourt-tmp-root/aur-pcl-ros/src/PCL-1.6.0-Source/segmentation/src/sac_segmentation.cpp:41:
+/tmp/yaourt-tmp-root/aur-pcl-ros/src/PCL-1.6.0-Source/common/include/pcl/impl/point_types.hpp:1009:68: warning: 'SHOT' is deprecated [-Wdeprecated-declarations]
+{standard input}: Assembler messages:
+{standard input}:385589: Warning: end of file not at end of a line; newline inserted
+{standard input}:385861: Error: expected comma after name `_ZN3pcl15SACSegmentationINS_13InterestPointEE7segmentERNS_13PointIndices_ISaIvEEERNS_18ModelCoefficients_IS4_EE' in .size directive
+c++: internal compiler error: Killed (program cc1plus)
+Please submit a full bug report,
+with preprocessed source if appropriate.
+See <https://bugs.archlinux.org/> for instructions.
+make[2]: *** [segmentation/CMakeFiles/pcl_segmentation.dir/src/sac_segmentation.cpp.o] Error 4
+make[1]: *** [segmentation/CMakeFiles/pcl_segmentation.dir/all] Error 2
+make: *** [all] Error 2
+
+============================================
+
+So add some swap space.
 
 
 
-TODO: Many of these packages ran make single-threaded. Try multithreading make to take advantage of the four cores.
 
+
+To get rid of errors like this one:
+	/bin/sh: warning: setlocale: LC_ALL: cannot change locale (en_US.UTF-8)
+Enable the locale in /etc/locale.gen and run locale-gen.
