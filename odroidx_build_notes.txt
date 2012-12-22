@@ -26,6 +26,7 @@ openni-git will want to use -mfloat-abi=soft. We need to use -mfloat-abi=hard. T
 pcl-ros source does not check for the ARM architecture when determining endianness or the host byte order. The ODROID is little-endian (so says 'gcc -dumpspecs'). So pause the installation after configuration is complete and edit the following two files to simply #define PCL_LITTLE_ENDIAN and PLY_LITTLE_ENDIAN before continuing:
 	/tmp/yaourt-tmp-root/aur-pcl-ros/src/PCL-1.6.0-Source/common/include/sensor_msgs/PointCloud2.h
 	/tmp/yaourt-tmp-root/aur-pcl-ros/src/PCL-1.6.0-Source/io/include/pcl/io/ply/byte_order.h
+Also remember to edit the PKGBUILD: s/fuerte/groovy/g.
 
 
 
