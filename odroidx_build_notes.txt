@@ -1,5 +1,18 @@
 
 
+Installing ROS:
+	cd groovy_underlay
+	git clone https://github.com/ros/message_generation.git
+	git clone https://github.com/ros/message_runtime.git
+	cd build/catkin_generated && ln -s ../../catkin/python/catkin
+
+
+
+When building tf, target pytf.cpp will complain about not being able to find Python.h. Edit tf's CMakeLists.txt and manually set the include path:
+	set(PYTHON_INCLUDE_PATH /usr/include/python2.7)
+
+
+
 openni-git will want to use -mfloat-abi=soft. We need to use -mfloat-abi=hard. To do so:
 	* Try and fail to install openni-git. It will ask if you wish to restart the build. Say yes.
 	* Edit /var/abs/local/yaourtbuild/openni-git/src/openni-build/Platform/Linux/Build/Common/Platform.Arm to include -mfloat-abi=hard instead of -mfloat-abi=softfp.
@@ -26,7 +39,7 @@ Many of these packages ran make single-threaded. Try multithreading make to take
 
 The following happens because the build runs out of memory:
 
-============================================
+========================================
 
 [ 41%] /bin/sh: warning: setlocale: LC_ALL: cannot change locale (en_US.UTF-8)
 Building CXX object segmentation/CMakeFiles/pcl_segmentation.dir/src/sac_segmentation.cpp.o
@@ -45,9 +58,28 @@ make[2]: *** [segmentation/CMakeFiles/pcl_segmentation.dir/src/sac_segmentation.
 make[1]: *** [segmentation/CMakeFiles/pcl_segmentation.dir/all] Error 2
 make: *** [all] Error 2
 
-============================================
+========================================
 
 So add some swap space.
+
+
+
+
+A few of these happens:
+
+========================================
+
+In file included from /usr/lib/gcc/armv7l-unknown-linux-gnueabihf/4.7.2/../../../../include/c++/4.7.2/bits/basic_ios.h:39:0,
+                 from /usr/lib/gcc/armv7l-unknown-linux-gnueabihf/4.7.2/../../../../include/c++/4.7.2/ios:45,
+                 from /usr/lib/gcc/armv7l-unknown-linux-gnueabihf/4.7.2/../../../../include/c++/4.7.2/istream:40,
+                 from /usr/lib/gcc/armv7l-unknown-linux-gnueabihf/4.7.2/../../../../include/c++/4.7.2/sstream:39,
+                 from /root/aur-pcl-ros/src/PCL-1.6.0-Source/apps/src/feature_matching.cpp:3:
+/usr/lib/gcc/armv7l-unknown-linux-gnueabihf/4.7.2/../../../../include/c++/4.7.2/bits/locale_facets.h: In member function ‘std::vector<_Tp, _Alloc>::iterator std::vector<_Tp, _Alloc>::begin() [with _Tp = flann::lsh::LshTable<float>; _Alloc = std::allocator<flann::lsh::LshTable<float> >; std::vector<_Tp, _Alloc>::iterator = __gnu_cxx::__normal_iterator<flann::lsh::LshTable<float>*, std::vector<flann::lsh::LshTable<float>, std::allocator<flann::lsh::LshTable<float> > > >; typename std::_Vector_base<_Tp, _Alloc>::pointer = flann::lsh::LshTable<float>*]’:
+/usr/lib/gcc/armv7l-unknown-linux-gnueabihf/4.7.2/../../../../include/c++/4.7.2/bits/locale_facets.h:1078:16: internal compiler error: Segmentation fault
+Please submit a full bug report,
+with preprocessed source if appropriate.
+
+========================================
 
 
 
@@ -75,3 +107,27 @@ Problems:
 To get rid of errors like this one:
 	/bin/sh: warning: setlocale: LC_ALL: cannot change locale (en_US.UTF-8)
 Enable the locale in /etc/locale.gen and run locale-gen.
+
+
+
+
+Building self_test (dependency of hokuyo_node) -- for some reason, it tries to link a library with -l/usr/lib/libgtest.so. This is incorrect syntax! (See man ld.) Fix it in CMakeCache.txt (though it should really be fixed elsewhere?).
+
+
+
+
+Building rgbdslam:
+	* Remove openni-dev dependency from /opt/ros/groovy/lib/pkgconfig/{pcl_io-1.6.pc,pcl_visualization-1.6.pc}
+	* sed -i 's/pcl-1.5/pcl-1.6/g' `rospack find pcl_ros`/manifest.xml
+
+
+
+Installing g2o-svn:
+	* gcc/g++ for ARM doesn't have the -msse options. Remove it from CMakeLists.txt.
+	* Looking for /usr/include/GL/gl.h? Install mesa.
+	* Installing this package did not install Findg2o.cmake, which rgbdslam wants.
+
+
+
+
+
