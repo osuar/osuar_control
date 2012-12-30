@@ -1,0 +1,10 @@
+Files and their purposes:
+
+adxl345.h:	ADXL345 accelerometer
+ahrs.h:		Attitude Heading Reference System
+comm.h:		Communications code (wired and wireless)
+config.h:	General configuration
+l3g4200d:	L3G4200D gyroscope
+motor.h:	Motor control
+pid.h:		PID function definition
+
