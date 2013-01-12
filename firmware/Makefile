@@ -221,4 +221,7 @@ ifeq ($(USE_FWLIB),yes)
   USE_OPT += -DUSE_STDPERIPH_DRIVER
 endif
 
+upload:
+	st-flash write build/$(PROJECT).bin 0x08000000
+
 include $(CHIBIOS)/os/ports/GCC/ARMCMx/rules.mk
