@@ -61,7 +61,7 @@ endif
 #
 
 # Define project name here
-PROJECT = ch
+PROJECT = osuar_fc
 
 # Imported source files and paths
 #CHIBIOS =
