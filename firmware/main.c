@@ -31,10 +31,40 @@ static msg_t led_thread(void *arg)
   }
 }
 
+void blink_led()
+{
+    palSetPad(GPIOD, GPIOD_LED3);       /* Orange.  */
+    chThdSleepMilliseconds(50);
+    palClearPad(GPIOD, GPIOD_LED3);     /* Orange.  */
+    chThdSleepMilliseconds(100);
+    palSetPad(GPIOD, GPIOD_LED3);       /* Orange.  */
+    chThdSleepMilliseconds(50);
+    palClearPad(GPIOD, GPIOD_LED3);     /* Orange.  */
+}
+
+/*
+ * Control loop
+ */
+static WORKING_AREA(wa_control_thread, 128);
+static msg_t control_thread(void *arg)
+{
+	(void) arg;
+	chRegSetThreadName("control");
+	systime_t time = chTimeNow();
+
+	while (TRUE) {
+		time += MS2ST(1000);   // Next deadline in 1 ms.
+		blink_led();
+		chThdSleepUntil(time);
+	}
+}
+
+
 /*
  * Application entry point.
  */
-int main(void) {
+int main(void)
+{
 
   /*
    * System initializations.
@@ -49,8 +79,13 @@ int main(void) {
   /*
    * Create the LED thread.
    */
-  chThdCreateStatic(wa_led_thread, sizeof(wa_led_thread), NORMALPRIO, led_thread, NULL);
+  //chThdCreateStatic(wa_led_thread, sizeof(wa_led_thread), NORMALPRIO, led_thread, NULL);
+
+	// Create control thread.
+	chThdCreateStatic(wa_control_thread, sizeof(wa_control_thread), NORMALPRIO, control_thread, NULL);
 
   while (TRUE) {
   }
+
+  return 0;
 }
