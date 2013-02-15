@@ -223,6 +223,6 @@ endif
 
 include $(CHIBIOS)/os/ports/GCC/ARMCMx/rules.mk
 
-upload:
+flash:
 	st-flash write build/$(PROJECT).bin 0x08000000
 
