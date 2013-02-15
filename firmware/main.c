@@ -82,7 +82,7 @@ int main(void)
   //chThdCreateStatic(wa_led_thread, sizeof(wa_led_thread), NORMALPRIO, led_thread, NULL);
 
 	// Create control thread.
-	chThdCreateStatic(wa_control_thread, sizeof(wa_control_thread), NORMALPRIO, control_thread, NULL);
+	chThdCreateStatic(wa_control_thread, sizeof(wa_control_thread), HIGHPRIO, control_thread, NULL);
 
   while (TRUE) {
   }
