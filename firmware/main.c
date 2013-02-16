@@ -15,31 +15,28 @@
 
 
 /*
- * This is a periodic thread that does absolutely nothing except flashing
- * a LED.
+ * Blink orange LED.
  */
 static WORKING_AREA(wa_led_thread, 128);
 static msg_t led_thread(void *arg)
 {
-  (void)arg;
-  chRegSetThreadName("blinker");
-  while (TRUE) {
-    palSetPad(GPIOD, GPIOD_LED3);       /* Orange.  */
-    chThdSleepMilliseconds(500);
-    palClearPad(GPIOD, GPIOD_LED3);     /* Orange.  */
-    chThdSleepMilliseconds(500);
-  }
-}
+	(void) arg;
+	chRegSetThreadName("blinker");
+	systime_t time = chTimeNow();
 
-void blink_led()
-{
-    palSetPad(GPIOD, GPIOD_LED3);       /* Orange.  */
-    chThdSleepMilliseconds(50);
-    palClearPad(GPIOD, GPIOD_LED3);     /* Orange.  */
-    chThdSleepMilliseconds(100);
-    palSetPad(GPIOD, GPIOD_LED3);       /* Orange.  */
-    chThdSleepMilliseconds(50);
-    palClearPad(GPIOD, GPIOD_LED3);     /* Orange.  */
+	while (TRUE) {
+		time += MS2ST(1000);   // Next deadline in 1 second.
+
+		palSetPad(GPIOD, GPIOD_LED3);
+		chThdSleepMilliseconds(50);
+		palClearPad(GPIOD, GPIOD_LED3);
+		chThdSleepMilliseconds(100);
+		palSetPad(GPIOD, GPIOD_LED3);
+		chThdSleepMilliseconds(50);
+		palClearPad(GPIOD, GPIOD_LED3);
+
+		chThdSleepUntil(time);
+	}
 }
 
 /*
@@ -53,8 +50,7 @@ static msg_t control_thread(void *arg)
 	systime_t time = chTimeNow();
 
 	while (TRUE) {
-		time += MS2ST(1000);   // Next deadline in 1 ms.
-		blink_led();
+		time += MS2ST(1);   // Next deadline in 1 second.
 		chThdSleepUntil(time);
 	}
 }
@@ -65,27 +61,29 @@ static msg_t control_thread(void *arg)
  */
 int main(void)
 {
+	/*
+	 * System initializations.
+	 * - HAL initialization, this also initializes the configured device drivers
+	 *   and performs the board-specific initializations.
+	 * - Kernel initialization, the main() function becomes a thread and the
+	 *   RTOS is active.
+	 */
+	halInit();
+	chSysInit();
 
-  /*
-   * System initializations.
-   * - HAL initialization, this also initializes the configured device drivers
-   *   and performs the board-specific initializations.
-   * - Kernel initialization, the main() function becomes a thread and the
-   *   RTOS is active.
-   */
-  halInit();
-  chSysInit();
+	/*
+	 * Create the LED thread.
+	 */
+	chThdCreateStatic(wa_led_thread, sizeof(wa_led_thread), NORMALPRIO, led_thread, NULL);
 
-  /*
-   * Create the LED thread.
-   */
-  //chThdCreateStatic(wa_led_thread, sizeof(wa_led_thread), NORMALPRIO, led_thread, NULL);
-
-	// Create control thread.
+	/*
+	 * Create control thread.
+	 */
 	chThdCreateStatic(wa_control_thread, sizeof(wa_control_thread), HIGHPRIO, control_thread, NULL);
 
-  while (TRUE) {
-  }
+	while (TRUE) {
+	}
 
-  return 0;
+	return 0;
 }
+
