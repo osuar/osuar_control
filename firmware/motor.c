@@ -5,50 +5,111 @@
  */
 void setup_motors()
 {
-#if (ESC_COMM == PWM)
 	/*
-	 * Enable timers.
+	 * Configure servo timer.
 	 */
-	pwmStart(&PWMD4, &esc_pwm_cfg);
 	pwmStart(&PWMD3, &servo_pwm_cfg);
 
 	/*
-	 * Set up pins.
+	 * Set up servo pins.
+	 */
+#if (NUM_ROTORS < 4)
+	palSetPadMode(GPIOB, GPIOB_PIN0, PAL_MODE_ALTERNATE(2));
+#endif // NUM_ROTORS < 4
+
+#if (NUM_ROTORS < 3)
+	palSetPadMode(GPIOB, GPIOB_PIN1, PAL_MODE_ALTERNATE(2));
+#endif // NUM_ROTORS < 3
+
+	//palSetPadMode(GPIOB, GPIOB_PIN4, PAL_MODE_ALTERNATE(2));
+	//palSetPadMode(GPIOB, GPIOB_PIN5, PAL_MODE_ALTERNATE(2));
+
+#if (ESC_COMM == PWM)
+	/*
+	 * Configure ESC timer.
+	 */
+	pwmStart(&PWMD4, &esc_pwm_cfg);
+
+	/*
+	 * Set up ESC pins.
 	 */
 	palSetPadMode(GPIOD, GPIOD_LED3, PAL_MODE_ALTERNATE(2));
 	palSetPadMode(GPIOD, GPIOD_LED4, PAL_MODE_ALTERNATE(2));
+
+#if (NUM_ROTORS > 2)
 	palSetPadMode(GPIOD, GPIOD_LED5, PAL_MODE_ALTERNATE(2));
+#endif // NUM_ROTORS > 2
+
+#if (NUM_ROTORS > 3)
 	palSetPadMode(GPIOD, GPIOD_LED6, PAL_MODE_ALTERNATE(2));
-	palSetPadMode(GPIOB, GPIOB_PIN0, PAL_MODE_ALTERNATE(2));
-	palSetPadMode(GPIOB, GPIOB_PIN1, PAL_MODE_ALTERNATE(2));
-	palSetPadMode(GPIOB, GPIOB_PIN4, PAL_MODE_ALTERNATE(2));
-	palSetPadMode(GPIOB, GPIOB_PIN5, PAL_MODE_ALTERNATE(2));
+#endif // NUM_ROTORS > 3
+
 #endif // ESC_COMM == PWM
 
 #if (ESC_COMM == SPI)
-
 #endif // ESC_COMM == SPI
 }
 
 /**
  * Send new desired motor speeds to ESCs.
  */
-void update_motors()
+void update_motors(float a, float b, float c, float d)
 {
-#if defined(ESC_PWM)
-	pwmEnableChannel(&PWMD4, 0, PWM_FRACTION_TO_WIDTH(&PWMD4, 1000, i));
-	pwmEnableChannel(&PWMD4, 1, PWM_FRACTION_TO_WIDTH(&PWMD4, 1000, i));
-	pwmEnableChannel(&PWMD4, 2, PWM_FRACTION_TO_WIDTH(&PWMD4, 1000, i));
-	pwmEnableChannel(&PWMD4, 3, PWM_FRACTION_TO_WIDTH(&PWMD4, 1000, i));
-	pwmEnableChannel(&PWMD3, 0, PWM_FRACTION_TO_WIDTH(&PWMD3, 1000, i));
-	pwmEnableChannel(&PWMD3, 1, PWM_FRACTION_TO_WIDTH(&PWMD3, 1000, i));
-	pwmEnableChannel(&PWMD3, 2, PWM_FRACTION_TO_WIDTH(&PWMD3, 1000, i));
-	pwmEnableChannel(&PWMD3, 3, PWM_FRACTION_TO_WIDTH(&PWMD3, 1000, i));
-#endif // ESC_PWM
+	/*
+	 * Commands for two-rotor system.
+	 */
+#if (NUM_ROTORS == 2)
+#if (ESC_COMM == PWM)
+	pwmEnableChannel(&PWMD4, 0, PWM_FRACTION_TO_WIDTH(&PWMD4, 1000, a));   // Motor 1
+	pwmEnableChannel(&PWMD4, 1, PWM_FRACTION_TO_WIDTH(&PWMD4, 1000, b));   // Motor 2
+#endif // ESC_COMM == PWM
 
-#if defined(ESC_SPI)
+#if (ESC_COMM == SPI)
+#endif // ESC_COMM == SPI
 
-#endif // ESC_SPI
+	pwmEnableChannel(&PWMD3, 0, PWM_FRACTION_TO_WIDTH(&PWMD3, 1000, c));   // Servo 1
+	pwmEnableChannel(&PWMD3, 1, PWM_FRACTION_TO_WIDTH(&PWMD3, 1000, d));   // Servo 2
+#endif // NUM_ROTORS == 2
+
+	/*
+	 * Commands for three-rotor system.
+	 */
+#if (NUM_ROTORS == 3)
+#if (ESC_COMM == PWM)
+	pwmEnableChannel(&PWMD4, 0, PWM_FRACTION_TO_WIDTH(&PWMD4, 1000, a));   // Motor 1
+	pwmEnableChannel(&PWMD4, 1, PWM_FRACTION_TO_WIDTH(&PWMD4, 1000, b));   // Motor 2
+	pwmEnableChannel(&PWMD4, 2, PWM_FRACTION_TO_WIDTH(&PWMD4, 1000, c));   // Motor 3
+#endif // ESC_COMM == PWM
+
+#if (ESC_COMM == SPI)
+#endif // ESC_COMM == SPI
+
+	pwmEnableChannel(&PWMD3, 0, PWM_FRACTION_TO_WIDTH(&PWMD3, 1000, c));   // Servo 1
+#endif // NUM_ROTORS == 3
+
+	/*
+	 * Commands for four-rotor system.
+	 */
+#if (NUM_ROTORS == 4)
+	uint16_t mot1, mot2, mot3, mot4;
+	mot1 = a;
+	mot2 = b;
+	mot3 = c;
+	mot4 = d;
+
+#if (ESC_COMM == PWM)
+	pwmEnableChannel(&PWMD4, 0, PWM_FRACTION_TO_WIDTH(&PWMD4, 1000, mot1));   // Motor 1
+	pwmEnableChannel(&PWMD4, 1, PWM_FRACTION_TO_WIDTH(&PWMD4, 1000, mot2));   // Motor 2
+	pwmEnableChannel(&PWMD4, 2, PWM_FRACTION_TO_WIDTH(&PWMD4, 1000, mot3));   // Motor 3
+	pwmEnableChannel(&PWMD4, 3, PWM_FRACTION_TO_WIDTH(&PWMD4, 1000, mot4));   // Motor 4
+#endif // ESC_COMM == PWM
+
+#if (ESC_COMM == SPI)
+#endif // ESC_COMM == SPI
+#endif // NUM_ROTORS == 4
+
+	//pwmEnableChannel(&PWMD3, 2, PWM_FRACTION_TO_WIDTH(&PWMD3, 1000, i));
+	//pwmEnableChannel(&PWMD3, 3, PWM_FRACTION_TO_WIDTH(&PWMD3, 1000, i));
 }
 
 

@@ -3,9 +3,10 @@
 
 #include "ch.h"
 #include "hal.h"
+#include "config.h"
 
 void setup_motors(void);
-void update_motors(void);
+void update_motors(float, float, float, float);
 
 #if (ESC_COMM == PWM)
 
@@ -21,10 +22,26 @@ static PWMConfig esc_pwm_cfg = {
 	1000,      // PWM period 1 ms.
 	NULL,      // No callback.
 	{
+#if (NUM_ROTORS == 2)
+		{PWM_OUTPUT_ACTIVE_HIGH, NULL},
+		{PWM_OUTPUT_ACTIVE_HIGH, NULL},
+		{PWM_OUTPUT_DISABLED, NULL},
+		{PWM_OUTPUT_DISABLED, NULL}
+#endif // NUM_ROTORS == 2
+
+#if (NUM_ROTORS == 3)
+		{PWM_OUTPUT_ACTIVE_HIGH, NULL},
+		{PWM_OUTPUT_ACTIVE_HIGH, NULL},
+		{PWM_OUTPUT_ACTIVE_HIGH, NULL},
+		{PWM_OUTPUT_DISABLED, NULL}
+#endif // NUM_ROTORS == 3
+
+#if (NUM_ROTORS == 4)
 		{PWM_OUTPUT_ACTIVE_HIGH, NULL},
 		{PWM_OUTPUT_ACTIVE_HIGH, NULL},
 		{PWM_OUTPUT_ACTIVE_HIGH, NULL},
 		{PWM_OUTPUT_ACTIVE_HIGH, NULL}
+#endif // NUM_ROTORS == 4
 	},
 
 	0   // HW dependent
@@ -39,10 +56,26 @@ static PWMConfig servo_pwm_cfg = {
 	1000,    // PWM period 20 ms.
 	NULL,    // No callback.
 	{
+#if (NUM_ROTORS == 2)
 		{PWM_OUTPUT_ACTIVE_HIGH, NULL},
 		{PWM_OUTPUT_ACTIVE_HIGH, NULL},
+		{PWM_OUTPUT_DISABLED, NULL},
+		{PWM_OUTPUT_DISABLED, NULL}
+#endif // NUM_ROTORS == 2
+
+#if (NUM_ROTORS == 3)
 		{PWM_OUTPUT_ACTIVE_HIGH, NULL},
-		{PWM_OUTPUT_ACTIVE_HIGH, NULL}
+		{PWM_OUTPUT_DISABLED, NULL},
+		{PWM_OUTPUT_DISABLED, NULL},
+		{PWM_OUTPUT_DISABLED, NULL}
+#endif // NUM_ROTORS == 3
+
+#if (NUM_ROTORS == 4)
+		{PWM_OUTPUT_DISABLED, NULL},
+		{PWM_OUTPUT_DISABLED, NULL},
+		{PWM_OUTPUT_DISABLED, NULL},
+		{PWM_OUTPUT_DISABLED, NULL}
+#endif // NUM_ROTORS == 4
 	},
 
 	0   // HW dependent
