@@ -1,10 +1,13 @@
 #ifndef MOTOR_H
 #define MOTOR_H
 
+#include "ch.h"
+#include "hal.h"
+
 void setup_motors(void);
 void update_motors(void);
 
-#if defined(ESC_PWM)
+#if (ESC_COMM == PWM)
 
 /*
  * PWM configuration structure for ESCs using channels 1 through 4 (PD12, PD13,
@@ -45,14 +48,14 @@ static PWMConfig servo_pwm_cfg = {
 	0   // HW dependent
 };
 
-#endif // ESC_PWM
+#endif // ESC_COMM == PWM
 
 
-#if defined(ESC_SPI)
+#if (ESC_COMM == SPI)
 
 
 
-#endif // ESC_SPI
+#endif // ESC_COMM == SPI
 
 #endif // MOTOR_H
 
