@@ -1,6 +1,11 @@
 #ifndef MOTOR_H
 #define MOTOR_H
 
+void setup_motors(void);
+void update_motors(void);
+
+#if defined(ESC_PWM)
+
 /*
  * PWM configuration structure for ESCs using channels 1 through 4 (PD12, PD13,
  * PD14, PD15) of TIM4.
@@ -39,6 +44,15 @@ static PWMConfig servo_pwm_cfg = {
 
 	0   // HW dependent
 };
+
+#endif // ESC_PWM
+
+
+#if defined(ESC_SPI)
+
+
+
+#endif // ESC_SPI
 
 #endif // MOTOR_H
 

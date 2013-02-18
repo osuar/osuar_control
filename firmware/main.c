@@ -48,23 +48,7 @@ static msg_t control_thread(void *arg)
 	(void) arg;
 	chRegSetThreadName("control");
 
-	/*
-	 * Enable timers.
-	 */
-	pwmStart(&PWMD4, &esc_pwm_cfg);     // Enable TIM4 for ESCs.
-	pwmStart(&PWMD3, &servo_pwm_cfg);   // Enable TIM3 for servos.
-
-	/*
-	 * Set up pins.
-	 */
-	palSetPadMode(GPIOD, GPIOD_LED3, PAL_MODE_ALTERNATE(2));
-	palSetPadMode(GPIOD, GPIOD_LED4, PAL_MODE_ALTERNATE(2));
-	palSetPadMode(GPIOD, GPIOD_LED5, PAL_MODE_ALTERNATE(2));
-	palSetPadMode(GPIOD, GPIOD_LED6, PAL_MODE_ALTERNATE(2));
-	palSetPadMode(GPIOB, GPIOB_PIN0, PAL_MODE_ALTERNATE(2));
-	palSetPadMode(GPIOB, GPIOB_PIN1, PAL_MODE_ALTERNATE(2));
-	palSetPadMode(GPIOB, GPIOB_PIN4, PAL_MODE_ALTERNATE(2));
-	palSetPadMode(GPIOB, GPIOB_PIN5, PAL_MODE_ALTERNATE(2));
+	setup_motors();
 
 	systime_t time = chTimeNow();
 	uint32_t i = 0;
@@ -78,14 +62,7 @@ static msg_t control_thread(void *arg)
 
 		// TODO: Update IMU.
 
-		pwmEnableChannel(&PWMD4, 0, PWM_FRACTION_TO_WIDTH(&PWMD4, 1000, i));
-		pwmEnableChannel(&PWMD4, 1, PWM_FRACTION_TO_WIDTH(&PWMD4, 1000, i));
-		pwmEnableChannel(&PWMD4, 2, PWM_FRACTION_TO_WIDTH(&PWMD4, 1000, i));
-		pwmEnableChannel(&PWMD4, 3, PWM_FRACTION_TO_WIDTH(&PWMD4, 1000, i));
-		pwmEnableChannel(&PWMD3, 0, PWM_FRACTION_TO_WIDTH(&PWMD3, 1000, i));
-		pwmEnableChannel(&PWMD3, 1, PWM_FRACTION_TO_WIDTH(&PWMD3, 1000, i));
-		pwmEnableChannel(&PWMD3, 2, PWM_FRACTION_TO_WIDTH(&PWMD3, 1000, i));
-		pwmEnableChannel(&PWMD3, 3, PWM_FRACTION_TO_WIDTH(&PWMD3, 1000, i));
+		update_motors();
 
 		chThdSleepUntil(time);
 	}
