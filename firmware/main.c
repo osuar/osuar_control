@@ -62,7 +62,7 @@ static msg_t control_thread(void *arg)
 
 		// TODO: Update IMU.
 
-		update_motors();
+		update_motors(i, i, i, i);
 
 		chThdSleepUntil(time);
 	}
