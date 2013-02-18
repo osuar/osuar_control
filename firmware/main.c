@@ -51,14 +51,14 @@ static msg_t control_thread(void *arg)
 	setup_motors();
 
 	systime_t time = chTimeNow();
-	uint32_t i = 0;
-	int dir = 1;
+	float i = 0;
+	float dir = 0.2;
 
 	while (TRUE) {
 		time += MS2ST(1);   // Next deadline in 1 ms.
 		i += dir;
-		if (i == 1000) dir = -1;
-		if (i == 0) dir = 1;
+		if (i > 1000.0) dir = -0.2;
+		if (i < 0.0) dir = 0.2;
 
 		// TODO: Update IMU.
 

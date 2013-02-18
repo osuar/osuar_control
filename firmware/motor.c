@@ -92,10 +92,10 @@ void update_motors(float a, float b, float c, float d)
 	 */
 #if (NUM_ROTORS == 4)
 	uint16_t mot1, mot2, mot3, mot4;
-	mot1 = a;
-	mot2 = b;
-	mot3 = c;
-	mot4 = d;
+	mot1 = (uint16_t) a;
+	mot2 = (uint16_t) b;
+	mot3 = (uint16_t) c;
+	mot4 = (uint16_t) d;
 
 #if (ESC_COMM == PWM)
 	pwmEnableChannel(&PWMD4, 0, PWM_FRACTION_TO_WIDTH(&PWMD4, 1000, mot1));   // Motor 1
