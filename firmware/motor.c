@@ -5,7 +5,7 @@
  */
 void setup_motors()
 {
-#if defined(ESC_PWM)
+#if (ESC_COMM == PWM)
 	/*
 	 * Enable timers.
 	 */
@@ -19,15 +19,15 @@ void setup_motors()
 	palSetPadMode(GPIOD, GPIOD_LED4, PAL_MODE_ALTERNATE(2));
 	palSetPadMode(GPIOD, GPIOD_LED5, PAL_MODE_ALTERNATE(2));
 	palSetPadMode(GPIOD, GPIOD_LED6, PAL_MODE_ALTERNATE(2));
-	palSetPadMode(GPIOB, GPIOB_LED0, PAL_MODE_ALTERNATE(2));
-	palSetPadMode(GPIOB, GPIOB_LED1, PAL_MODE_ALTERNATE(2));
-	palSetPadMode(GPIOB, GPIOB_LED4, PAL_MODE_ALTERNATE(2));
-	palSetPadMode(GPIOB, GPIOB_LED5, PAL_MODE_ALTERNATE(2));
-#endif // ESC_PWM
+	palSetPadMode(GPIOB, GPIOB_PIN0, PAL_MODE_ALTERNATE(2));
+	palSetPadMode(GPIOB, GPIOB_PIN1, PAL_MODE_ALTERNATE(2));
+	palSetPadMode(GPIOB, GPIOB_PIN4, PAL_MODE_ALTERNATE(2));
+	palSetPadMode(GPIOB, GPIOB_PIN5, PAL_MODE_ALTERNATE(2));
+#endif // ESC_COMM == PWM
 
-#if defined(ESC_SPI)
+#if (ESC_COMM == SPI)
 
-#endif // ESC_SPI
+#endif // ESC_COMM == SPI
 }
 
 /**
