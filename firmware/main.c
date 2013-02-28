@@ -37,6 +37,8 @@ static msg_t led_thread(void *arg)
 
 		chThdSleepUntil(time);
 	}
+
+	return 0;
 }
 
 /*
@@ -66,6 +68,8 @@ static msg_t control_thread(void *arg)
 
 		chThdSleepUntil(time);
 	}
+
+	return 0;
 }
 
 
