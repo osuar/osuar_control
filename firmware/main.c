@@ -1,17 +1,17 @@
 // ChibiOS
-#include "ch.h"
-#include "hal.h"
+#include <ch.h>
+#include <hal.h>
 
 // Drivers
-#include "i2c.h"
-#include "pid.h"   // PID function definition
-#include "mpu6050.h"   // MPU-6050
+#include <i2c.h>
+#include <pid.h>   // PID function definition
+#include <mpu6050.h>   // MPU-6050
 
 // Flight controller
-#include "ahrs.h"   // Attitude-Heading Reference System
-#include "comm.h"   // Communications code (wired and wireless)
-#include "motor.h"   // Motor control
-#include "config.h"   // General configuration
+#include <ahrs.h>   // Attitude-Heading Reference System
+#include <comm.h>   // Communications code (wired and wireless)
+#include <motor.h>   // Motor control
+#include <config.h>   // General configuration
 
 
 /*

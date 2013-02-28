@@ -1,9 +1,9 @@
 #ifndef MOTOR_H
 #define MOTOR_H
 
-#include "ch.h"
-#include "hal.h"
-#include "config.h"
+#include <ch.h>
+#include <hal.h>
+#include <config.h>
 
 void setup_motors(void);
 void update_motors(float, float, float, float);
