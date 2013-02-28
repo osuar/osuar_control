@@ -74,6 +74,36 @@ static msg_t comm_thread(void *arg)
 }
 
 /*
+ * Second communications loop
+ */
+static WORKING_AREA(wa_comm_thread_2, 128);
+static msg_t comm_thread_2(void *arg)
+{
+	(void) arg;
+	chRegSetThreadName("communications 2");
+	systime_t time = chTimeNow();
+	int counter = 0;
+
+	char txbuf[20];
+
+	while (TRUE) {
+		time += MS2ST(234);   // Next deadline in 1 second.
+		counter++;
+
+		sprintf(txbuf, "Je vis aussi!\r\n");
+		uartStartSend(&UARTD3, sizeof(txbuf), txbuf);
+
+		palSetPad(GPIOD, GPIOD_LED5);
+		chThdSleepMilliseconds(50);
+		palClearPad(GPIOD, GPIOD_LED5);
+
+		chThdSleepUntil(time);
+	}
+
+	return 0;
+}
+
+/*
  * Control loop
  */
 static WORKING_AREA(wa_control_thread, 128);
@@ -148,6 +178,11 @@ int main(void)
 	 * Create the communications thread.
 	 */
 	chThdCreateStatic(wa_comm_thread, sizeof(wa_comm_thread), NORMALPRIO, comm_thread, NULL);
+
+	/*
+	 * Create the second communications thread.
+	 */
+	chThdCreateStatic(wa_comm_thread_2, sizeof(wa_comm_thread_2), NORMALPRIO, comm_thread_2, NULL);
 
 	/*
 	 * Create control thread.
