@@ -96,17 +96,23 @@ int main(void)
 
 	/*
 	 * Initialize SPI driver 3.
-	 * PA15 - NSS
+	 * PB0, PB1, PC4, PC5 - slave select lines
 	 * PC10 - SCK
 	 * PC11 - MISO
 	 * PC12 - MOSI
 	 */
-	spiStart(&SPID3, &spi3cfg);
-	palSetPad(GPIOA, 15);
-	palSetPadMode(GPIOA, 15, PAL_MODE_OUTPUT_PUSHPULL | PAL_STM32_OSPEED_HIGHEST);
-	palSetPadMode(GPIOC, 10, PAL_MODE_ALTERNATE(5)    | PAL_STM32_OSPEED_HIGHEST);
+	//spiStart(&SPID3, &spi3cfg);   // TODO: Do I need to call this before palSetPad() and such?
+	palSetPad(GPIOB, 0);
+	palSetPad(GPIOB, 1);
+	palSetPad(GPIOC, 4);
+	palSetPad(GPIOC, 5);
+	palSetPadMode(GPIOB, 0, PAL_MODE_OUTPUT_PUSHPULL | PAL_STM32_OSPEED_HIGHEST);
+	palSetPadMode(GPIOB, 1, PAL_MODE_OUTPUT_PUSHPULL | PAL_STM32_OSPEED_HIGHEST);
+	palSetPadMode(GPIOC, 4, PAL_MODE_OUTPUT_PUSHPULL | PAL_STM32_OSPEED_HIGHEST);
+	palSetPadMode(GPIOC, 5, PAL_MODE_OUTPUT_PUSHPULL | PAL_STM32_OSPEED_HIGHEST);
+	palSetPadMode(GPIOC, 10, PAL_MODE_ALTERNATE(5)   | PAL_STM32_OSPEED_HIGHEST);
 	palSetPadMode(GPIOC, 11, PAL_MODE_ALTERNATE(5));
-	palSetPadMode(GPIOC, 12, PAL_MODE_ALTERNATE(5)    | PAL_STM32_OSPEED_HIGHEST);
+	palSetPadMode(GPIOC, 12, PAL_MODE_ALTERNATE(5)   | PAL_STM32_OSPEED_HIGHEST);
 
 	/*
 	 * Initialize ADC driver 1 and set the following as inputs:
