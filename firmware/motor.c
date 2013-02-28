@@ -24,6 +24,7 @@ void setup_motors()
 	//palSetPadMode(GPIOB, GPIOB_PIN4, PAL_MODE_ALTERNATE(2));
 	//palSetPadMode(GPIOB, GPIOB_PIN5, PAL_MODE_ALTERNATE(2));
 
+
 #if (ESC_COMM == PWM)
 	/*
 	 * Configure ESC timer.
@@ -46,7 +47,36 @@ void setup_motors()
 
 #endif // ESC_COMM == PWM
 
+
 #if (ESC_COMM == SPI)
+
+	/*
+	 * Initialize SPI driver 3.
+	 * PB0, PB1, PC4, PC5 - slave select lines
+	 * PC10 - SCK
+	 * PC11 - MISO
+	 * PC12 - MOSI
+	 */
+	//spiStart(&SPID3, &spi3cfg);   // TODO: Do I need to call this before palSetPad() and such?
+	palSetPadMode(GPIOC, 10, PAL_MODE_ALTERNATE(5) | PAL_STM32_OSPEED_HIGHEST);
+	palSetPadMode(GPIOC, 11, PAL_MODE_ALTERNATE(5));
+	palSetPadMode(GPIOC, 12, PAL_MODE_ALTERNATE(5) | PAL_STM32_OSPEED_HIGHEST);
+
+	palSetPad(GPIOB, 0);
+	palSetPadMode(GPIOB, 0, PAL_MODE_OUTPUT_PUSHPULL | PAL_STM32_OSPEED_HIGHEST);
+	palSetPad(GPIOB, 1);
+	palSetPadMode(GPIOB, 1, PAL_MODE_OUTPUT_PUSHPULL | PAL_STM32_OSPEED_HIGHEST);
+
+#if (NUM_ROTORS > 2)
+	palSetPad(GPIOC, 4);
+	palSetPadMode(GPIOC, 4, PAL_MODE_OUTPUT_PUSHPULL | PAL_STM32_OSPEED_HIGHEST);
+#endif // NUM_ROTORS > 2
+
+#if (NUM_ROTORS > 3)
+	palSetPad(GPIOC, 5);
+	palSetPadMode(GPIOC, 5, PAL_MODE_OUTPUT_PUSHPULL | PAL_STM32_OSPEED_HIGHEST);
+#endif // NUM_ROTORS > 3
+
 #endif // ESC_COMM == SPI
 }
 
