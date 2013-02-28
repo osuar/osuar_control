@@ -56,8 +56,6 @@ static msg_t comm_thread(void *arg)
 
 	char txbuf[20];
 
-	setup_comm();   // TODO: This hangs thread, I think.
-
 	while (TRUE) {
 		time += MS2ST(100);   // Next deadline in 1 second.
 		counter++;
@@ -121,6 +119,8 @@ int main(void)
 	 */
 	halInit();
 	chSysInit();
+
+	setup_comm();   // TODO: This hangs thread, I think.
 
 	/*
 	 * Initialize ADC driver 1 and set the following as inputs:
