@@ -85,6 +85,16 @@ int main(void)
 	chSysInit();
 
 	/*
+	 * Activate USART2 and USART4
+	 */
+	sdStart(&SD2, NULL);
+	sdStart(&SD4, NULL);
+	palSetPadMode(GPIOA, 0, PAL_MODE_ALTERNATE(7));   // USART4 TX
+	palSetPadMode(GPIOA, 1, PAL_MODE_ALTERNATE(7));   // USART4 RX
+	palSetPadMode(GPIOA, 2, PAL_MODE_ALTERNATE(7));   // USART2 TX
+	palSetPadMode(GPIOA, 3, PAL_MODE_ALTERNATE(7));   // USART2 RX
+
+	/*
 	 * Create the LED thread.
 	 */
 	chThdCreateStatic(wa_led_thread, sizeof(wa_led_thread), NORMALPRIO, led_thread, NULL);
