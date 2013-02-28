@@ -109,6 +109,18 @@ int main(void)
 	palSetPadMode(GPIOC, 12, PAL_MODE_ALTERNATE(5)    | PAL_STM32_OSPEED_HIGHEST);
 
 	/*
+	 * Initialize ADC driver 1 and set the following as inputs:
+	 * PA4, PA5, PC0, PC1, PC2, PC3
+	 */
+	adcStart(&ADCD1, NULL);
+	palSetPadMode(GPIOA, 4, PAL_MODE_INPUT_ANALOG);
+	palSetPadMode(GPIOA, 5, PAL_MODE_INPUT_ANALOG);
+	palSetPadMode(GPIOC, 0, PAL_MODE_INPUT_ANALOG);
+	palSetPadMode(GPIOC, 1, PAL_MODE_INPUT_ANALOG);
+	palSetPadMode(GPIOC, 2, PAL_MODE_INPUT_ANALOG);
+	palSetPadMode(GPIOC, 3, PAL_MODE_INPUT_ANALOG);
+
+	/*
 	 * Create the LED thread.
 	 */
 	chThdCreateStatic(wa_led_thread, sizeof(wa_led_thread), NORMALPRIO, led_thread, NULL);
