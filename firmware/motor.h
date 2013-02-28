@@ -11,13 +11,13 @@ void update_motors(float, float, float, float);
 #if (ESC_COMM == PWM)
 
 /*
- * PWM configuration structure for ESCs using channels 1 through 4 (PD12, PD13,
- * PD14, PD15) of TIM4.
+ * PWM configuration structure for ESCs using channels 1 through 4 (PC6, PC7,
+ * PC8, PC9) of TIM8.
  *
  * See datasheet page 29 for available timers and their capabilities.
  * See datasheet page 45 for pinouts.
  */
-static PWMConfig esc_pwm_cfg = {
+static PWMConfig pwm8cfg = {
 	1000000,   // 1 MHz PWM clock frequency.
 	1000,      // PWM period 1 ms.
 	NULL,      // No callback.
@@ -48,38 +48,41 @@ static PWMConfig esc_pwm_cfg = {
 };
 
 /*
- * PWM configuration structure for servos using channels 1 through 4 (PB4, PB5,
- * PB0, PB1) of TIM3.
+ * PWM configuration structures for servos using one or both of:
+ * PA8 - TIM1 channel 1
+ * PB5 - TIM3 channel 2
  */
-static PWMConfig servo_pwm_cfg = {
+#if (NUM_ROTORS < 4)
+static PWMConfig pwm1cfg = {
 	50000,   // 50 kHz PWM clock frequency.
 	1000,    // PWM period 20 ms.
 	NULL,    // No callback.
 	{
-#if (NUM_ROTORS == 2)
-		{PWM_OUTPUT_ACTIVE_HIGH, NULL},
-		{PWM_OUTPUT_ACTIVE_HIGH, NULL},
-		{PWM_OUTPUT_DISABLED, NULL},
-		{PWM_OUTPUT_DISABLED, NULL}
-#endif // NUM_ROTORS == 2
-
-#if (NUM_ROTORS == 3)
 		{PWM_OUTPUT_ACTIVE_HIGH, NULL},
 		{PWM_OUTPUT_DISABLED, NULL},
 		{PWM_OUTPUT_DISABLED, NULL},
 		{PWM_OUTPUT_DISABLED, NULL}
-#endif // NUM_ROTORS == 3
-
-#if (NUM_ROTORS == 4)
-		{PWM_OUTPUT_DISABLED, NULL},
-		{PWM_OUTPUT_DISABLED, NULL},
-		{PWM_OUTPUT_DISABLED, NULL},
-		{PWM_OUTPUT_DISABLED, NULL}
-#endif // NUM_ROTORS == 4
 	},
 
 	0   // HW dependent
 };
+#endif // NUM_ROTORS < 4
+
+#if (NUM_ROTORS < 3)
+static PWMConfig pwm3cfg = {
+	50000,   // 50 kHz PWM clock frequency.
+	1000,    // PWM period 20 ms.
+	NULL,    // No callback.
+	{
+		{PWM_OUTPUT_DISABLED, NULL},
+		{PWM_OUTPUT_ACTIVE_HIGH, NULL},
+		{PWM_OUTPUT_DISABLED, NULL},
+		{PWM_OUTPUT_DISABLED, NULL}
+	},
+
+	0   // HW dependent
+};
+#endif // NUM_ROTORS < 3
 
 #endif // ESC_COMM == PWM
 
