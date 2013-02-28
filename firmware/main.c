@@ -2,6 +2,8 @@
 #include <ch.h>
 #include <hal.h>
 
+#include <stdio.h>
+
 // Drivers
 #include <i2c.h>
 #include <pid.h>   // PID function definition
@@ -42,6 +44,38 @@ static msg_t led_thread(void *arg)
 }
 
 /*
+ * Communications loop
+ */
+static WORKING_AREA(wa_comm_thread, 128);
+static msg_t comm_thread(void *arg)
+{
+	(void) arg;
+	chRegSetThreadName("communications");
+	systime_t time = chTimeNow();
+	int counter = 0;
+
+	char txbuf[20];
+
+	setup_comm();   // TODO: This hangs thread, I think.
+
+	while (TRUE) {
+		time += MS2ST(100);   // Next deadline in 1 second.
+		counter++;
+
+		sprintf(txbuf, "Je vis!\r\n");
+		uartStartSend(&UARTD2, sizeof(txbuf), txbuf);
+
+		palSetPad(GPIOD, GPIOD_LED4);
+		chThdSleepMilliseconds(50);
+		palClearPad(GPIOD, GPIOD_LED4);
+
+		chThdSleepUntil(time);
+	}
+
+	return 0;
+}
+
+/*
  * Control loop
  */
 static WORKING_AREA(wa_control_thread, 128);
@@ -51,7 +85,6 @@ static msg_t control_thread(void *arg)
 	chRegSetThreadName("control");
 
 	setup_motors();
-	setup_comm();   // TODO: This hangs thread, I think.
 
 	systime_t time = chTimeNow();
 	float i = 0;
@@ -105,6 +138,11 @@ int main(void)
 	 * Create the LED thread.
 	 */
 	chThdCreateStatic(wa_led_thread, sizeof(wa_led_thread), NORMALPRIO, led_thread, NULL);
+
+	/*
+	 * Create the communications thread.
+	 */
+	chThdCreateStatic(wa_comm_thread, sizeof(wa_comm_thread), NORMALPRIO, comm_thread, NULL);
 
 	/*
 	 * Create control thread.
