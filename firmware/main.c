@@ -95,6 +95,20 @@ int main(void)
 	palSetPadMode(GPIOA, 3, PAL_MODE_ALTERNATE(7));   // USART2 RX
 
 	/*
+	 * Initialize SPI driver 3.
+	 * PA15 - NSS
+	 * PC10 - SCK
+	 * PC11 - MISO
+	 * PC12 - MOSI
+	 */
+	spiStart(&SPID3, &spi3cfg);
+	palSetPad(GPIOA, 15);
+	palsetPadMode(GPIOA, 15, PAL_MODE_OUTPUT_PUSHPULL | PAL_STM32_OSPEED_HIGHEST);
+	palSetPadMode(GPIOC, 10, PAL_MODE_ALTERNATE(5)    | PAL_STM32_OSPEED_HIGHEST);
+	palSetPadMode(GPIOC, 11, PAL_MODE_ALTERNATE(5));
+	palSetPadMode(GPIOC, 12, PAL_MODE_ALTERNATE(5)    | PAL_STM32_OSPEED_HIGHEST);
+
+	/*
 	 * Create the LED thread.
 	 */
 	chThdCreateStatic(wa_led_thread, sizeof(wa_led_thread), NORMALPRIO, led_thread, NULL);
