@@ -62,7 +62,7 @@ static msg_t control_thread(void *arg)
 		if (i > 1000.0) dir = -0.2;
 		if (i < 0.0) dir = 0.2;
 
-		// TODO: Update IMU.
+		update_ahrs();
 
 		update_motors(i, i, i, i);
 
