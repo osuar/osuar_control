@@ -171,4 +171,13 @@ void update_motors(float a, float b, float c, float d)
 #endif // NUM_ROTORS == 4
 }
 
+/*
+ * SPI end transfer callback.
+ */
+static void spicb(SPIDriver *spip)
+{
+	chSysLockFromIsr();
+	spiUnselectI(spip);   // Release slave select line.
+	chSysUnlockFromIsr();
+}
 
