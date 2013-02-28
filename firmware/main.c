@@ -135,6 +135,11 @@ int main(void)
 	palSetPadMode(GPIOC, 3, PAL_MODE_INPUT_ANALOG);
 
 	/*
+	 * Short delay to let the various setup functions finish.
+	 */
+	chThdSleepMilliseconds(1);
+
+	/*
 	 * Create the LED thread.
 	 */
 	chThdCreateStatic(wa_led_thread, sizeof(wa_led_thread), NORMALPRIO, led_thread, NULL);
