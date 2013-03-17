@@ -105,6 +105,33 @@ static msg_t comm_thread_2(void *arg)
 }
 
 /*
+ * ADC loop
+ */
+static WORKING_AREA(wa_adc_thread, 128);
+static msg_t adc_thread(void *arg)
+{
+	(void) arg;
+	chRegSetThreadName("adc");
+	systime_t time = chTimeNow();
+
+	while (TRUE) {
+		time += MS2ST(500);
+
+		update_adc();
+
+		uint16_t dutyCycle = avg_ch[3] * 500/4096 + 1;
+
+		palSetPad(GPIOD, 15);
+		chThdSleepMilliseconds(dutyCycle);
+		palClearPad(GPIOD, 15);
+
+		chThdSleepUntil(time);
+	}
+
+	return 0;
+}
+
+/*
  * Control loop
  */
 static WORKING_AREA(wa_control_thread, 128);
@@ -174,6 +201,11 @@ int main(void)
 	 * Create the second communications thread.
 	 */
 	chThdCreateStatic(wa_comm_thread_2, sizeof(wa_comm_thread_2), NORMALPRIO, comm_thread_2, NULL);
+
+	/*
+	 * Create the ADC thread.
+	 */
+	chThdCreateStatic(wa_adc_thread, sizeof(wa_adc_thread), NORMALPRIO, adc_thread, NULL);
 
 	/*
 	 * Create control thread.

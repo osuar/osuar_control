@@ -1,5 +1,12 @@
 #include <osuar_adc.h>
 
+/*
+ * ADC samples buffer.
+ */
+static adcsample_t samples[ADC_NUM_CHANNELS * ADC_GRP1_BUF_DEPTH];
+
+adcsample_t avg_ch[ADC_NUM_CHANNELS];
+
 void setup_adc(void)
 {
 	/*
@@ -7,6 +14,7 @@ void setup_adc(void)
 	 * PC1, PC2, PC3
 	 */
 	adcStart(&ADCD1, NULL);
+
 	palSetPadMode(GPIOA, 4, PAL_MODE_INPUT_ANALOG);
 	palSetPadMode(GPIOA, 5, PAL_MODE_INPUT_ANALOG);
 	palSetPadMode(GPIOC, 0, PAL_MODE_INPUT_ANALOG);
@@ -28,16 +36,14 @@ void update_adc(void)
  * The latest samples are transmitted into a single SPI transaction.
  */
 void adccb(ADCDriver *adcp, adcsample_t *buffer, size_t n) {
-
-  (void) buffer; (void) n;
-  /* Note, only in the ADC_COMPLETE state because the ADC driver fires an
-     intermediate callback when the buffer is half full.*/
-  if (adcp->state == ADC_COMPLETE) {
-    adcsample_t avg_ch1, avg_ch2;
-
-    /* Calculates the average values from the ADC samples.*/
-    avg_ch1 = (samples[0] + samples[2] + samples[4] + samples[6]) / 4;
-    avg_ch2 = (samples[1] + samples[3] + samples[5] + samples[7]) / 4;
-  }
+	(void) buffer; (void) n;
+	/* Note, only in the ADC_COMPLETE state because the ADC driver fires an
+	 * intermediate callback when the buffer is half full. */
+	if (adcp->state == ADC_COMPLETE) {
+		int i=0;
+		for (i=0; i<6; i++) {
+			avg_ch[i] = (samples[i] + samples[i+1] + samples[i+2] + samples[i+3]) / 4;
+		}
+	}
 }
 
