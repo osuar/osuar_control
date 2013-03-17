@@ -42,9 +42,9 @@ static const ADCConversionGroup adcgrpcfg = {
   /* HW dependent part.*/
   0,   // CR1 initialization data
   ADC_CR2_SWSTART,   // CR2 initialization data
-  ADC_SMPR1_SMP_AN10(ADC_SAMPLE_56) | ADC_SMPR1_SMP_AN11(ADC_SAMPLE_56) |
-  ADC_SMPR1_SMP_AN12(ADC_SAMPLE_56) | ADC_SMPR1_SMP_AN13(ADC_SAMPLE_56),   // SMPR1 initialization data
-  ADC_SMPR2_SMP_AN4(ADC_SAMPLE_56) | ADC_SMPR2_SMP_AN5(ADC_SAMPLE_56),   // SMPR2 initialization data
+  ADC_SMPR1_SMP_AN13(ADC_SAMPLE_56) | ADC_SMPR1_SMP_AN12(ADC_SAMPLE_56) |
+  ADC_SMPR1_SMP_AN11(ADC_SAMPLE_56) | ADC_SMPR1_SMP_AN10(ADC_SAMPLE_56),   // SMPR1 initialization data
+  ADC_SMPR2_SMP_AN5(ADC_SAMPLE_56) | ADC_SMPR2_SMP_AN4(ADC_SAMPLE_56),   // SMPR2 initialization data
   ADC_SQR1_NUM_CH(ADC_NUM_CHANNELS),   // SQR1 initialization data
   0,   // SQR2 initialization data
   ADC_SQR3_SQ6_N(ADC_CHANNEL_IN13) | ADC_SQR3_SQ5_N(ADC_CHANNEL_IN12) |
