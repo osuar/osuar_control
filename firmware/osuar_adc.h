@@ -10,17 +10,12 @@
 /* Depth of the conversion buffer, channels are sampled four times each.*/
 #define ADC_GRP1_BUF_DEPTH      4
 
-void setup_adc(void);
-void update_adc(void);
-extern void adccb(ADCDriver *adcp, adcsample_t *buffer, size_t n);
-
 /* Average values from ADC samples. */
 extern adcsample_t avg_ch[ADC_NUM_CHANNELS];
 
-/*
- * ADC samples buffer.
- */
-//adcsample_t samples[ADC_GRP1_NUM_CHANNELS * ADC_GRP1_BUF_DEPTH];
+extern void setup_adc(void);
+extern void update_adc(void);
+extern void adccb(ADCDriver *adcp, adcsample_t *buffer, size_t n);
 
 /*
  * ADC conversion group.
