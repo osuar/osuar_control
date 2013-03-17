@@ -21,11 +21,18 @@ extern void adccb(ADCDriver *adcp, adcsample_t *buffer, size_t n);
  * ADC conversion group.
  * Mode:        Linear buffer, 4 samples of 6 channels, SW triggered.
  * Channels:    IN4, IN5, IN10, IN11, IN12, IN13 (48 cycles sample time)
+ * ===
+ * Usage notes:
  *
- * NOTE: The SQR, or sequence, registers, are named appropriately: they specify
- * the order in which the ADC driver will sample the channels. Here, the
- * channels are sampled in the order given above. See the definition of
- * ADCConversionGroup in adc_lld.h.
+ * TODO: Figure out what the CR registers do.
+ *
+ * The SMPR registers specify sample times. SMPR1 is for channels 10--18. SMPR2
+ * is for channels 0--9. Since we use channels in both ranges, we specify both
+ * SMPR registers.
+ *
+ * The SQR registers specify the sequence in which the ADC driver will sample
+ * the channels. Here, the channels are sampled in the order given above. See
+ * the definition of ADCConversionGroup in adc_lld.h.
  */
 static const ADCConversionGroup adcgrpcfg = {
   FALSE,   // Linear buffer (TRUE for circular)
@@ -36,7 +43,7 @@ static const ADCConversionGroup adcgrpcfg = {
   0,   // CR1 initialization data
   ADC_CR2_SWSTART,   // CR2 initialization data
   ADC_SMPR1_SMP_AN11(ADC_SAMPLE_56),   // SMPR1 initialization data
-  0,    // SMPR2 initialization data
+  ADC_SMPR2_SMP_AN11(ADC_SAMPLE_56),   // SMPR2 initialization data
   ADC_SQR1_NUM_CH(ADC_NUM_CHANNELS),   // SQR1 initialization data
   0,   // SQR2 initialization data
   ADC_SQR3_SQ6_N(ADC_CHANNEL_IN13) | ADC_SQR3_SQ5_N(ADC_CHANNEL_IN12) |
