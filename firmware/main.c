@@ -58,7 +58,7 @@ static msg_t comm_thread(void *arg)
 	char txbuf[20];
 
 	while (TRUE) {
-		time += MS2ST(100);   // Next deadline in 1 second.
+		time += MS2ST(100);
 		counter++;
 
 		sprintf(txbuf, "Je vis!\r\n");
@@ -88,7 +88,7 @@ static msg_t comm_thread_2(void *arg)
 	char txbuf[20];
 
 	while (TRUE) {
-		time += MS2ST(234);   // Next deadline in 1 second.
+		time += MS2ST(234);
 		counter++;
 
 		sprintf(txbuf, "Je vis aussi!\r\n");
