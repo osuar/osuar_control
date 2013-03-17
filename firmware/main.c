@@ -119,7 +119,7 @@ static msg_t adc_thread(void *arg)
 
 		update_adc();
 
-		uint16_t dutyCycle = avg_ch[3] * 500/4096 + 1;
+		uint16_t dutyCycle = avg_ch[3] * 500/4096 + 1;   // TODO: The +1 at the end makes this work. Why?
 
 		palSetPad(GPIOD, 15);
 		chThdSleepMilliseconds(dutyCycle);
