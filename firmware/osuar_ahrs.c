@@ -1,4 +1,4 @@
-#include <ahrs.h>
+#include <osuar_ahrs.h>
 
 void setup_ahrs(void)
 {

@@ -1,4 +1,4 @@
-#include <comm.h>
+#include <osuar_comm.h>
 
 void setup_comm(void)
 {

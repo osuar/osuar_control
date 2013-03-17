@@ -3,7 +3,7 @@
 
 #include <ch.h>
 #include <hal.h>
-#include <config.h>
+#include <osuar_config.h>
 
 void setup_ahrs(void);
 void update_ahrs(void);
