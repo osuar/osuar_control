@@ -5,15 +5,16 @@
 #include <stdio.h>
 
 // Drivers
-#include <i2c.h>
-#include <pid.h>   // PID function definition
-#include <mpu6050.h>   // MPU-6050
+#include <osuar_adc.h>   // ADC code
+#include <osuar_i2c.h>
+#include <osuar_pid.h>   // PID function definition
+#include <osuar_mpu6050.h>   // MPU-6050
 
 // Flight controller
-#include <ahrs.h>   // Attitude-Heading Reference System
-#include <comm.h>   // Communications code (wired and wireless)
-#include <motor.h>   // Motor control
-#include <config.h>   // General configuration
+#include <osuar_ahrs.h>   // Attitude-Heading Reference System
+#include <osuar_comm.h>   // Communications code (wired and wireless)
+#include <osuar_motor.h>   // Motor control
+#include <osuar_config.h>   // General configuration
 
 
 /*
@@ -152,17 +153,7 @@ int main(void)
 
 	setup_comm();   // TODO: This hangs thread, I think.
 
-	/*
-	 * Initialize ADC driver 1 and set the following as inputs:
-	 * PA4, PA5, PC0, PC1, PC2, PC3
-	 */
-	adcStart(&ADCD1, NULL);
-	palSetPadMode(GPIOA, 4, PAL_MODE_INPUT_ANALOG);
-	palSetPadMode(GPIOA, 5, PAL_MODE_INPUT_ANALOG);
-	palSetPadMode(GPIOC, 0, PAL_MODE_INPUT_ANALOG);
-	palSetPadMode(GPIOC, 1, PAL_MODE_INPUT_ANALOG);
-	palSetPadMode(GPIOC, 2, PAL_MODE_INPUT_ANALOG);
-	palSetPadMode(GPIOC, 3, PAL_MODE_INPUT_ANALOG);
+	setup_adc();
 
 	/*
 	 * Short delay to let the various setup functions finish.
