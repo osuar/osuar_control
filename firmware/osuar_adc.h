@@ -19,9 +19,13 @@ extern void adccb(ADCDriver *adcp, adcsample_t *buffer, size_t n);
 
 /*
  * ADC conversion group.
- * Mode:        Linear buffer, 4 samples of 2 channels, SW triggered.
- * Channels:    IN11   (48 cycles sample time)
- *              Sensor (192 cycles sample time)
+ * Mode:        Linear buffer, 4 samples of 6 channels, SW triggered.
+ * Channels:    IN4, IN5, IN10, IN11, IN12, IN13 (48 cycles sample time)
+ *
+ * NOTE: The SQR, or sequence, registers, are named appropriately: they specify
+ * the order in which the ADC driver will sample the channels. Here, the
+ * channels are sampled in the order given above. See the definition of
+ * ADCConversionGroup in adc_lld.h.
  */
 static const ADCConversionGroup adcgrpcfg = {
   FALSE,   // Linear buffer (TRUE for circular)
