@@ -1,6 +1,8 @@
 #ifndef I2C_H
 #define I2C_H
 
+#define OSUAR_I2C_TIMEOUT 16800   // TODO: 16800 ticks.. does this equal a timeout of 100 us?
+
 /*
  * I2C configuration structure.
  *
