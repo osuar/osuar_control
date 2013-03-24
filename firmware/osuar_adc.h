@@ -32,7 +32,8 @@ extern void adccb(ADCDriver *adcp, adcsample_t *buffer, size_t n);
  *
  * The SQR registers specify the sequence in which the ADC driver will sample
  * the channels. Here, the channels are sampled in the order given above. See
- * the definition of ADCConversionGroup in adc_lld.h.
+ * the definition of ADCConversionGroup in adc_lld.h and bit definitions
+ * starting on line 1400 in stm32f4xx.h.
  */
 static const ADCConversionGroup adcgrpcfg = {
 	FALSE,   // Linear buffer (TRUE for circular)
@@ -49,7 +50,7 @@ static const ADCConversionGroup adcgrpcfg = {
 	ADC_SMPR2_SMP_AN5(ADC_SAMPLE_56)  |
 	ADC_SMPR2_SMP_AN4(ADC_SAMPLE_56)  ,   // SMPR2 initialization data
 	ADC_SQR1_NUM_CH(ADC_NUM_CHANNELS) ,   // SQR1 initialization data
-	ADC_SQR2_SQ6_N(ADC_CHANNEL_IN13)  ,   // SQR2 initialization data
+	ADC_SQR2_SQ7_N(ADC_CHANNEL_IN13)  ,   // SQR2 initialization data
 	ADC_SQR3_SQ5_N(ADC_CHANNEL_IN12)  |
 	ADC_SQR3_SQ4_N(ADC_CHANNEL_IN11)  |
 	ADC_SQR3_SQ3_N(ADC_CHANNEL_IN10)  |
