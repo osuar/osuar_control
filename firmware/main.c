@@ -140,6 +140,8 @@ static msg_t control_thread(void *arg)
 	(void) arg;
 	chRegSetThreadName("control");
 
+	setup_ahrs();
+
 	setup_motors();
 
 	systime_t time = chTimeNow();
