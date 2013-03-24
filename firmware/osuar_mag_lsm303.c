@@ -1,23 +1,33 @@
 #include <osuar_mag_lsm303.h>
 
-msg_t mag_transmit(uint8_t* txbuf, size_t txsize, uint8_t* rxbuf, size_t, rxsize)
+static uint8_t mag_tx_data[8];
+static uint8_t mag_rx_data[8];
+
+static int16_t mRaw[3];   // Raw 16-bit readings of magnetometer.
+static float mVec[3];   // Vector to magnetic north.
+
+msg_t mag_transmit(uint8_t *txbuf, size_t txsize, uint8_t *rxbuf, size_t rxsize);
+msg_t mag_receive(uint8_t *rxbuf, size_t rxsize);
+
+
+msg_t mag_transmit(uint8_t* txbuf, size_t txsize, uint8_t* rxbuf, size_t rxsize)
 {
-	return i2cMasterTransmitTimeout(I2CD1,
-			LSM303_mag_ADDRESS,
+	return i2cMasterTransmitTimeout(&I2CD1,
+			MAG_LSM303_ADDRESS,
 			txbuf,   // TX buffer
 			txsize,   // Number of bytes to send
 			rxbuf,   // RX buffer
 			rxsize,   // Number of bytes to read
-			OSUAR_I2C_TIMEOUT)   // Number of ticks before timeout
+			OSUAR_I2C_TIMEOUT);   // Number of ticks before timeout
 }
 
 msg_t mag_receive(uint8_t* rxbuf, size_t rxsize)
 {
-	return i2cMasterReceiveTimeout(I2CD1,
-			LSM303_mag_ADDRESS,
+	return i2cMasterReceiveTimeout(&I2CD1,
+			MAG_LSM303_ADDRESS,
 			rxbuf,   // RX buffer
 			rxsize,   // Number of bytes to read
-			OSUAR_I2C_TIMEOUT)   // Number of ticks before timeout
+			OSUAR_I2C_TIMEOUT);   // Number of ticks before timeout
 }
 
 void init_mag(void)
