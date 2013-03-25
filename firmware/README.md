@@ -4,10 +4,10 @@ The code in this directory is built for the STM32F405 that powers the flight con
 
 ## Files and their purposes
 
-ahrs.h:		Attitude Heading Reference System
-comm.h:		Communications code (wired and wireless)
-config.h:	General configuration
-motor.h:	Motor control
-mpu6050.h:	MPU-6050 3-axis accelerometer and 3-axis gyroscope
-pid.h:		PID function definition
+* ahrs.h:		Attitude Heading Reference System
+* comm.h:		Communications code (wired and wireless)
+* config.h:		General configuration
+* motor.h:		Motor control
+* mpu6050.h:	MPU-6050 3-axis accelerometer and 3-axis gyroscope
+* pid.h:		PID function definition
 
