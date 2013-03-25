@@ -47,7 +47,7 @@ static msg_t led_thread(void *arg)
 /*
  * Communications loop
  */
-static WORKING_AREA(wa_comm_thread, 128);
+static WORKING_AREA(wa_comm_thread, 1280);
 static msg_t comm_thread(void *arg)
 {
 	(void) arg;
@@ -57,12 +57,16 @@ static msg_t comm_thread(void *arg)
 
 	char txbuf[20];
 
+	float mag[3];
+
 	while (TRUE) {
 		time += MS2ST(100);
 		counter++;
 
-		sprintf(txbuf, "Je vis!\r\n");
-		uartStartSend(&UARTD2, sizeof(txbuf), txbuf);
+		get_mag(mag);
+
+		sprintf(txbuf, "X: %d  Y: %d  Z: %d\r\n", (int) mag[0], (int) mag[1], (int) mag[2]);
+		uartStartSend(&UARTD1, sizeof(txbuf), txbuf);
 
 		palSetPad(GPIOD, GPIOD_LED4);
 		chThdSleepMilliseconds(50);
