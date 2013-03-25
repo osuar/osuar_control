@@ -8,9 +8,9 @@
 void setup_comm(void);
 
 /*
- * USART2 configuration structure.
+ * USART1 configuration structure.
  */
-static const UARTConfig uart2cfg = {
+static const UARTConfig uart1cfg = {
 	NULL,          /* End of Transmission buffer callback               */
 	NULL,          /* Physical end of transmission callback             */
 	NULL,          /* Receive buffer filled callback                    */
