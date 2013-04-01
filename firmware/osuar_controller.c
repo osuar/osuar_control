@@ -55,3 +55,40 @@ void angular_velocity_controller (float* cur_vel, float* des_vel, float* dc_shif
 	dc_shift[2] = step_pid(cur_vel[2], des_vel[2], pid_data[PID_ANG_VEL_Z]);
 }
 
+void calculate_duty_cycles (float dc_throttle, float* dc_shift, float* dc_final)
+{
+#if (NUM_ROTORS == 3)
+	dc_servo_final[I_ST] = 0.5 + dc_shift[2];
+	dc_rotor_final[I_MT] = (dc_throttle +  dc_shift[1]) / cos((dc_final[I_ST] - 0.5) * PI);
+	dc_rotor_final[I_MR] =  dc_throttle + -dc_shift[1] - dc_shift[0]*sqrt(3);
+	dc_rotor_final[I_ML] =  dc_throttle + -dc_shift[1] + dc_shift[0]*sqrt(3);
+#endif // NUM_ROTORS == 3
+
+	/* Map duty cycles. */
+	map_to_bounds(dc_rotor_final, NUM_ROTORS, 0.0, THROTTLE_MAX, dc_rotor_final);
+}
+
+void map_to_bounds (float* input, uint8_t input_size, float bound_lower, float bound_upper, float* output)
+{
+	float map_lower = bound_lower;
+	float map_upper = bound_upper;
+
+	/* Find maximum and minimum input values. */
+	int i;
+	for (i=0; i<input_size; i++) {
+		if (map_upper < input[i]) {
+			map_upper = input[i];
+		}
+		else if (map_lower > input[i]) {
+			map_lower = input[i];
+		}
+	}
+
+	/* Limit, but not fit, the inputs to the maximum and minimum values. */
+	float offset = ABS(bound_lower - map_lower);
+	float scale = 1.0 / (map_upper - map_lower);
+	for (i=0; i<input_size; i++) {
+		output[i] = (input[i] + offset) * scale;
+	}
+}
+
