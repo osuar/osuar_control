@@ -24,5 +24,17 @@
  */
 void angular_position_controller (float* cur_pos, float* cur_vel, float* des_pos, float* des_vel);
 
+/**
+ * @brief Calculate shifts in individual duty cycles of motors baseed on
+ *     desired angular velocity inputs.
+ *
+ * @param cur_vel Current velocity.
+ * @param des_vel Desired velocity.
+ *
+ * @output dc_shift Shift in duty cycle. This will be added to the throttle
+ *     duty cycle value in calculate_pwm_duty_cycles().
+ */
+void angular_velocity_controller (float* cur_vel, float* des_vel, int16_t* dc_shift);
+
 #endif // OSUAR_CONTROLLER_H
 
