@@ -9,7 +9,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#define NUM_ROTORS 4
+#define NUM_ROTORS 3
 #define ESC_COMM SPI   // Set to either PWM or SPI.
 
 
