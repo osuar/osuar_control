@@ -59,13 +59,13 @@ void calculate_duty_cycles (float dc_throttle, float* dc_shift, float* dc_final)
 {
 #if (NUM_ROTORS == 3)
 	dc_servo_final[I_ST] = 0.5 + dc_shift[2];
-	dc_rotor_final[I_MT] = (dc_throttle +  dc_shift[1]) / cos((dc_final[I_ST] - 0.5) * PI);
-	dc_rotor_final[I_MR] =  dc_throttle + -dc_shift[1] - dc_shift[0]*sqrt(3);
-	dc_rotor_final[I_ML] =  dc_throttle + -dc_shift[1] + dc_shift[0]*sqrt(3);
+	dc_rotor_final[I_RT] = (dc_throttle +  dc_shift[1]) / cos((dc_final[I_ST] - 0.5) * PI);
+	dc_rotor_final[I_RR] =  dc_throttle + -dc_shift[1] - dc_shift[0]*sqrt(3);
+	dc_rotor_final[I_RL] =  dc_throttle + -dc_shift[1] + dc_shift[0]*sqrt(3);
 #endif // NUM_ROTORS == 3
 
 	/* Map duty cycles. */
-	map_to_bounds(dc_rotor_final, NUM_ROTORS, 0.0, THROTTLE_MAX, dc_rotor_final);
+	map_to_bounds(dc_rotor_final, NUM_ROTORS, 0.0, THROTTLE_CAP, dc_rotor_final);
 }
 
 void map_to_bounds (float* input, uint8_t input_size, float bound_lower, float bound_upper, float* output)
