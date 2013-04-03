@@ -6,9 +6,14 @@
 
 #include <osuar_controller.h>
 
+/* TODO: Make setter function. */
+static float ang_pos_xy_cap, ang_vel_xy_cap, ang_vel_z_cap;
+static pid_data_t pid_data[6];
+
 void angular_position_controller (float* cur_pos, float* cur_vel, float* des_pos, float* des_vel)
 {
 	/* Cap des_pos for X and Y axes. */
+	/* TODO: Take cur_vel into account. */
 	int i;
 	for (i=0; i<2; i++) {
 		if (des_pos[i] > ang_pos_xy_cap) {
@@ -20,9 +25,9 @@ void angular_position_controller (float* cur_pos, float* cur_vel, float* des_pos
 	}
 
 	/* Calculate desired velocities. */
-	desired_vel[0] = step_pid(cur_pos[0], des_pos[0], pid_data[PID_ANG_POS_X]);
-	desired_vel[1] = step_pid(cur_pos[1], des_pos[1], pid_data[PID_ANG_POS_Y]);
-	desired_vel[2] = step_pid(cur_pos[2], des_pos[2], pid_data[PID_ANG_POS_Z]);
+	des_vel[0] = calculate_pid(cur_pos[0], des_pos[0], &pid_data[I_ANG_POS_X]);
+	des_vel[1] = calculate_pid(cur_pos[1], des_pos[1], &pid_data[I_ANG_POS_Y]);
+	des_vel[2] = calculate_pid(cur_pos[2], des_pos[2], &pid_data[I_ANG_POS_Z]);
 }
 
 void angular_velocity_controller (float* cur_vel, float* des_vel, float* dc_shift)
@@ -50,22 +55,22 @@ void angular_velocity_controller (float* cur_vel, float* des_vel, float* dc_shif
 	}
 
 	/* Calculate duty cycle shifts. */
-	dc_shift[0] = step_pid(cur_vel[0], des_vel[0], pid_data[PID_ANG_VEL_X]);
-	dc_shift[1] = step_pid(cur_vel[1], des_vel[1], pid_data[PID_ANG_VEL_Y]);
-	dc_shift[2] = step_pid(cur_vel[2], des_vel[2], pid_data[PID_ANG_VEL_Z]);
+	dc_shift[0] = calculate_pid(cur_vel[0], des_vel[0], &pid_data[I_ANG_VEL_X]);
+	dc_shift[1] = calculate_pid(cur_vel[1], des_vel[1], &pid_data[I_ANG_VEL_Y]);
+	dc_shift[2] = calculate_pid(cur_vel[2], des_vel[2], &pid_data[I_ANG_VEL_Z]);
 }
 
 void calculate_duty_cycles (float dc_throttle, float* dc_shift, float* dc_final)
 {
 #if (NUM_ROTORS == 3)
-	dc_servo_final[I_ST] = 0.5 + dc_shift[2];
-	dc_rotor_final[I_RT] = (dc_throttle +  dc_shift[1]) / cos((dc_final[I_ST] - 0.5) * PI);
-	dc_rotor_final[I_RR] =  dc_throttle + -dc_shift[1] - dc_shift[0]*sqrt(3);
-	dc_rotor_final[I_RL] =  dc_throttle + -dc_shift[1] + dc_shift[0]*sqrt(3);
+	dc_final[I_ST] = 0.5 + dc_shift[2];
+	dc_final[I_RT] = (dc_throttle +  dc_shift[1]) / cos((dc_final[I_ST] - 0.5) * M_PI);
+	dc_final[I_RR] =  dc_throttle + -dc_shift[1] - dc_shift[0]*sqrt(3);
+	dc_final[I_RL] =  dc_throttle + -dc_shift[1] + dc_shift[0]*sqrt(3);
 #endif // NUM_ROTORS == 3
 
 	/* Map duty cycles. */
-	map_to_bounds(dc_rotor_final, NUM_ROTORS, 0.0, THROTTLE_CAP, dc_rotor_final);
+	map_to_bounds(dc_final, NUM_ROTORS, 0.0, THROTTLE_CAP, dc_final);
 }
 
 void map_to_bounds (float* input, uint8_t input_size, float bound_lower, float bound_upper, float* output)

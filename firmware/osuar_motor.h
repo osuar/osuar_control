@@ -3,6 +3,7 @@
 
 #include <ch.h>
 #include <hal.h>
+#include <osuar_controller.h>
 #include <osuar_config.h>
 
 void setup_motors(void);

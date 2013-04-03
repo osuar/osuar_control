@@ -1,6 +1,8 @@
 #ifndef OSUAR_PID_H
 #define OSUAR_PID_H
 
+#include <stdint.h>
+
 /**
  * @brief PID parameters struct.
  */
