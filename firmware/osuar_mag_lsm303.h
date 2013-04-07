@@ -15,6 +15,8 @@
 #define MAG_Z_MIN -427
 #define MAG_Z_MAX 165
 
+extern int mag_id;
+
 void init_mag(void);
 void poll_mag(void);
 void get_mag(float output[3]);

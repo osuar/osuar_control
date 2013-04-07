@@ -55,7 +55,7 @@ static msg_t comm_thread(void *arg)
 	systime_t time = chTimeNow();
 	int counter = 0;
 
-	char txbuf[20];
+	char txbuf[50];
 
 	float mag[3];
 
@@ -65,8 +65,8 @@ static msg_t comm_thread(void *arg)
 
 		get_mag(mag);
 
-		sprintf(txbuf, "X: %d  Y: %d  Z: %d\r\n", (int) mag[0], (int) mag[1], (int) mag[2]);
-		uartStartSend(&UARTD1, sizeof(txbuf), txbuf);
+		sprintf(txbuf, "X: %d  Y: %d  Z: %d\r\n", (int) (mag[0]*10), (int) (mag[1]*10), (int) (mag[2]*10));
+		//uartStartSend(&UARTD1, sizeof(txbuf), txbuf);
 
 		palSetPad(GPIOD, GPIOD_LED4);
 		chThdSleepMilliseconds(50);
@@ -138,13 +138,17 @@ static msg_t adc_thread(void *arg)
 /*
  * Control loop
  */
-static WORKING_AREA(wa_control_thread, 128);
+static WORKING_AREA(wa_control_thread, 2048);
 static msg_t control_thread(void *arg)
 {
 	(void) arg;
 	chRegSetThreadName("control");
 
 	setup_ahrs();
+
+	char txbuf[20];
+	sprintf(txbuf, "Mag ID: %d\r\n", mag_id);
+	uartStartSend(&UARTD1, sizeof(txbuf), txbuf);
 
 	setup_motors();
 

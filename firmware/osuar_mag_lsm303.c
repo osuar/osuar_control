@@ -1,5 +1,7 @@
 #include <osuar_mag_lsm303.h>
 
+int mag_id;
+
 static uint8_t mag_tx_data[8];
 static uint8_t mag_rx_data[8];
 
@@ -32,22 +34,26 @@ msg_t mag_receive(uint8_t* rxbuf, size_t rxsize)
 
 void init_mag(void)
 {
+	mag_tx_data[0] = 0x0f;
+	mag_transmit(mag_tx_data, 1, mag_rx_data, 1);
+	mag_id = mag_rx_data[0];
+
 	// Grab default values from magnetometer.
 	mag_tx_data[0] = 0x00;
 	mag_transmit(mag_tx_data, 1, mag_rx_data, 3);
 
 	// TODO: error check!
 	// Data rate 75 Hz (DS p. 33).
-	mag_tx_data[0] = (mag_rx_data[0] & ~(7<<2)) | (6<<2);
+	mag_tx_data[1] = (mag_rx_data[0] & ~(7<<2)) | (6<<2);
 
 	// Gain 670 LSB/gauss (DS p. 34).
-	mag_tx_data[1] = (mag_rx_data[1] & ~(7<<5)) | (3<<5);
+	mag_tx_data[2] = (mag_rx_data[1] & ~(7<<5)) | (3<<5);
 
 	// Continuous-conversion mode (DS p. 34).
-	mag_tx_data[2] = (mag_rx_data[2] & ~(3)) | 0;
+	mag_tx_data[3] = (mag_rx_data[2] & ~(3)) | 0;
 
 	// Write to registers.
-	mag_transmit(mag_tx_data, 3, mag_rx_data, 0);
+	mag_transmit(mag_tx_data, 4, mag_rx_data, 0);
 }
 
 void poll_mag(void)
@@ -71,7 +77,8 @@ void get_mag(float output[3])
 {
 	int i;
 	for (i=0; i<3; i++) {
-		output[i] = mVec[i];
+		//output[i] = mVec[i];
+		output[i] = (float) mRaw[i];
 	}
 }
 
