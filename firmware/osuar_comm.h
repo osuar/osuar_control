@@ -31,7 +31,7 @@ static const UARTConfig uart3cfg = {
 	NULL,          /* Receive buffer filled callback                    */
 	NULL,          /* Char received while out of the UART_RECEIVE state */
 	NULL,          /* Receive error callback                            */
-	115200,        /* Baudrate                                          */
+	460800,        /* Baudrate                                          */
 	0,             /* cr1 register values                               */
 	0,             /* cr2 register values                               */
 	0              /* cr3 register values                               */
