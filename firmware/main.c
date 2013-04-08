@@ -3,6 +3,7 @@
 #include <hal.h>
 
 #include <stdio.h>
+#include <chsprintf.h>
 
 // Drivers
 #include <osuar_adc.h>   // ADC code
@@ -55,18 +56,15 @@ static msg_t comm_thread(void *arg)
 	systime_t time = chTimeNow();
 	int counter = 0;
 
-	char txbuf[50];
-
-	float mag[3];
+	uint8_t txbuf[20];
 
 	while (TRUE) {
 		time += MS2ST(100);
 		counter++;
 
-		get_mag(mag);
-
-		sprintf(txbuf, "X: %d  Y: %d  Z: %d\r\n", (int) (mag[0]*10), (int) (mag[1]*10), (int) (mag[2]*10));
-		//uartStartSend(&UARTD1, sizeof(txbuf), txbuf);
+		/* TODO: USART1 just doesn't work.. */
+		//chsprintf(txbuf, "Je vis!\r\n");
+		//uartStartSend(&UARTD1, 10, txbuf);
 
 		palSetPad(GPIOD, GPIOD_LED4);
 		chThdSleepMilliseconds(50);
@@ -89,13 +87,17 @@ static msg_t comm_thread_2(void *arg)
 	systime_t time = chTimeNow();
 	int counter = 0;
 
-	char txbuf[20];
+	uint8_t txbuf[20];
+
+	float mag[3];
 
 	while (TRUE) {
 		time += MS2ST(234);
 		counter++;
 
-		sprintf(txbuf, "Je vis aussi!\r\n");
+		get_mag(mag);
+
+		chsprintf(txbuf, "X: %d %d %d %d\r\n", 3, 4, 5, 10);
 		uartStartSend(&UARTD3, sizeof(txbuf), txbuf);
 
 		palSetPad(GPIOD, GPIOD_LED5);
