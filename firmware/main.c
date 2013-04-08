@@ -48,7 +48,7 @@ static msg_t led_thread(void *arg)
 /*
  * Communications loop
  */
-static WORKING_AREA(wa_comm_thread, 128);
+static WORKING_AREA(wa_comm_thread, 1280);
 static msg_t comm_thread(void *arg)
 {
 	(void) arg;
@@ -56,15 +56,14 @@ static msg_t comm_thread(void *arg)
 	systime_t time = chTimeNow();
 	int counter = 0;
 
-	uint8_t txbuf[20];
+	uint8_t txbuf[50];
 
 	while (TRUE) {
 		time += MS2ST(234);
 		counter++;
 
-		/* TODO: USART1 just doesn't work.. */
-		//chsprintf(txbuf, "Je vis!\r\n");
-		//uartStartSend(&UARTD1, 10, txbuf);
+		chsprintf(txbuf, "Je vis! %d %d %d %d\r\n", 1, 2, 3, 4);
+		uartStartSend(&UARTD1, sizeof(txbuf), txbuf);
 
 		palSetPad(GPIOD, GPIOD_LED4);
 		chThdSleepMilliseconds(50);
@@ -154,10 +153,6 @@ static msg_t control_thread(void *arg)
 	chRegSetThreadName("control");
 
 	setup_ahrs();
-
-	char txbuf[20];
-	sprintf(txbuf, "Mag ID: %d\r\n", mag_id);
-	uartStartSend(&UARTD1, sizeof(txbuf), txbuf);
 
 	setup_motors();
 
