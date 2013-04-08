@@ -87,9 +87,9 @@ void poll_mag(void)
 	mag_transmit(mag_tx_data, 1, mag_rx_data, 6);
 
 	// Convert to 2's complement.
-	mRaw[0] = ((mag_rx_data[0] << 8) | mag_rx_data[1]);   // X
-	mRaw[1] = ((mag_rx_data[4] << 8) | mag_rx_data[5]);   // Y
-	mRaw[2] = ((mag_rx_data[2] << 8) | mag_rx_data[3]);   // Z
+	mRaw[0] = (((int16_t) mag_rx_data[0] << 8) | (int16_t) mag_rx_data[1]);   // X
+	mRaw[1] = (((int16_t) mag_rx_data[4] << 8) | (int16_t) mag_rx_data[5]);   // Y
+	mRaw[2] = (((int16_t) mag_rx_data[2] << 8) | (int16_t) mag_rx_data[3]);   // Z
 
 	// Convert to float and account for offset.
 	mVec[0] = ((float) (mRaw[0] - MAG_X_MIN)) / (MAG_X_MAX - MAG_X_MIN) * 2 - 1;
