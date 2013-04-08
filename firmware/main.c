@@ -48,7 +48,7 @@ static msg_t led_thread(void *arg)
 /*
  * Communications loop
  */
-static WORKING_AREA(wa_comm_thread, 1280);
+static WORKING_AREA(wa_comm_thread, 128);
 static msg_t comm_thread(void *arg)
 {
 	(void) arg;
@@ -59,7 +59,7 @@ static msg_t comm_thread(void *arg)
 	uint8_t txbuf[20];
 
 	while (TRUE) {
-		time += MS2ST(100);
+		time += MS2ST(234);
 		counter++;
 
 		/* TODO: USART1 just doesn't work.. */
@@ -79,7 +79,7 @@ static msg_t comm_thread(void *arg)
 /*
  * Second communications loop
  */
-static WORKING_AREA(wa_comm_thread_2, 128);
+static WORKING_AREA(wa_comm_thread_2, 1280);
 static msg_t comm_thread_2(void *arg)
 {
 	(void) arg;
@@ -87,17 +87,24 @@ static msg_t comm_thread_2(void *arg)
 	systime_t time = chTimeNow();
 	int counter = 0;
 
-	uint8_t txbuf[20];
+	uint8_t txbuf[50];
+
+	/* Zero out buffer. */
+	int i;
+	for (i=0; i<sizeof(txbuf); i++) {
+		txbuf[i] = 0;
+	}
 
 	float mag[3];
 
 	while (TRUE) {
-		time += MS2ST(234);
+		time += MS2ST(100);
 		counter++;
 
 		get_mag(mag);
 
-		chsprintf(txbuf, "X: %d %d %d %d\r\n", 3, 4, 5, 10);
+		//chsprintf(txbuf, "X: %d %d %d %d\r\n", 3, 4, 5, 10);
+		chsprintf(txbuf, "Mag ID: %d   X: %d  Y: %d  Z: %d\r\n", mag_id, (uint8_t) (mag[0]*100), (uint8_t) (mag[1]*100), (uint8_t) (mag[2]*100));
 		uartStartSend(&UARTD3, sizeof(txbuf), txbuf);
 
 		palSetPad(GPIOD, GPIOD_LED5);
