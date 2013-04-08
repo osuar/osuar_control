@@ -56,13 +56,23 @@ static msg_t comm_thread(void *arg)
 	systime_t time = chTimeNow();
 	int counter = 0;
 
+	float mag[3];
+
 	uint8_t txbuf[50];
 
+	/* Zero out buffer. */
+	int i;
+	for (i=0; i<sizeof(txbuf); i++) {
+		txbuf[i] = 0;
+	}
+
 	while (TRUE) {
-		time += MS2ST(234);
+		time += MS2ST(100);
 		counter++;
 
-		chsprintf(txbuf, "Je vis! %d %d %d %d\r\n", 1, 2, 3, 4);
+		get_mag(mag);
+
+		chsprintf(txbuf, "Mag ID: %d   X: %d  Y: %d  Z: %d\r\n", mag_id, (uint8_t) (mag[0]*100), (uint8_t) (mag[1]*100), (uint8_t) (mag[2]*100));
 		uartStartSend(&UARTD1, sizeof(txbuf), txbuf);
 
 		palSetPad(GPIOD, GPIOD_LED4);
@@ -94,16 +104,11 @@ static msg_t comm_thread_2(void *arg)
 		txbuf[i] = 0;
 	}
 
-	float mag[3];
-
 	while (TRUE) {
-		time += MS2ST(100);
+		time += MS2ST(234);
 		counter++;
 
-		get_mag(mag);
-
-		//chsprintf(txbuf, "X: %d %d %d %d\r\n", 3, 4, 5, 10);
-		chsprintf(txbuf, "Mag ID: %d   X: %d  Y: %d  Z: %d\r\n", mag_id, (uint8_t) (mag[0]*100), (uint8_t) (mag[1]*100), (uint8_t) (mag[2]*100));
+		chsprintf(txbuf, "Je vis! %d %d %d %d\r\n", 1, 2, 3, 4);
 		uartStartSend(&UARTD3, sizeof(txbuf), txbuf);
 
 		palSetPad(GPIOD, GPIOD_LED5);
