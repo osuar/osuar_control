@@ -14,22 +14,46 @@ msg_t mag_receive(uint8_t *rxbuf, size_t rxsize);
 
 msg_t mag_transmit(uint8_t* txbuf, size_t txsize, uint8_t* rxbuf, size_t rxsize)
 {
-	return i2cMasterTransmitTimeout(&I2CD1,
+	static msg_t status;
+	static i2cflags_t errors;
+
+	i2cAcquireBus(&I2CD1);
+	status = i2cMasterTransmitTimeout(&I2CD1,
 			MAG_LSM303_ADDRESS,
 			txbuf,   // TX buffer
 			txsize,   // Number of bytes to send
 			rxbuf,   // RX buffer
 			rxsize,   // Number of bytes to read
 			OSUAR_I2C_TIMEOUT);   // Number of ticks before timeout
+	i2cReleaseBus(&I2CD1);
+
+	/* Get error flags. Currently, we don't do anything with them. */
+	if (status != RDY_OK) {
+		errors = i2cGetErrors(&I2CD1);
+	}
+
+	return status;
 }
 
 msg_t mag_receive(uint8_t* rxbuf, size_t rxsize)
 {
-	return i2cMasterReceiveTimeout(&I2CD1,
+	static msg_t status;
+	static i2cflags_t errors;
+
+	i2cAcquireBus(&I2CD1);
+	status = i2cMasterReceiveTimeout(&I2CD1,
 			MAG_LSM303_ADDRESS,
 			rxbuf,   // RX buffer
 			rxsize,   // Number of bytes to read
 			OSUAR_I2C_TIMEOUT);   // Number of ticks before timeout
+	i2cReleaseBus(&I2CD1);
+
+	/* Get error flags. Currently, we don't do anything with them. */
+	if (status != RDY_OK) {
+		errors = i2cGetErrors(&I2CD1);
+	}
+
+	return status;
 }
 
 void init_mag(void)
