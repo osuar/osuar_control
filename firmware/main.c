@@ -166,14 +166,14 @@ static msg_t control_thread(void *arg)
 	float dir = 0.2;
 
 	while (TRUE) {
-		time += MS2ST(1);   // Next deadline in 1 ms.
+		time += MS2ST(1.2);   // Next deadline in 1 ms.   TODO: Any sooner than this, and I2C stops working.
 		i += dir;
 		if (i > 1000.0) dir = -0.2;
 		if (i < 0.0) dir = 0.2;
 
 		update_ahrs();
 
-		update_motors(i, i, i, i);
+		//update_motors(i, i, i, i);   // TODO: This causes crash.
 
 		chThdSleepUntil(time);
 	}
