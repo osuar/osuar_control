@@ -58,13 +58,7 @@ static msg_t comm_thread(void *arg)
 
 	float mag[3];
 
-	uint8_t txbuf[50];
-
-	/* Zero out buffer. */
-	int i;
-	for (i=0; i<sizeof(txbuf); i++) {
-		txbuf[i] = 0;
-	}
+	uint8_t txbuf[200];
 
 	while (TRUE) {
 		time += MS2ST(100);
