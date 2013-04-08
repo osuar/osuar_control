@@ -2,8 +2,8 @@
 
 void setup_ahrs(void)
 {
-	palSetPadMode(GPIOB, 8, PAL_MODE_ALTERNATE(4));   // I2C1_SCL
-	palSetPadMode(GPIOB, 9, PAL_MODE_ALTERNATE(4));   // I2C1_SDA
+	palSetPadMode(GPIOB, 8, PAL_STM32_OTYPE_OPENDRAIN | PAL_MODE_ALTERNATE(4));   // I2C1_SCL
+	palSetPadMode(GPIOB, 9, PAL_STM32_OTYPE_OPENDRAIN | PAL_MODE_ALTERNATE(4));   // I2C1_SDA
 	i2cStart(&I2CD1, &i2c1cfg);
 
 	//init_accel();   // TODO
