@@ -72,7 +72,7 @@ static msg_t comm_thread(void *arg)
 
 		get_mag(mag);
 
-		chsprintf(txbuf, "Mag ID: %d   X: %d  Y: %d  Z: %d\r\n", mag_id, (uint8_t) (mag[0]*100), (uint8_t) (mag[1]*100), (uint8_t) (mag[2]*100));
+		chsprintf(txbuf, "Mag ID: %d   X: %d  Y: %d  Z: %d   %d\r\n", mag_id, (uint8_t) (mag[0]*100), (uint8_t) (mag[1]*100), (uint8_t) (mag[2]*100), chTimeNow());
 		uartStartSend(&UARTD1, sizeof(txbuf), txbuf);
 
 		palSetPad(GPIOD, GPIOD_LED4);
