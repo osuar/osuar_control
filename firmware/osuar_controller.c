@@ -73,6 +73,31 @@ void calculate_duty_cycles (float dc_throttle, float* dc_shift, float* dc_final)
 	map_to_bounds(dc_final, NUM_ROTORS, 0.0, THROTTLE_CAP, dc_final);
 }
 
+// TODO: Flesh this out. Refer to the fly() function in https://github.com/yoos/tricopter/blob/master/src/pilot.cpp
+void flight_controller (float* dc)
+{
+	// Calculate target rotation vector based on groundstation input and scale to maximum rotation of ang_pos_xy_cap.
+	// TODO
+
+	// Calculate current rotation vector (Euler angles) from DCM and make appropriate modifications to make PID calculations work later.
+	// TODO
+
+	// Keep abs(target - current) within [-PI, PI]. This way, nothing bad happens as we rotate to any angle in [-PI, PI].
+	// TODO
+
+	angular_position_controller(cur_pos, cur_vel, des_pos, des_vel);
+
+	angular_velocity_controller(cur_vel, des_vel, dc_shift);
+
+	// Set throttle based on groundstation input.
+	// TODO
+
+	// Increase throttle based on tilt.
+	// TODO
+
+	calculate_pwm_duty_cycles(throttle, dc_shift, dc);
+}
+
 void map_to_bounds (float* input, uint8_t input_size, float bound_lower, float bound_upper, float* output)
 {
 	float map_lower = bound_lower;

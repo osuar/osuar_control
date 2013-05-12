@@ -7,7 +7,7 @@
 #include <osuar_config.h>
 
 void setup_motors(void);
-void update_motors(float, float, float, float);
+void update_motors(float* dc);
 
 /*
  * SPI end transfer callback.

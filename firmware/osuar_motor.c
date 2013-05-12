@@ -72,7 +72,7 @@ void setup_motors()
 /**
  * Send new desired motor speeds to ESCs.
  */
-void update_motors(float a, float b, float c, float d)
+void update_motors(float* dc)
 {
 	/*
 	 * Commands for two-rotor system.

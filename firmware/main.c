@@ -152,6 +152,8 @@ static msg_t control_thread(void *arg)
 	float i = 0;
 	float dir = 0.2;
 
+	float dc[4];   // Duty cycles for rotors. TODO: This should be initialized in a more centralized place.
+
 	while (TRUE) {
 		time += MS2ST(1);   // Next deadline in 1 ms.
 		i += dir;
@@ -160,7 +162,9 @@ static msg_t control_thread(void *arg)
 
 		update_ahrs();
 
-		update_motors(i, i, i, i);
+		flight_controller(dc);
+
+		update_motors(dc);
 
 		chThdSleepUntil(time);
 	}
