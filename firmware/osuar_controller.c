@@ -8,7 +8,6 @@
 
 /* TODO: Make setter function. */
 static float ang_pos_xy_cap, ang_vel_xy_cap, ang_vel_z_cap;
-static int I_ST = 0, I_RT = 1, I_RR = 2, I_L = 3, I_RFR = 4, I_RFL = 5, I_RBR = 6, I_RBL = 7;
 static pid_data_t pid_data[6];
 static dc_final[8], target_ang_pos[3], curent_ang_pos[3];
 float throttle;
@@ -73,10 +72,10 @@ void calculate_duty_cycles (float dc_throttle, float* dc_shift, float* dc_final)
 #endif // NUM_ROTORS == 3
 
 #if (NUM_ROTORS == 4)
-        dc_final[I_RFR] = dc_throttle - dc_shift[1] - dc_shift[0];
-        dc_final[I_RFL] = dc_throttle - dc_shift[1] + dc_shift[0];
-        dc_final[I_RBR] = dc_throttle + dc_shift[1] + dc_shift[0];
-        dc_final[I_RBL] = dc_throttle + dc_shift[1] - dc_shift[0];
+        dc_final[I_R315] = dc_throttle - dc_shift[1] - dc_shift[0];
+        dc_final[I_R045] = dc_throttle - dc_shift[1] + dc_shift[0];
+        dc_final[I_R225] = dc_throttle + dc_shift[1] + dc_shift[0];
+        dc_final[I_R135] = dc_throttle + dc_shift[1] - dc_shift[0];
 #endif // NUM_ROTORS == 4
 
 	/* Map duty cycles. */
