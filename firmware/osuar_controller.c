@@ -8,7 +8,10 @@
 
 /* TODO: Make setter function. */
 static float ang_pos_xy_cap, ang_vel_xy_cap, ang_vel_z_cap;
+static int I_ST = 0, I_RT = 1, I_RR = 2, I_L = 3, I_RFR = 4, I_RFL = 5, I_RBR = 6, I_RBL = 7;
 static pid_data_t pid_data[6];
+static dc_final[8], target_ang_pos[3], curent_ang_pos[3];
+float throttle;
 
 void angular_position_controller (float* cur_pos, float* cur_vel, float* des_pos, float* des_vel)
 {
@@ -69,6 +72,13 @@ void calculate_duty_cycles (float dc_throttle, float* dc_shift, float* dc_final)
 	dc_final[I_RL] =  dc_throttle + -dc_shift[1] + dc_shift[0]*sqrt(3);
 #endif // NUM_ROTORS == 3
 
+#if (NUM_ROTORS == 4)
+        dc_final[I_RFR] = dc_throttle - dc_shift[1] - dc_shift[0];
+        dc_final[I_RFL] = dc_throttle - dc_shift[1] + dc_shift[0];
+        dc_final[I_RBR] = dc_throttle + dc_shift[1] + dc_shift[0];
+        dc_final[I_RBL] = dc_throttle + dc_shift[1] - dc_shift[0];
+#endif // NUM_ROTORS == 4
+
 	/* Map duty cycles. */
 	map_to_bounds(dc_final, NUM_ROTORS, 0.0, THROTTLE_CAP, dc_final);
 }
@@ -78,12 +88,25 @@ void flight_controller (float* dc)
 {
 	// Calculate target rotation vector based on groundstation input and scale to maximum rotation of ang_pos_xy_cap.
 	// TODO
+        target_ang_pos[0] = -joy.axes[SY] * ang_pos_xy_cap;
+        target_ang_pos[1] =  joy.axes[SX] * ang_pos_xy_cap;
+        target_ang_pos[2] =  joy.axes[SZ] * ang_pos_z_cap * CONTROL_LOOP_INTERVAL * MASTER_DT/1000000;
 
 	// Calculate current rotation vector (Euler angles) from DCM and make appropriate modifications to make PID calculations work later.
 	// TODO
+        current_ang_pos[0] = atan2(bodyDCM[2][1], bodyDCM[2][2]) * bodyDCM[0][0] + atan2(bodyDCM[2][0], bodyDCM[2][2]) * bodyDCM[0][1];
+        current_ang_pos[1] = atan2(bodyDCM[2][0], dobyDCM[2][2]) * bodyDCM[1][1] - atan2(bodyDCM[2][1], bodyDCM[2][2]) * bodyDCM[1][0];
 
 	// Keep abs(target - current) within [-PI, PI]. This way, nothing bad happens as we rotate to any angle in [-PI, PI].
 	// TODO
+        for(int i = 0; i < 3; i++){
+            if(target_ang_pos[i] - current_ang_pos[i] > PI){
+                current_ang_pos[i] += 2*PI;
+            }
+            else{
+                current_ang_pos[i] -= 2*PI;
+            }
+        }
 
 	angular_position_controller(cur_pos, cur_vel, des_pos, des_vel);
 
@@ -91,9 +114,11 @@ void flight_controller (float* dc)
 
 	// Set throttle based on groundstation input.
 	// TODO
+        throttle = throttle_enabled * (0.8*joy.axis[ST1] + 0.2*joy.axes[ST0]) * (TMAX - TMIN);
 
 	// Increase throttle based on tilt.
 	// TODO
+        throttle = throttle / MAX(bodyDCM[2][2], 0.707107);
 
 	calculate_pwm_duty_cycles(throttle, dc_shift, dc);
 }
