@@ -8,7 +8,7 @@
 #include <osuar_adc.h>   // ADC code
 #include <osuar_i2c.h>
 #include <osuar_pid.h>   // PID function definition
-#include <osuar_mpu6050.h>   // MPU-6050
+#include <osuar_mpu6000.h>   // MPU-6000
 
 // Flight controller
 #include <osuar_ahrs.h>   // Attitude-Heading Reference System
