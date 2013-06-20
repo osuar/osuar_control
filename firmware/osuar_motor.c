@@ -23,15 +23,15 @@ void setup_motors()
 	 */
 #if (ESC_COMM == PWM)
 	pwmStart(&PWMD8, &pwm8cfg);
-	palSetPadMode(GPIOC, 6, PAL_MODE_ALTERNATE(2));
-	palSetPadMode(GPIOC, 7, PAL_MODE_ALTERNATE(2));
+	palSetPadMode(GPIOC, 6, PAL_MODE_ALTERNATE(3));
+	palSetPadMode(GPIOC, 7, PAL_MODE_ALTERNATE(3));
 
 #if (NUM_ROTORS > 2)
-	palSetPadMode(GPIOC, 8, PAL_MODE_ALTERNATE(2));
+	palSetPadMode(GPIOC, 8, PAL_MODE_ALTERNATE(3));
 #endif // NUM_ROTORS > 2
 
 #if (NUM_ROTORS > 3)
-	palSetPadMode(GPIOC, 9, PAL_MODE_ALTERNATE(2));
+	palSetPadMode(GPIOC, 9, PAL_MODE_ALTERNATE(3));
 #endif // NUM_ROTORS > 3
 
 #endif // ESC_COMM == PWM
