@@ -1,5 +1,5 @@
-#ifndef MPU6050_H
-#define MPU6050_H
+#ifndef MPU6000_H
+#define MPU6000_H
 
 #define IMU_RX_DEPTH 8
 #define IMU_TX_DEPTH 8
@@ -10,7 +10,7 @@ uint16_t imu_rx_data[IMU_RX_DEPTH];
 uint16_t imu_tx_data[IMU_TX_DEPTH];
 
 /*
- * Configuration struct for MPU6050.
+ * Configuration struct for MPU6000.
  */
 //static const I2CSlaveConfig mpucfg = {
 //	NULL,
@@ -28,5 +28,5 @@ uint16_t imu_tx_data[IMU_TX_DEPTH];
 //	FALSE
 //};
 
-#endif // MPU6050_H
+#endif // MPU6000_H
 
