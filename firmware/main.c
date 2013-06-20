@@ -18,33 +18,6 @@
 
 
 /*
- * Blink orange LED.
- */
-static WORKING_AREA(wa_led_thread, 128);
-static msg_t led_thread(void *arg)
-{
-	(void) arg;
-	chRegSetThreadName("blinker");
-	systime_t time = chTimeNow();
-
-	while (TRUE) {
-		time += MS2ST(1000);   // Next deadline in 1 second.
-
-		palSetPad(GPIOD, GPIOD_LED3);
-		chThdSleepMilliseconds(50);
-		palClearPad(GPIOD, GPIOD_LED3);
-		chThdSleepMilliseconds(100);
-		palSetPad(GPIOD, GPIOD_LED3);
-		chThdSleepMilliseconds(50);
-		palClearPad(GPIOD, GPIOD_LED3);
-
-		chThdSleepUntil(time);
-	}
-
-	return 0;
-}
-
-/*
  * Communications loop
  */
 static WORKING_AREA(wa_comm_thread, 1280);
@@ -91,6 +64,9 @@ static msg_t comm_thread_2(void *arg)
 
 	char txbuf[20];
 
+	palSetPadMode(GPIOA, 6, PAL_MODE_OUTPUT_PUSHPULL);
+	palSetPadMode(GPIOA, 7, PAL_MODE_OUTPUT_PUSHPULL);
+
 	while (TRUE) {
 		time += MS2ST(234);
 		counter++;
@@ -98,9 +74,12 @@ static msg_t comm_thread_2(void *arg)
 		sprintf(txbuf, "Je vis aussi!\r\n");
 		uartStartSend(&UARTD3, sizeof(txbuf), txbuf);
 
-		palSetPad(GPIOD, GPIOD_LED5);
+		palSetPad(GPIOA, 7);
 		chThdSleepMilliseconds(50);
-		palClearPad(GPIOD, GPIOD_LED5);
+		palClearPad(GPIOA, 7);
+		palSetPad(GPIOA, 6);
+		chThdSleepMilliseconds(50);
+		palClearPad(GPIOA, 6);
 
 		chThdSleepUntil(time);
 	}
@@ -149,18 +128,29 @@ static msg_t control_thread(void *arg)
 	setup_motors();
 
 	systime_t time = chTimeNow();
-	float i = 0;
-	float dir = 0.2;
+	float i[4];
+	i[0] = 0;
+	i[1] = 250;
+	i[2] = 500;
+	i[3] = 750;
+	uint8_t j = 0;
+	float dir[4];
+	dir[0] = 0.2;
+	dir[1] = 0.2;
+	dir[2] = 0.2;
+	dir[3] = 0.2;
 
 	while (TRUE) {
 		time += MS2ST(1);   // Next deadline in 1 ms.
-		i += dir;
-		if (i > 1000.0) dir = -0.2;
-		if (i < 0.0) dir = 0.2;
+		for (j=0; j<4; j++) {
+			i[j] += dir[j];
+			if (i[j] > 1000.0) dir[j] = -0.2;
+			if (i[j] < 0.0) dir[j] = 0.2;
+		}
 
 		update_ahrs();
 
-		update_motors(i, i, i, i);
+		update_motors(i[0], i[1], i[2], i[3]);
 
 		chThdSleepUntil(time);
 	}
@@ -188,15 +178,12 @@ int main(void)
 
 	setup_adc();
 
+	setup_motors();
+
 	/*
 	 * Short delay to let the various setup functions finish.
 	 */
 	chThdSleepMilliseconds(1);
-
-	/*
-	 * Create the LED thread.
-	 */
-	chThdCreateStatic(wa_led_thread, sizeof(wa_led_thread), NORMALPRIO, led_thread, NULL);
 
 	/*
 	 * Create the communications thread.
