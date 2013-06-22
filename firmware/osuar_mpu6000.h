@@ -1,32 +1,33 @@
 #ifndef MPU6000_H
 #define MPU6000_H
 
-#define IMU_RX_DEPTH 8
-#define IMU_TX_DEPTH 8
+#include <osuar_spi.h>
+
+#define MPU_SPI_BUFSIZE 512
+
+#define GYR_LSB 1
+#define ACC_LSB 1
 
 // TODO: Macros for registers
 
-uint16_t imu_rx_data[IMU_RX_DEPTH];
-uint16_t imu_tx_data[IMU_TX_DEPTH];
-
-/*
- * Configuration struct for MPU6000.
+/**
+ * @brief Maximum speed SPI configuration for MPU-6000 (656.250 kHz, CPHA=0,
+ * CPOL=0, MSb first).
  */
-//static const I2CSlaveConfig mpucfg = {
-//	NULL,
-//	NULL,
-//	&imu_rx_data[0],
-//	IMU_RX_DEPTH,
-//	0,
-//	0,
-//	&imu_tx_data[0],
-//	IMU_TX_DEPTH,
-//	0,
-//	0,
-//	0b0011101,   // TODO: I don't know what this does
-//	I2C_WRITE,
-//	FALSE
-//};
+static const SPIConfig mpu_spicfg = {
+	NULL,
+	GPIOB,
+	2,
+	SPI_CR1_BR_2 | SPI_CR1_BR_0   /* 21000000/2^5 = 656250 */
+};
+
+/**
+ * @brief Get gyro and accelerometer readings from IMU.
+ *
+ * @output gyr Rotational rate per axis in rad/s.
+ * @output acc Acceleration per axis in g's.
+ */
+void mpu_read(float gyr[3], float acc[3]);
 
 #endif // MPU6000_H
 
