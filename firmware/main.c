@@ -12,7 +12,7 @@
 
 // Flight controller
 #include <osuar_ahrs.h>   // Attitude-Heading Reference System
-#include <osuar_comm.h>   // Communications code (wired and wireless)
+#include <osuar_uart.h>   // Communications code (wired and wireless)
 #include <osuar_motor.h>   // Motor control
 #include <osuar_config.h>   // General configuration
 
@@ -174,7 +174,7 @@ int main(void)
 	halInit();
 	chSysInit();
 
-	setup_comm();   // TODO: This hangs thread, I think.
+	setup_uart();
 
 	setup_adc();
 
