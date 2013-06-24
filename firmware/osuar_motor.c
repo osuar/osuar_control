@@ -40,30 +40,23 @@ void setup_motors()
 #if (ESC_COMM == SPI)
 
 	/*
-	 * Initialize SPI driver 3.
+	 * Initialize SPI CS lines.
 	 * PB0, PB1, PC4, PC5 - slave select lines
-	 * PC10 - SCK
-	 * PC11 - MISO
-	 * PC12 - MOSI
 	 */
-	//spiStart(&SPID3, &spi3cfg);   // TODO: Do I need to call this before palSetPad() and such?
-	palSetPadMode(GPIOC, 10, PAL_MODE_ALTERNATE(5) | PAL_STM32_OSPEED_HIGHEST);
-	palSetPadMode(GPIOC, 11, PAL_MODE_ALTERNATE(5));
-	palSetPadMode(GPIOC, 12, PAL_MODE_ALTERNATE(5) | PAL_STM32_OSPEED_HIGHEST);
 
-	palSetPad(GPIOB, 0);
 	palSetPadMode(GPIOB, 0, PAL_MODE_OUTPUT_PUSHPULL | PAL_STM32_OSPEED_HIGHEST);
-	palSetPad(GPIOB, 1);
+	palSetPad(GPIOB, 0);
 	palSetPadMode(GPIOB, 1, PAL_MODE_OUTPUT_PUSHPULL | PAL_STM32_OSPEED_HIGHEST);
+	palSetPad(GPIOB, 1);
 
 #if (NUM_ROTORS > 2)
-	palSetPad(GPIOC, 4);
 	palSetPadMode(GPIOC, 4, PAL_MODE_OUTPUT_PUSHPULL | PAL_STM32_OSPEED_HIGHEST);
+	palSetPad(GPIOC, 4);
 #endif // NUM_ROTORS > 2
 
 #if (NUM_ROTORS > 3)
-	palSetPad(GPIOC, 5);
 	palSetPadMode(GPIOC, 5, PAL_MODE_OUTPUT_PUSHPULL | PAL_STM32_OSPEED_HIGHEST);
+	palSetPad(GPIOC, 5);
 #endif // NUM_ROTORS > 3
 
 #endif // ESC_COMM == SPI
@@ -94,9 +87,7 @@ void update_motors(float a, float b, float c, float d)
 #endif // ESC_COMM == PWM
 
 #if (ESC_COMM == SPI)
-	spiStart(&SPID3, &spi3cfgPB0);
 	// TODO: send data to motor0.
-	spiStart(&SPID3, &spi3cfgPB1);
 	// TODO: send data to motor1.
 #endif // ESC_COMM == SPI
 
@@ -125,11 +116,8 @@ void update_motors(float a, float b, float c, float d)
 #endif // ESC_COMM == PWM
 
 #if (ESC_COMM == SPI)
-	spiStart(&SPID3, &spi3cfgPB0);
 	// TODO: send data to motor0.
-	spiStart(&SPID3, &spi3cfgPB1);
 	// TODO: send data to motor1.
-	spiStart(&SPID3, &spi3cfgPC4);
 	// TODO: send data to motor2.
 #endif // ESC_COMM == SPI
 
@@ -158,26 +146,12 @@ void update_motors(float a, float b, float c, float d)
 #endif // ESC_COMM == PWM
 
 #if (ESC_COMM == SPI)
-	spiStart(&SPID3, &spi3cfgPB0);
 	// TODO: send data to motor0.
-	spiStart(&SPID3, &spi3cfgPB1);
 	// TODO: send data to motor1.
-	spiStart(&SPID3, &spi3cfgPC4);
 	// TODO: send data to motor2.
-	spiStart(&SPID3, &spi3cfgPC5);
 	// TODO: send data to motor3.
 #endif // ESC_COMM == SPI
 
 #endif // NUM_ROTORS == 4
-}
-
-/*
- * SPI end transfer callback.
- */
-static void spicb(SPIDriver *spip)
-{
-	chSysLockFromIsr();
-	spiUnselectI(spip);   // Release slave select line.
-	chSysUnlockFromIsr();
 }
 
