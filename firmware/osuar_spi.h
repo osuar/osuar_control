@@ -10,9 +10,19 @@
 void setup_spi(void);
 
 /**
- * SPI communication.
+ * @brief SPI exchange
  */
-void comm_spi(SPIDriver *spid, const SPIConfig *spicfg, uint8_t *txbuf, uint8_t *rxbuf, uint16_t bufsize);
+void spi_exchange(SPIDriver *spid, const SPIConfig *spicfg, uint8_t *txbuf, uint8_t *rxbuf, uint16_t bufsize);
+
+/**
+ * @brief SPI send
+ */
+void spi_send(SPIDriver *spid, const SPIConfig *spicfg, uint8_t *txbuf, uint16_t bufsize);
+
+/**
+ * @brief SPI receive
+ */
+void spi_receive(SPIDriver *spid, const SPIConfig *spicfg, uint8_t *rxbuf, uint16_t bufsize);
 
 #endif /* OSUAR_SPI_H */
 
