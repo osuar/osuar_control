@@ -16,5 +16,10 @@ void uart_printf(const char *format, ...);
  */
 void uart_printf_i(const char *format, ...);
 
+/*
+ * Utility function to clear (i.e., zero) a buffer.
+ */
+void clear_buffer(uint8_t *buffer);
+
 #endif /* OSUAR_UART_H */
 

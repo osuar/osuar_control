@@ -149,3 +149,11 @@ void uart_printf_i(const char *format, ...)
 	uartStartSendI(&UARTD3, strlen(uart_print_buf), uart_print_buf);
 }
 
+void clear_buffer(uint8_t *buffer)
+{
+	uint16_t i;
+	for (i=0; i<sizeof(buffer); i++) {
+		buffer[i] = 0;
+	}
+}
+
