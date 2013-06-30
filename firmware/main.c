@@ -32,26 +32,13 @@ static msg_t comm_thread(void *arg)
 
 	float mag[3];
 
-	palSetPadMode(GPIOA, 6, PAL_MODE_OUTPUT_PUSHPULL);
-	palSetPadMode(GPIOA, 7, PAL_MODE_OUTPUT_PUSHPULL);
-
 	while (TRUE) {
 		time += MS2ST(1000);
 		counter++;
 
+		clear_buffer(txbuf);
 		sprintf(txbuf, "X: %d  Y: %d  Z: %d\r\n", (int) mag[0], (int) mag[1], (int) mag[2]);
 		uartStartSend(&UARTD1, sizeof(txbuf), txbuf);
-
-		palSetPad(GPIOD, GPIOD_LED4);
-		chThdSleepMilliseconds(50);
-		palClearPad(GPIOD, GPIOD_LED4);
-
-		palSetPad(GPIOA, 7);
-		chThdSleepMilliseconds(50);
-		palClearPad(GPIOA, 7);
-		palSetPad(GPIOA, 6);
-		chThdSleepMilliseconds(50);
-		palClearPad(GPIOA, 6);
 
 		chThdSleepUntil(time);
 	}
@@ -76,6 +63,7 @@ static msg_t comm_thread_2(void *arg)
 		time += MS2ST(100);
 		counter++;
 
+		clear_buffer(txbuf);
 		debug_ahrs(txbuf);
 		uartStartSend(&UARTD3, sizeof(txbuf), txbuf);
 
@@ -139,12 +127,14 @@ static msg_t control_thread(void *arg)
 		time += MS2ST(CONTROL_DT*1000);   // Next deadline in 1 ms.
 		for (j=0; j<4; j++) {
 			i[j] += step[j];
-			if (i[j] > 600.0 || i[j] < 0.0) step[j] = -step[j];
+			if (i[j] > 800.0 || i[j] < 0.0) step[j] = -step[j];
 		}
 
 		update_ahrs();
 
 		update_motors(i[0], i[1], i[2], i[3]);
+
+		palTogglePad(GPIOA, 6);
 
 		chThdSleepUntil(time);
 	}
@@ -177,6 +167,11 @@ int main(void)
 	setup_ahrs();
 
 	setup_motors();
+
+	palSetPadMode(GPIOA, 6, PAL_MODE_OUTPUT_PUSHPULL);
+	palSetPadMode(GPIOA, 7, PAL_MODE_OUTPUT_PUSHPULL);
+	palClearPad(GPIOA, 6);
+	palClearPad(GPIOA, 7);
 
 	/*
 	 * Short delay to let the various setup functions finish.
