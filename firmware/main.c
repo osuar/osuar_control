@@ -28,7 +28,7 @@ static msg_t comm_thread(void *arg)
 	systime_t time = chTimeNow();
 	int counter = 0;
 
-	char txbuf[20];
+	uint8_t txbuf[20];
 
 	float mag[3];
 
@@ -37,7 +37,7 @@ static msg_t comm_thread(void *arg)
 		counter++;
 
 		clear_buffer(txbuf);
-		sprintf(txbuf, "X: %d  Y: %d  Z: %d\r\n", (int) mag[0], (int) mag[1], (int) mag[2]);
+		chsprintf(txbuf, "X: %u  Y: %u  Z: %u\r\n", (uint8_t) mag[0], (uint8_t) mag[1], (uint8_t) mag[2]);
 		uartStartSend(&UARTD1, sizeof(txbuf), txbuf);
 
 		chThdSleepUntil(time);
@@ -57,7 +57,7 @@ static msg_t comm_thread_2(void *arg)
 	systime_t time = chTimeNow();
 	int counter = 0;
 
-	char txbuf[200];
+	uint8_t txbuf[200];
 
 	while (TRUE) {
 		time += MS2ST(100);
@@ -103,7 +103,6 @@ static msg_t adc_thread(void *arg)
 /*
  * Control loop
  */
-#define CONTROL_DT 0.005
 static WORKING_AREA(wa_control_thread, 128);
 static msg_t control_thread(void *arg)
 {
@@ -111,28 +110,19 @@ static msg_t control_thread(void *arg)
 	chRegSetThreadName("control");
 
 	systime_t time = chTimeNow();
-	float i[4];
-	i[0] = 0;
-	i[1] = 1/CONTROL_DT;
-	i[2] = 2/CONTROL_DT;
-	i[3] = 3/CONTROL_DT;
-	uint8_t j = 0;
-	float step[4];
-	step[0] = CONTROL_DT*1000;
-	step[1] = CONTROL_DT*1000;
-	step[2] = CONTROL_DT*1000;
-	step[3] = CONTROL_DT*1000;
+
+	/* DCM of body in global frame. */
+	float dcm_bg[3][3];
+	m_init_identity(dcm_bg);
 
 	while (TRUE) {
 		time += MS2ST(CONTROL_DT*1000);   // Next deadline in 1 ms.
-		for (j=0; j<4; j++) {
-			i[j] += step[j];
-			if (i[j] > 800.0 || i[j] < 0.0) step[j] = -step[j];
-		}
 
-		update_ahrs();
+		update_ahrs(dcm_bg);
 
-		update_motors(i[0], i[1], i[2], i[3]);
+		/* TODO: Run controller and get duty cycles. */
+
+		/* TODO: Update motors with duty cycles. */
 
 		palTogglePad(GPIOA, 6);
 
