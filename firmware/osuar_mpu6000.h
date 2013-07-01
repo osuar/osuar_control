@@ -1,7 +1,6 @@
-#ifndef MPU6000_H
-#define MPU6000_H
+#ifndef OSUAR_MPU6000_H
+#define OSUAR_MPU6000_H
 
-#include <osuar_math.h>
 #include <osuar_spi.h>
 #include <osuar_uart.h>
 
@@ -112,5 +111,5 @@ void setup_mpu(void);
  */
 void read_mpu(float gyr[3], float acc[3]);
 
-#endif // MPU6000_H
+#endif // OSUAR_MPU6000_H
 
