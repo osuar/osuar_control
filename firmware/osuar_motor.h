@@ -8,11 +8,6 @@
 void setup_motors(void);
 void update_motors(float, float, float, float);
 
-/*
- * SPI end transfer callback.
- */
-static void spicb(SPIDriver*);
-
 
 #if (ESC_COMM == PWM)
 
@@ -107,28 +102,28 @@ static PWMConfig pwm3cfg = {
  * The slave select lines are PB0, PB1, PC4, PC5.
  */
 static const SPIConfig spi3cfgPB0 = {
-	spicb,
+	NULL,
 	GPIOB,
 	0,
 	SPI_CR1_DFF
 };
 
 static const SPIConfig spi3cfgPB1 = {
-	spicb,
+	NULL,
 	GPIOB,
 	1,
 	SPI_CR1_DFF
 };
 
 static const SPIConfig spi3cfgPC4 = {
-	spicb,
+	NULL,
 	GPIOC,
 	4,
 	SPI_CR1_DFF
 };
 
 static const SPIConfig spi3cfgPC5 = {
-	spicb,
+	NULL,
 	GPIOC,
 	5,
 	SPI_CR1_DFF
