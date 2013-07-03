@@ -11,10 +11,10 @@
 #define MAX(a, b) ((a > b) ? (a) : (b))
 
 /* Sine, cosine, sqrt functions from multipilot32. */
-float sine(float x)
-float cosine(float x)
-float msqrt(float x)
-float minvsqrt(float x)
+float sine(float x);
+float cosine(float x);
+float msqrt(float x);
+float minvsqrt(float x);
 
 /* Dot product */
 float v_dotp (float v1[3], float v2[3]);
