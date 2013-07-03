@@ -1,5 +1,48 @@
 #include <osuar_math.h>
 
+float sine(float x)
+{
+	const float B = 4/M_PI;
+	const float C = -4/(M_PI*M_PI);
+	while (x > M_PI) x -= 2*M_PI;
+	while (x < -M_PI) x += 2*M_PI;
+	float y = B * x + C * x * ABS(x);
+	const float P = 0.225;
+	y = P * (y * ABS(y) - y) + y;
+	return y;
+}
+
+float cosine(float x)
+{
+	return sine(x+M_PI/2);
+}
+
+float msqrt(float x)
+{
+	union {
+		float f;
+		int i;
+	} tmp;
+	tmp.f = x;
+	tmp.i = 0x5f3759df - (tmp.i >> 1);
+	float y = tmp.f;
+	y = y * (1.5f-0.5f*x*y*y);
+	return 1.0f/(y*(1.5f-0.5f*x*y*y));
+}
+
+float minvsqrt(float x)
+{
+	union {
+		float f;
+		int i;
+	} tmp;
+	tmp.f = x;
+	tmp.i = 0x5f3759df - (tmp.i >> 1);
+	float y = tmp.f;
+	y = y * (1.5f-0.5f*x*y*y);
+	return y*(1.5f-0.5f*x*y*y);
+}
+
 float v_dotp(float v1[3], float v2[3])
 {
 	static float output;
@@ -45,7 +88,7 @@ float v_mod(float v[3])
 	output = v[0] * v[0];
 	output += v[1] * v[1];
 	output += v[2] * v[2];
-	output = sqrt(output);
+	output = msqrt(output);
 	return output;
 }
 

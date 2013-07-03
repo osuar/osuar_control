@@ -199,7 +199,7 @@ UINCDIR =
 ULIBDIR =
 
 # List all user libraries here
-ULIBS = -lm
+ULIBS =
 
 #
 # End of user defines

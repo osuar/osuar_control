@@ -1,13 +1,20 @@
 #ifndef OSUAR_MATH_H
 #define OSUAR_MATH_H
 
-#include <math.h>
 #include <stdint.h>
+
+#define M_PI 3.1415926535
 
 #define ABS(x) (((x) < 0) ? -(x) : (x))
 #define CLAMP(x, min, max) (((x) < min) ? (min):(((x) > max) ? (max):(x)))
 #define MIN(a, b) ((a < b) ? (a) : (b))
 #define MAX(a, b) ((a > b) ? (a) : (b))
+
+/* Sine, cosine, sqrt functions from multipilot32. */
+float sine(float x)
+float cosine(float x)
+float msqrt(float x)
+float minvsqrt(float x)
 
 /* Dot product */
 float v_dotp (float v1[3], float v2[3]);
