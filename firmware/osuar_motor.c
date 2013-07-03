@@ -10,8 +10,8 @@
  * See datasheet page 45 for pinouts.
  */
 static PWMConfig pwm8cfg = {
-	1000000,   // 1 MHz PWM clock frequency.
-	1000,      // PWM period 1 ms.
+	400000,    // 4 kHz PWM clock frequency.
+	1000,      // PWM period 2.5 ms.
 	NULL,      // No callback.
 	{
 #if (NUM_ROTORS == 2)
@@ -182,7 +182,7 @@ void setup_motors()
 #endif // ESC_COMM == SPI
 }
 
-void update_motors(float a, float b, float c, float d)
+void update_motors(float dc[4])
 {
 	/*
 	 * Commands for two-rotor system.
@@ -245,21 +245,14 @@ void update_motors(float a, float b, float c, float d)
 	 * Commands for four-rotor system.
 	 */
 #if (NUM_ROTORS == 4)
-	uint16_t motor0, motor1, motor2, motor3;
-
 	/*
 	 * Calculate motor values.
 	 */
-	motor0 = (uint16_t) a;
-	motor1 = (uint16_t) b;
-	motor2 = (uint16_t) c;
-	motor3 = (uint16_t) d;
-
 #if (ESC_COMM == PWM)
-	pwmEnableChannel(&PWMD8, 0, PWM_FRACTION_TO_WIDTH(&PWMD8, 1000, motor0));
-	pwmEnableChannel(&PWMD8, 1, PWM_FRACTION_TO_WIDTH(&PWMD8, 1000, motor1));
-	pwmEnableChannel(&PWMD8, 2, PWM_FRACTION_TO_WIDTH(&PWMD8, 1000, motor2));
-	pwmEnableChannel(&PWMD8, 3, PWM_FRACTION_TO_WIDTH(&PWMD8, 1000, motor3));
+	pwmEnableChannel(&PWMD8, 0, PWM_PERCENTAGE_TO_WIDTH(&PWMD8, dc[0]*10000));
+	pwmEnableChannel(&PWMD8, 1, PWM_PERCENTAGE_TO_WIDTH(&PWMD8, dc[1]*10000));
+	pwmEnableChannel(&PWMD8, 2, PWM_PERCENTAGE_TO_WIDTH(&PWMD8, dc[2]*10000));
+	pwmEnableChannel(&PWMD8, 3, PWM_PERCENTAGE_TO_WIDTH(&PWMD8, dc[3]*10000));
 #endif // ESC_COMM == PWM
 
 #if (ESC_COMM == SPI)

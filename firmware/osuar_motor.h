@@ -13,7 +13,7 @@ void setup_motors(void);
 /**
  * Send new desired motor speeds to ESCs.
  */
-void update_motors(float, float, float, float);
+void update_motors(float dc[4]);
 
 #endif // MOTOR_H
 
