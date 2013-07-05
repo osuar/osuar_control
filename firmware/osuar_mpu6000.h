@@ -1,13 +1,22 @@
 #ifndef OSUAR_MPU6000_H
 #define OSUAR_MPU6000_H
 
+#include <ch.h>
+#include <hal.h>
+
+#include <chsprintf.h>
+
 #include <osuar_spi.h>
 #include <osuar_uart.h>
 
 #define MPU_SPI_BUFSIZE 20
 
-#define GYR_LSB 1
-#define ACC_LSB 1
+#define GYR_X_OFFSET  0.021890
+#define GYR_Y_OFFSET  0.000050
+#define GYR_Z_OFFSET  0.036700
+#define ACC_X_OFFSET -0.002
+#define ACC_Y_OFFSET -0.017
+#define ACC_Z_OFFSET  0.145
 
 // Register names
 #define MPU6000_AUX_VDDIO          0x01   // R/W
@@ -110,6 +119,12 @@ void setup_mpu(void);
  * @output acc Acceleration per axis in g's.
  */
 void read_mpu(float gyr[3], float acc[3]);
+
+/**
+ * @brief Output debug string.
+ * @output buffer Buffer to populate with debug string.
+ */
+void debug_mpu(uint8_t *buffer);
 
 #endif // OSUAR_MPU6000_H
 
