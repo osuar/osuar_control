@@ -75,7 +75,7 @@ static msg_t comm_thread_2(void *arg)
 		counter++;
 
 		clear_buffer(txbuf);
-		debug_ahrs(txbuf);
+		debug_mpu(txbuf);
 		uartStartSend(&UARTD3, sizeof(txbuf), txbuf);
 
 		chThdSleepUntil(time);
