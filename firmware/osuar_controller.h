@@ -9,7 +9,6 @@
 
 #include <ch.h>
 #include <hal.h>
-#include <math.h>
 #include <osuar_config.h>
 #include <osuar_pid.h>
 #include <osuar_math.h>
@@ -33,7 +32,7 @@
  *
  * @output des_vel Desired velocity.
  */
-void angular_position_controller (float* cur_pos, float* cur_vel, float* des_pos, float* des_vel);
+void angular_position_controller(float* cur_pos, float* cur_vel, float* des_pos, float* des_vel);
 
 /**
  * @brief Calculate shifts in individual duty cycles of motors baseed on
@@ -45,7 +44,7 @@ void angular_position_controller (float* cur_pos, float* cur_vel, float* des_pos
  * @output dc_shift Shift in duty cycle. This will be added to the throttle
  *     duty cycle value in calculate_pwm_duty_cycles().
  */
-void angular_velocity_controller (float* cur_vel, float* des_vel, float* dc_shift);
+void angular_velocity_controller(float* cur_vel, float* des_vel, float* dc_shift);
 
 /**
  * @brief Calculate PWM duty cycles.
@@ -56,7 +55,18 @@ void angular_velocity_controller (float* cur_vel, float* des_vel, float* dc_shif
  *
  * @output dc_final Final duty cycles of motors and/or servos.
  */
-void calculate_duty_cycles(float dc_throttle, float* dc_shift, float* dc_final);
+void calculate_dc(float dc_throttle, float* dc_shift, float* dc_final);
+
+/**
+ * @brief Set up controller.
+ */
+void setup_controller(void);
+
+/**
+ * @brief Run the flight controller.
+ *
+ */
+void run_controller(float throttle, float dcm_bg[3][3], float gyr[3], float dc[4]);
 
 /**
  * @brief Map input array to be within desired bounds.
@@ -69,6 +79,11 @@ void calculate_duty_cycles(float dc_throttle, float* dc_shift, float* dc_final);
  * @output output Mapped output array.
  */
 void map_to_bounds(float* input, uint8_t input_size, float bound_lower, float bound_upper, float* output);
+
+/**
+ * debug
+ */
+void debug_controller(uint8_t *buffer);
 
 #endif // OSUAR_CONTROLLER_H
 

@@ -7,15 +7,17 @@
 #include <osuar_controller.h>
 
 /* TODO: Make setter function. */
-static float ang_pos_xy_cap, ang_vel_xy_cap, ang_vel_z_cap;
+static float ang_pos_xy_cap, ang_vel_xy_cap, ang_vel_z_cap;   // These aren't constants because we may want to change them mid-flight.
 static pid_data_t pid_data[6];
-static dc_final[8], target_ang_pos[3], curent_ang_pos[3];
-float throttle;
+static float dc_shift[3];
+static float des_ang_pos[3], cur_ang_pos[3], des_ang_vel[3];
 
-void angular_position_controller (float* cur_pos, float* cur_vel, float* des_pos, float* des_vel)
+void angular_position_controller(float* cur_pos, float* cur_vel, float* des_pos, float* des_vel)
 {
 	/* Cap des_pos for X and Y axes. */
 	/* TODO: Take cur_vel into account. */
+	(void)cur_vel;
+
 	int i;
 	for (i=0; i<2; i++) {
 		if (des_pos[i] > ang_pos_xy_cap) {
@@ -32,7 +34,7 @@ void angular_position_controller (float* cur_pos, float* cur_vel, float* des_pos
 	des_vel[2] = calculate_pid(cur_pos[2], des_pos[2], &pid_data[I_ANG_POS_Z]);
 }
 
-void angular_velocity_controller (float* cur_vel, float* des_vel, float* dc_shift)
+void angular_velocity_controller(float* cur_vel, float* des_vel, float* dc_shift)
 {
 	/* Cap des_vel for X and Y axes. */
 	int i;
@@ -62,7 +64,7 @@ void angular_velocity_controller (float* cur_vel, float* des_vel, float* dc_shif
 	dc_shift[2] = calculate_pid(cur_vel[2], des_vel[2], &pid_data[I_ANG_VEL_Z]);
 }
 
-void calculate_duty_cycles (float dc_throttle, float* dc_shift, float* dc_final)
+void calculate_dc (float dc_throttle, float* dc_shift, float* dc_final)
 {
 #if (NUM_ROTORS == 3)
 	dc_final[I_ST] = 0.5 + dc_shift[2];
@@ -72,57 +74,73 @@ void calculate_duty_cycles (float dc_throttle, float* dc_shift, float* dc_final)
 #endif // NUM_ROTORS == 3
 
 #if (NUM_ROTORS == 4)
-        dc_final[I_R315] = dc_throttle - dc_shift[1] - dc_shift[0];
-        dc_final[I_R045] = dc_throttle - dc_shift[1] + dc_shift[0];
-        dc_final[I_R225] = dc_throttle + dc_shift[1] + dc_shift[0];
-        dc_final[I_R135] = dc_throttle + dc_shift[1] - dc_shift[0];
+	dc_final[I_R045] = dc_throttle + dc_shift[0] - dc_shift[2];
+	dc_final[I_R135] = dc_throttle + dc_shift[1] + dc_shift[2];
+	dc_final[I_R225] = dc_throttle - dc_shift[0] - dc_shift[2];
+	dc_final[I_R315] = dc_throttle - dc_shift[1] + dc_shift[2];
 #endif // NUM_ROTORS == 4
 
 	/* Map duty cycles. */
 	map_to_bounds(dc_final, NUM_ROTORS, 0.0, THROTTLE_CAP, dc_final);
 }
 
-// TODO: Flesh this out. Refer to the fly() function in https://github.com/yoos/tricopter/blob/master/src/pilot.cpp
-void flight_controller (float* dc)
+void setup_controller(void)
 {
+	static uint8_t i;
+
+	ang_pos_xy_cap = M_PI/4;
+	ang_vel_xy_cap = 2*M_PI;
+	ang_vel_z_cap  = M_PI/2;   // These aren't constants because we may want to change them mid-flight.
+
+	for (i=0; i<3; i++) {
+		pid_data[I_ANG_POS_X+i].Kp = ANG_POS_KP;
+		pid_data[I_ANG_POS_X+i].Ki = ANG_POS_KI;
+		pid_data[I_ANG_POS_X+i].Kd = ANG_POS_KD;
+		pid_data[I_ANG_POS_X+i].dt = CONTROL_DT;
+		pid_data[I_ANG_POS_X+i].last_val = 0.0;
+		pid_data[I_ANG_VEL_X+i].Kp = ANG_VEL_KP;
+		pid_data[I_ANG_VEL_X+i].Ki = ANG_VEL_KI;
+		pid_data[I_ANG_VEL_X+i].Kd = ANG_VEL_KD;
+		pid_data[I_ANG_VEL_X+i].dt = CONTROL_DT;
+		pid_data[I_ANG_VEL_X+i].last_val = 0.0;
+	}
+}
+
+void run_controller(float throttle, float dcm_bg[3][3], float gyr[3], float dc[4])
+{
+	uint8_t i;
 	// Calculate target rotation vector based on groundstation input and scale to maximum rotation of ang_pos_xy_cap.
 	// TODO
-        target_ang_pos[0] = -joy.axes[SY] * ang_pos_xy_cap;
-        target_ang_pos[1] =  joy.axes[SX] * ang_pos_xy_cap;
-        target_ang_pos[2] =  joy.axes[SZ] * ang_pos_z_cap * CONTROL_LOOP_INTERVAL * MASTER_DT/1000000;
+	des_ang_pos[0] = 0; //-joy.axes[SY] * ang_pos_xy_cap;
+	des_ang_pos[1] = 0; // joy.axes[SX] * ang_pos_xy_cap;
+	des_ang_pos[2] = 0; // joy.axes[SZ] * ang_pos_z_cap * CONTROL_LOOP_INTERVAL * MASTER_DT/1000000;
 
 	// Calculate current rotation vector (Euler angles) from DCM and make appropriate modifications to make PID calculations work later.
 	// TODO
-        current_ang_pos[0] = atan2(bodyDCM[2][1], bodyDCM[2][2]) * bodyDCM[0][0] + atan2(bodyDCM[2][0], bodyDCM[2][2]) * bodyDCM[0][1];
-        current_ang_pos[1] = atan2(bodyDCM[2][0], dobyDCM[2][2]) * bodyDCM[1][1] - atan2(bodyDCM[2][1], bodyDCM[2][2]) * bodyDCM[1][0];
+	cur_ang_pos[0] =  arctan2(dcm_bg[2][1], dcm_bg[2][2]) * dcm_bg[0][0] - arctan2(dcm_bg[2][0], dcm_bg[2][2]) * dcm_bg[0][1];
+	cur_ang_pos[1] = -arctan2(dcm_bg[2][0], dcm_bg[2][2]) * dcm_bg[1][1] + arctan2(dcm_bg[2][1], dcm_bg[2][2]) * dcm_bg[1][0];
 
 	// Keep abs(target - current) within [-PI, PI]. This way, nothing bad happens as we rotate to any angle in [-PI, PI].
-	// TODO
-        for(int i = 0; i < 3; i++){
-            if(target_ang_pos[i] - current_ang_pos[i] > PI){
-                current_ang_pos[i] += 2*PI;
-            }
-            else{
-                current_ang_pos[i] -= 2*PI;
-            }
-        }
+	for (i=0; i<2; i++){
+		if(des_ang_pos[i] - cur_ang_pos[i] > M_PI){
+			cur_ang_pos[i] += 2*M_PI;
+		}
+		else{
+			cur_ang_pos[i] -= 2*M_PI;
+		}
+	}
 
-	angular_position_controller(cur_pos, cur_vel, des_pos, des_vel);
+	angular_position_controller(cur_ang_pos, gyr, des_ang_pos, des_ang_vel);
 
-	angular_velocity_controller(cur_vel, des_vel, dc_shift);
-
-	// Set throttle based on groundstation input.
-	// TODO
-        throttle = throttle_enabled * (0.8*joy.axis[ST1] + 0.2*joy.axes[ST0]) * (TMAX - TMIN);
+	angular_velocity_controller(gyr, des_ang_vel, dc_shift);
 
 	// Increase throttle based on tilt.
-	// TODO
-        throttle = throttle / MAX(bodyDCM[2][2], 0.707107);
+//	throttle = throttle / MAX(dcm_bg[2][2], 0.707107);
 
-	calculate_pwm_duty_cycles(throttle, dc_shift, dc);
+	calculate_dc(throttle, dc_shift, dc);
 }
 
-void map_to_bounds (float* input, uint8_t input_size, float bound_lower, float bound_upper, float* output)
+void map_to_bounds(float* input, uint8_t input_size, float bound_lower, float bound_upper, float* output)
 {
 	float map_lower = bound_lower;
 	float map_upper = bound_upper;
@@ -144,5 +162,13 @@ void map_to_bounds (float* input, uint8_t input_size, float bound_lower, float b
 	for (i=0; i<input_size; i++) {
 		output[i] = (input[i] + offset) * scale;
 	}
+}
+
+void debug_controller(uint8_t *buffer)
+{
+	chsprintf(buffer, "%8u %7d %7d\r\n",
+			chTimeNow(),
+			(int32_t) (cur_ang_pos[0]*1000000),
+			(int32_t) (cur_ang_pos[1]*1000000));
 }
 
