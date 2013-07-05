@@ -39,16 +39,16 @@ static msg_t comm_thread(void *arg)
 		counter++;
 
 		clear_buffer(txbuf);
-		chsprintf(txbuf, "%4u %4u %4u   %4u %4u %4u   %4u %4u %4u\r\n",
-				(uint16_t) ABS(dbg_dcm[0][0]*1000),
-				(uint16_t) ABS(dbg_dcm[0][1]*1000),
-				(uint16_t) ABS(dbg_dcm[0][2]*1000),
-				(uint16_t) ABS(dbg_dcm[1][0]*1000),
-				(uint16_t) ABS(dbg_dcm[1][1]*1000),
-				(uint16_t) ABS(dbg_dcm[1][2]*1000),
-				(uint16_t) ABS(dbg_dcm[2][0]*1000),
-				(uint16_t) ABS(dbg_dcm[2][1]*1000),
-				(uint16_t) ABS(dbg_dcm[2][2]*1000));
+		chsprintf(txbuf, "%5d %5d %5d   %5d %5d %5d   %5d %5d %5d\r\n",
+				(int16_t) (dbg_dcm[0][0]*1000),
+				(int16_t) (dbg_dcm[0][1]*1000),
+				(int16_t) (dbg_dcm[0][2]*1000),
+				(int16_t) (dbg_dcm[1][0]*1000),
+				(int16_t) (dbg_dcm[1][1]*1000),
+				(int16_t) (dbg_dcm[1][2]*1000),
+				(int16_t) (dbg_dcm[2][0]*1000),
+				(int16_t) (dbg_dcm[2][1]*1000),
+				(int16_t) (dbg_dcm[2][2]*1000));
 		uartStartSend(&UARTD1, sizeof(txbuf), txbuf);
 
 		chThdSleepUntil(time);

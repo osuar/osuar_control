@@ -77,16 +77,16 @@ void read_mpu(float gyr[3], float acc[3])
 	/* Read gyroscope. */
 	mpu_txbuf[0] = MPU6000_GYRO_XOUT_H | (1<<7);
 	spi_exchange(&SPID1, &mpu_hs_spicfg, mpu_txbuf, mpu_rxbuf, 7);
-	gyr[0] = ((int16_t) ((mpu_rxbuf[1]<<8) | mpu_rxbuf[2])) / 65.5 * 3.14159 / 180 + GYR_X_OFFSET;
-	gyr[1] = ((int16_t) ((mpu_rxbuf[3]<<8) | mpu_rxbuf[4])) / 65.5 * 3.14159 / 180 + GYR_Y_OFFSET;
-	gyr[2] = ((int16_t) ((mpu_rxbuf[5]<<8) | mpu_rxbuf[6])) / 65.5 * 3.14159 / 180 + GYR_Z_OFFSET;
+	gyr[0] = ((int16_t) -((mpu_rxbuf[1]<<8) | mpu_rxbuf[2])) / 65.5 * 3.14159 / 180 + GYR_X_OFFSET;
+	gyr[1] = ((int16_t) -((mpu_rxbuf[3]<<8) | mpu_rxbuf[4])) / 65.5 * 3.14159 / 180 + GYR_Y_OFFSET;
+	gyr[2] = ((int16_t) -((mpu_rxbuf[5]<<8) | mpu_rxbuf[6])) / 65.5 * 3.14159 / 180 + GYR_Z_OFFSET;
 
 	/* Read accelerometer. */
 	mpu_txbuf[0] = MPU6000_ACCEL_XOUT_H | (1<<7);
 	spi_exchange(&SPID1, &mpu_hs_spicfg, mpu_txbuf, mpu_rxbuf, 7);
-	acc[0] = ((int16_t) ((mpu_rxbuf[1]<<8) | mpu_rxbuf[2])) / 16384.0 + ACC_X_OFFSET;
-	acc[1] = ((int16_t) ((mpu_rxbuf[3]<<8) | mpu_rxbuf[4])) / 16384.0 + ACC_Y_OFFSET;
-	acc[2] = ((int16_t) ((mpu_rxbuf[5]<<8) | mpu_rxbuf[6])) / 16384.0 + ACC_Z_OFFSET;
+	acc[0] = ((int16_t) -((mpu_rxbuf[1]<<8) | mpu_rxbuf[2])) / 16384.0 + ACC_X_OFFSET;
+	acc[1] = ((int16_t) -((mpu_rxbuf[3]<<8) | mpu_rxbuf[4])) / 16384.0 + ACC_Y_OFFSET;
+	acc[2] = ((int16_t) -((mpu_rxbuf[5]<<8) | mpu_rxbuf[6])) / 16384.0 + ACC_Z_OFFSET;
 
 	/* Read temperature. */
 	mpu_txbuf[0] = MPU6000_TEMP_OUT_H | (1<<7);
@@ -115,8 +115,8 @@ void debug_mpu(uint8_t *buffer)
 
 	chsprintf(buffer, "%8u %7d %7d %7d\r\n",
 			count,
-			(int32_t) (g0*1000000),
-			(int32_t) (g1*1000000),
-			(int32_t) (g2*1000000));
+			(int32_t) (dbg_acc[0]*1000000),
+			(int32_t) (dbg_acc[1]*1000000),
+			(int32_t) (dbg_acc[2]*1000000));
 }
 

@@ -11,12 +11,12 @@
 
 #define MPU_SPI_BUFSIZE 20
 
-#define GYR_X_OFFSET  0.021890
-#define GYR_Y_OFFSET  0.000050
-#define GYR_Z_OFFSET  0.036700
-#define ACC_X_OFFSET -0.002
-#define ACC_Y_OFFSET -0.017
-#define ACC_Z_OFFSET  0.145
+#define GYR_X_OFFSET -0.021890
+#define GYR_Y_OFFSET -0.000050
+#define GYR_Z_OFFSET -0.036700
+#define ACC_X_OFFSET  0.002
+#define ACC_Y_OFFSET  0.017
+#define ACC_Z_OFFSET -0.145
 
 // Register names
 #define MPU6000_AUX_VDDIO          0x01   // R/W
