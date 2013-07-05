@@ -6,12 +6,12 @@ static float v_acc_last[3];   /* Last accelerometer read */
 static float acc_scale;       /* Scale down accelerometer weight if it differs from 1 g too much. */
 static float acc_weight;      /* Variable accelerometer weight */
 
-static float k_bb[3];   /* K body unit vector expressed in body coordinates */
+//static float k_bb[3];   /* K body unit vector expressed in body coordinates */
 static float k_gb[3];   /* K global unit vector expressed in body coordinates */
-static float j_gb[3];   /* J global unit vector expressed in body coordinates */
+//static float j_gb[3];   /* J global unit vector expressed in body coordinates */
 
 static float w_a[3];    /* Corrective rotation vector based on acceleration */
-static float w_m[3];    /* Corrective rotation vector based on magnetometer */
+//static float w_m[3];    /* Corrective rotation vector based on magnetometer */
 static float w_dt[3];   /* Angular displacement vector = w * dt, where w is the angular velocity vector and dt is the time elapsed. */
 
 static float dcm_gyro[3][3];   /* DCM based on gyro readings, corrected with w_a. */
@@ -44,7 +44,7 @@ void setup_ahrs(void)
 	setup_mpu();
 
 	/* Initialize DCMs as identity matrices. */
-	uint8_t i, j;
+	static uint8_t i, j;
 	for (i=0; i<3; i++) {
 		for (j=0; j<3; j++) {
 			m_init_identity(dcm_gyro);
@@ -96,11 +96,14 @@ void setup_ahrs(void)
 	#endif // ACC_WEIGHT
 }
 
-void update_ahrs(float dt, float dcm_out[3][3])
+void update_ahrs(float dt, float dcm_out[3][3], float gyr_out[3])
 {
-	static uint8_t i, j;
+	static uint8_t i;
 
 	read_mpu(v_gyr, v_acc);
+	for (i=0; i<3; i++) {
+		gyr_out[i] = v_gyr[i];
+	}
 
 	/**
 	 * Accelerometer
@@ -304,5 +307,6 @@ void update_ahrs(float dt, float dcm_out[3][3])
 
 void debug_ahrs(uint8_t *buffer)
 {
+	(void)buffer;
 }
 
