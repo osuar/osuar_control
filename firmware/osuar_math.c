@@ -161,8 +161,8 @@ int m_inverse(int n, float mat[3][3])
 		/* find pivot row, the row with biggest entry in current column */
 		tmp = 0;
 		for (i = k; i < n; i++) {
-			if (fabs(mat[i][k]) >= tmp) {   /* Avoid using other functions inside abs()? */
-				tmp = fabs(mat[i][k]);
+			if (ABS(mat[i][k]) >= tmp) {   /* Avoid using other functions inside abs()? */
+				tmp = ABS(mat[i][k]);
 				pivrow = i;
 			}
 		}
