@@ -20,9 +20,10 @@ void setup_ahrs(void);
 
 /**
  * @brief Update the AHRS.
+ * @param dt Time interval since last update.
  * @output dcm_out The orientation of the body relative to the world.
  */
-void update_ahrs(float dcm_out[3][3]);
+void update_ahrs(float dt, float dcm_out[3][3]);
 
 /**
  * @brief Output debug string.

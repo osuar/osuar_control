@@ -96,9 +96,9 @@ void setup_ahrs(void)
 	#endif // ACC_WEIGHT
 }
 
-void update_ahrs(float dcm_out[3][3])
+void update_ahrs(float dt, float dcm_out[3][3])
 {
-	static uint8_t i;
+	static uint8_t i, j;
 
 	read_mpu(v_gyr, v_acc);
 
@@ -212,7 +212,7 @@ void update_ahrs(float dcm_out[3][3])
 	// magnetometer correction vectors to obtain final w*dt.
 	static float numerator, denominator;
 	for (i=0; i<3; i++) {
-		numerator   = v_gyr[i] * CONTROL_DT/1000000;
+		numerator   = v_gyr[i] * dt;
 		denominator = 1.0;
 
 		#ifdef ACC_WEIGHT
@@ -305,7 +305,7 @@ void update_ahrs(float dcm_out[3][3])
 	//orthonormalize(dcm_out);   // TODO: This shouldn't be necessary.
 	#else
 	for (i=0; i<3; i++) {
-		for (int j=0; j<3; j++) {
+		for (j=0; j<3; j++) {
 			dcm_out[i][j] = dcm_gyro[i][j];
 		}
 	}
