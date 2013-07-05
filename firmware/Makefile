@@ -84,7 +84,7 @@ CSRC = $(PORTSRC) \
        $(BOARDSRC) \
        $(CHIBIOS)/os/various/devices_lib/accel/lis302dl.c \
        $(CHIBIOS)/os/various/chprintf.c \
-       main.c chsprintf.c osuar_adc.c osuar_ahrs.c osuar_math.c osuar_motor.c osuar_pid.c osuar_mpu6000.c osuar_spi.c osuar_uart.c
+       main.c chsprintf.c osuar_adc.c osuar_ahrs.c osuar_controller.c osuar_math.c osuar_motor.c osuar_pid.c osuar_mpu6000.c osuar_spi.c osuar_uart.c
 
 # C++ sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
