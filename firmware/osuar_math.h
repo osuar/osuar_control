@@ -16,6 +16,9 @@ float cosine(float x);
 float msqrt(float x);
 float minvsqrt(float x);
 
+/* atan2 */
+float arctan2(float y, float x);
+
 /* Dot product */
 float v_dotp (float v1[3], float v2[3]);
 

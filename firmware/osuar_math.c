@@ -43,6 +43,25 @@ float minvsqrt(float x)
 	return y*(1.5f-0.5f*x*y*y);
 }
 
+float arctan2(float y, float x)
+{
+	float coeff_1 = M_PI / 4.0;
+	float coeff_2 = 3.0 * coeff_1;
+	float abs_y = ABS(y);
+	float angle;
+
+	if (x >= 0.0) {
+		float r = (x - abs_y) / (x + abs_y);
+		angle = coeff_1 - coeff_1 * r;
+	}
+	else {
+		float r = (x + abs_y) / (abs_y - x);
+		angle = coeff_2 - coeff_1 * r;
+	}
+
+	return y < 0.0 ? -angle : angle;
+}
+
 float v_dotp(float v1[3], float v2[3])
 {
 	static float output;
