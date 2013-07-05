@@ -146,16 +146,6 @@ void update_ahrs(float dt, float dcm_out[3][3])
 	}
 	#endif // ACC_SCALE_WEIGHT
 
-	// Uncomment the loop below to get accelerometer readings in order to
-	// obtain trim_angle.
-	//if (loopCount % COMM_LOOP_INTERVAL == 0) {
-	//	sp("A(");
-	//	sp(v_acc[0]*1000); sp(", ");
-	//	sp(v_acc[1]*1000); sp(", ");
-	//	sp(v_acc[2]*1000);
-	//	sp(")  ");
-	//}
-
 	// Express K global unit vector in BODY frame as k_gb for use in drift
 	// correction (we need K to be described in the BODY frame because
 	// gravity is measured by the accelerometer in the BODY frame).
@@ -314,10 +304,5 @@ void update_ahrs(float dt, float dcm_out[3][3])
 
 void debug_ahrs(uint8_t *buffer)
 {
-	chsprintf(buffer, "%8u %4u %4u %4u\r\n",
-			chTimeNow(),
-			(uint16_t) ABS(v_gyr[0]*1000),
-			(uint16_t) ABS(v_gyr[1]*1000),
-			(uint16_t) ABS(v_gyr[2]*1000));
 }
 
