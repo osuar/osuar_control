@@ -18,6 +18,7 @@
 
 
 float dbg_dcm[3][3];
+float throttle = 0.50;
 
 /*
  * Communications loop
@@ -31,8 +32,6 @@ static msg_t comm_thread(void *arg)
 	int counter = 0;
 
 	uint8_t txbuf[200];
-
-	float mag[3];
 
 	while (TRUE) {
 		time += MS2ST(10);
@@ -75,7 +74,7 @@ static msg_t comm_thread_2(void *arg)
 		counter++;
 
 		clear_buffer(txbuf);
-		debug_mpu(txbuf);
+		debug_controller(txbuf);
 		uartStartSend(&UARTD3, sizeof(txbuf), txbuf);
 
 		chThdSleepUntil(time);
@@ -126,16 +125,22 @@ static msg_t control_thread(void *arg)
 	float dcm_bg[3][3];
 	m_init_identity(dcm_bg);
 
+	/* Gyro data to be used in controller. */
+	float gyr[3];
+	gyr[0] = 0;
+	gyr[1] = 0;
+	gyr[2] = 0;
+
 	/* Motor duty cycles */
 	float motor_dc[4];
 
-	float dc[4];   // Duty cycles for rotors. TODO: This should be initialized in a more centralized place.
+	uint16_t arm_counter = 5000;
 
 	while (TRUE) {
 		time += MS2ST(CONTROL_DT*1000)*100;   // Next deadline in 1 ms.   TODO: For some reason, MS2ST seems broken for if CH_FREQUENCY is set to anything other than its default value of 1000. Thus, the 100x multiplier here.
 
-		update_ahrs(CONTROL_DT, dcm_bg);
-		//run_controller(dcm_bg, motor_dc);   // TODO: Implement!
+		update_ahrs(CONTROL_DT, dcm_bg, gyr);
+		run_controller(throttle, dcm_bg, gyr, motor_dc);
 
 		static uint8_t i, j;
 		for (i=0; i<3; i++) {
@@ -144,13 +149,16 @@ static msg_t control_thread(void *arg)
 			}
 		}
 
-		motor_dc[0] = 0.1;
-		motor_dc[1] = 0.1;
-		motor_dc[2] = 0.1;
-		motor_dc[3] = 0.1;
 		update_motors(motor_dc);
 
 		palTogglePad(GPIOA, 6);
+
+		if (arm_counter > 0) {
+			arm_counter -= 1;
+		}
+		else {
+			throttle = 0.65;
+		}
 
 		chThdSleepUntil(time);
 	}
@@ -183,6 +191,8 @@ int main(void)
 	setup_ahrs();
 
 	setup_motors();
+
+	setup_controller();
 
 	palSetPadMode(GPIOA, 6, PAL_MODE_OUTPUT_PUSHPULL);
 	palSetPadMode(GPIOA, 7, PAL_MODE_OUTPUT_PUSHPULL);
