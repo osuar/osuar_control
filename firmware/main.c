@@ -17,6 +17,8 @@
 #include <osuar_config.h>   // General configuration
 
 
+float dbg_dcm[3][3];
+
 /*
  * Communications loop
  */
@@ -28,16 +30,25 @@ static msg_t comm_thread(void *arg)
 	systime_t time = chTimeNow();
 	int counter = 0;
 
-	uint8_t txbuf[20];
+	uint8_t txbuf[200];
 
 	float mag[3];
 
 	while (TRUE) {
-		time += MS2ST(1000);
+		time += MS2ST(10);
 		counter++;
 
 		clear_buffer(txbuf);
-		chsprintf(txbuf, "X: %u  Y: %u  Z: %u\r\n", (uint8_t) mag[0], (uint8_t) mag[1], (uint8_t) mag[2]);
+		chsprintf(txbuf, "%4u %4u %4u   %4u %4u %4u   %4u %4u %4u\r\n",
+				(uint16_t) ABS(dbg_dcm[0][0]*1000),
+				(uint16_t) ABS(dbg_dcm[0][1]*1000),
+				(uint16_t) ABS(dbg_dcm[0][2]*1000),
+				(uint16_t) ABS(dbg_dcm[1][0]*1000),
+				(uint16_t) ABS(dbg_dcm[1][1]*1000),
+				(uint16_t) ABS(dbg_dcm[1][2]*1000),
+				(uint16_t) ABS(dbg_dcm[2][0]*1000),
+				(uint16_t) ABS(dbg_dcm[2][1]*1000),
+				(uint16_t) ABS(dbg_dcm[2][2]*1000));
 		uartStartSend(&UARTD1, sizeof(txbuf), txbuf);
 
 		chThdSleepUntil(time);
@@ -103,7 +114,7 @@ static msg_t adc_thread(void *arg)
 /*
  * Control loop
  */
-static WORKING_AREA(wa_control_thread, 128);
+static WORKING_AREA(wa_control_thread, 1280);
 static msg_t control_thread(void *arg)
 {
 	(void) arg;
@@ -115,14 +126,27 @@ static msg_t control_thread(void *arg)
 	float dcm_bg[3][3];
 	m_init_identity(dcm_bg);
 
+	/* Motor duty cycles */
+	float motor_dc[4];
+
 	while (TRUE) {
-		time += MS2ST(CONTROL_DT*1000);   // Next deadline in 1 ms.
+		time += MS2ST(CONTROL_DT*1000)*100;   // Next deadline in 1 ms.   TODO: For some reason, MS2ST seems broken for if CH_FREQUENCY is set to anything other than its default value of 1000. Thus, the 100x multiplier here.
 
-		update_ahrs(dcm_bg);
+		update_ahrs(CONTROL_DT, dcm_bg);
+		//run_controller(dcm_bg, motor_dc);   // TODO: Implement!
 
-		/* TODO: Run controller and get duty cycles. */
+		static uint8_t i, j;
+		for (i=0; i<3; i++) {
+			for (j=0; j<3; j++) {
+				dbg_dcm[i][j] = dcm_bg[i][j];
+			}
+		}
 
-		/* TODO: Update motors with duty cycles. */
+		motor_dc[0] = 0.1;
+		motor_dc[1] = 0.1;
+		motor_dc[2] = 0.1;
+		motor_dc[3] = 0.1;
+		update_motors(motor_dc);
 
 		palTogglePad(GPIOA, 6);
 
