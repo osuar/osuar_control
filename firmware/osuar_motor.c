@@ -10,8 +10,8 @@
  * See datasheet page 45 for pinouts.
  */
 static PWMConfig pwm8cfg = {
-	400000,    // 4 kHz PWM clock frequency.
-	1000,      // PWM period 2.5 ms.
+	500000,    // 5 kHz PWM clock frequency.
+	1000,      // PWM period 2.0 ms.
 	NULL,      // No callback.
 	{
 #if (NUM_ROTORS == 2)
