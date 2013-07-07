@@ -13,7 +13,7 @@ static const SPIConfig mpu_hs_spicfg = {
 	NULL,
 	GPIOB,
 	2,
-	SPI_CR1_BR_1   /* 42000000/2^2 = 10500000 */
+	SPI_CR1_BR_0   /* 42000000/2^1 = 21000000 */
 };
 
 /**
@@ -70,6 +70,8 @@ void setup_mpu(void)
 	mpu_txbuf[0] = MPU6000_ACCEL_CONFIG;
 	mpu_txbuf[1] = (mpu_rxbuf[1] & ~0x18) | 0x00;
 	spi_exchange(&SPID1, &mpu_hs_spicfg, mpu_txbuf, mpu_rxbuf, 2);   /* Exchange data. */
+
+	read_mpu(dbg_gyr, dbg_acc);   /* Read once to clear out bad data? */
 }
 
 void read_mpu(float gyr[3], float acc[3])

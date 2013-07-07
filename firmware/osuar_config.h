@@ -12,13 +12,13 @@
 /**
  * Which quadrotor? Choose from: APOLLO, HERMES
  */
-#define APOLLO
+#define HERMES
 
 #define NUM_ROTORS 4
 #define ESC_COMM PWM   // Set to either PWM or SPI.
 
 /* Loop periods */
-#define CONTROL_DT 0.001
+#define CONTROL_DT 0.001   /* Note that MS2ST won't work here. See its implementation to find out why. */
 
 /******************************************************************************
  * 2-rotor system.

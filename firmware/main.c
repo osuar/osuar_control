@@ -19,6 +19,7 @@
 
 float dbg_dcm[3][3];
 float throttle = 0.50;
+static uint32_t counter = 0;
 
 /*
  * Communications loop
@@ -29,16 +30,15 @@ static msg_t comm_thread(void *arg)
 	(void) arg;
 	chRegSetThreadName("communications");
 	systime_t time = chTimeNow();
-	int counter = 0;
 
 	uint8_t txbuf[200];
 
 	while (TRUE) {
 		time += MS2ST(10);
-		counter++;
 
 		clear_buffer(txbuf);
-		chsprintf(txbuf, "%5d %5d %5d   %5d %5d %5d   %5d %5d %5d\r\n",
+		chsprintf(txbuf, "%9d   %5d %5d %5d   %5d %5d %5d   %5d %5d %5d\r\n",
+				counter,
 				(int16_t) (dbg_dcm[0][0]*1000),
 				(int16_t) (dbg_dcm[0][1]*1000),
 				(int16_t) (dbg_dcm[0][2]*1000),
@@ -70,11 +70,11 @@ static msg_t comm_thread_2(void *arg)
 	uint8_t txbuf[200];
 
 	while (TRUE) {
-		time += MS2ST(100);
+		time += MS2ST(10);
 		counter++;
 
 		clear_buffer(txbuf);
-		debug_controller(txbuf);
+		debug_mpu(txbuf);
 		uartStartSend(&UARTD3, sizeof(txbuf), txbuf);
 
 		chThdSleepUntil(time);
@@ -118,7 +118,6 @@ static msg_t control_thread(void *arg)
 {
 	(void) arg;
 	chRegSetThreadName("control");
-
 	systime_t time = chTimeNow();
 
 	/* DCM of body in global frame. */
@@ -134,10 +133,9 @@ static msg_t control_thread(void *arg)
 	/* Motor duty cycles */
 	float motor_dc[4];
 
-	uint16_t arm_counter = 5000;
-
 	while (TRUE) {
-		time += MS2ST(CONTROL_DT*1000)*100;   // Next deadline in 1 ms.   TODO: For some reason, MS2ST seems broken for if CH_FREQUENCY is set to anything other than its default value of 1000. Thus, the 100x multiplier here.
+		counter++;
+		time += CONTROL_DT*CH_FREQUENCY;
 
 		update_ahrs(CONTROL_DT, dcm_bg, gyr);
 		run_controller(throttle, dcm_bg, gyr, motor_dc);
@@ -152,13 +150,6 @@ static msg_t control_thread(void *arg)
 		update_motors(motor_dc);
 
 		palTogglePad(GPIOA, 6);
-
-		if (arm_counter > 0) {
-			arm_counter -= 1;
-		}
-		else {
-			throttle = 0.65;
-		}
 
 		chThdSleepUntil(time);
 	}
@@ -202,7 +193,7 @@ int main(void)
 	/*
 	 * Short delay to let the various setup functions finish.
 	 */
-	chThdSleepMilliseconds(1);
+	chThdSleepMilliseconds(50);
 
 	/*
 	 * Create the communications thread.
