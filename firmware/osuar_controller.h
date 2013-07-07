@@ -49,6 +49,10 @@ void angular_velocity_controller(float* cur_vel, float* des_vel, float* dc_shift
 /**
  * @brief Calculate PWM duty cycles.
  *
+ * Note that all axes are based around the IMU. The 0th motor is in line with
+ * the IMU's positive X axis, the 1st motor with the IMU's positive Y axis, and
+ * so on.
+ *
  * @param dc_throttle Throttle duty cycle. Range [0.0, 1.0]
  * @param dc_shift Shifts in duty cycles calculated by angular position and/or
  *     velocity controllers.
