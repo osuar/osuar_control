@@ -2,7 +2,7 @@
 
 static uint8_t mpu_txbuf[MPU_SPI_BUFSIZE];
 static uint8_t mpu_rxbuf[MPU_SPI_BUFSIZE];
-static float dbg_gyr[3], dbg_acc[3];
+static float dbg_gyr[3], dbg_acc[3], dbg_temp;
 
 /**
  * @brief High speed SPI configuration for MPU-6000 (10.5 MHz, CPHA=0,
@@ -77,16 +77,16 @@ void read_mpu(float gyr[3], float acc[3])
 	/* Read gyroscope. */
 	mpu_txbuf[0] = MPU6000_GYRO_XOUT_H | (1<<7);
 	spi_exchange(&SPID1, &mpu_hs_spicfg, mpu_txbuf, mpu_rxbuf, 7);
-	gyr[0] = ((int16_t) -((mpu_rxbuf[1]<<8) | mpu_rxbuf[2])) / 65.5 * 3.14159 / 180 + GYR_X_OFFSET;
-	gyr[1] = ((int16_t) -((mpu_rxbuf[3]<<8) | mpu_rxbuf[4])) / 65.5 * 3.14159 / 180 + GYR_Y_OFFSET;
-	gyr[2] = ((int16_t) -((mpu_rxbuf[5]<<8) | mpu_rxbuf[6])) / 65.5 * 3.14159 / 180 + GYR_Z_OFFSET;
+	gyr[0] = ((int16_t) ((mpu_rxbuf[1]<<8) | mpu_rxbuf[2])) / 65.5 * 3.14159 / 180 + GYR_X_OFFSET;
+	gyr[1] = ((int16_t) ((mpu_rxbuf[3]<<8) | mpu_rxbuf[4])) / 65.5 * 3.14159 / 180 + GYR_Y_OFFSET;
+	gyr[2] = ((int16_t) ((mpu_rxbuf[5]<<8) | mpu_rxbuf[6])) / 65.5 * 3.14159 / 180 + GYR_Z_OFFSET;
 
 	/* Read accelerometer. */
 	mpu_txbuf[0] = MPU6000_ACCEL_XOUT_H | (1<<7);
 	spi_exchange(&SPID1, &mpu_hs_spicfg, mpu_txbuf, mpu_rxbuf, 7);
-	acc[0] = ((int16_t) -((mpu_rxbuf[1]<<8) | mpu_rxbuf[2])) / 16384.0 + ACC_X_OFFSET;
-	acc[1] = ((int16_t) -((mpu_rxbuf[3]<<8) | mpu_rxbuf[4])) / 16384.0 + ACC_Y_OFFSET;
-	acc[2] = ((int16_t) -((mpu_rxbuf[5]<<8) | mpu_rxbuf[6])) / 16384.0 + ACC_Z_OFFSET;
+	acc[0] = ((int16_t) ((mpu_rxbuf[1]<<8) | mpu_rxbuf[2])) / 16384.0 + ACC_X_OFFSET;
+	acc[1] = ((int16_t) ((mpu_rxbuf[3]<<8) | mpu_rxbuf[4])) / 16384.0 + ACC_Y_OFFSET;
+	acc[2] = ((int16_t) ((mpu_rxbuf[5]<<8) | mpu_rxbuf[6])) / 16384.0 + ACC_Z_OFFSET;
 
 	/* Read temperature. */
 	mpu_txbuf[0] = MPU6000_TEMP_OUT_H | (1<<7);
@@ -99,24 +99,36 @@ void read_mpu(float gyr[3], float acc[3])
 		dbg_gyr[i] = gyr[i];
 		dbg_acc[i] = acc[i];
 	}
+	dbg_temp = mpu_temp;
 }
 
+#define DEBUG_CALIBRATE 1
 void debug_mpu(uint8_t *buffer)
 {
 	static uint16_t count = 1;
 	static float g0 = 0;
 	static float g1 = 0;
 	static float g2 = 0;
-	g0 = (g0*count + dbg_acc[0]) / (count+1);
-	g1 = (g1*count + dbg_acc[1]) / (count+1);
-	g2 = (g2*count + dbg_acc[2]) / (count+1);
+	static float a0 = 0;
+	static float a1 = 0;
+	static float a2 = 0;
+	g0 = (DEBUG_CALIBRATE) ? (g0*count + dbg_gyr[0] - GYR_X_OFFSET) / (count+1) : dbg_gyr[0];
+	g1 = (DEBUG_CALIBRATE) ? (g1*count + dbg_gyr[1] - GYR_Y_OFFSET) / (count+1) : dbg_gyr[1];
+	g2 = (DEBUG_CALIBRATE) ? (g2*count + dbg_gyr[2] - GYR_Z_OFFSET) / (count+1) : dbg_gyr[2];
+	a0 = (DEBUG_CALIBRATE) ? (a0*count + dbg_acc[0] - ACC_X_OFFSET) / (count+1) : dbg_acc[0];
+	a1 = (DEBUG_CALIBRATE) ? (a1*count + dbg_acc[1] - ACC_Y_OFFSET) / (count+1) : dbg_acc[1];
+	a2 = (DEBUG_CALIBRATE) ? (a2*count + dbg_acc[2] - ACC_Z_OFFSET) / (count+1) : dbg_acc[2];
 
 	count += 1;
 
-	chsprintf(buffer, "%8u %7d %7d %7d\r\n",
+	chsprintf(buffer, "%8u  G: %7d %7d %7d  A: %7d %7d %7d  T: %7d\r\n",
 			count,
-			(int32_t) (dbg_acc[0]*1000000),
-			(int32_t) (dbg_acc[1]*1000000),
-			(int32_t) (dbg_acc[2]*1000000));
+			(int32_t) (g0*1000000),
+			(int32_t) (g1*1000000),
+			(int32_t) (g2*1000000),
+			(int32_t) (a0*1000000),
+			(int32_t) (a1*1000000),
+			(int32_t) (a2*1000000),
+			(int32_t) (dbg_temp*1000));
 }
 

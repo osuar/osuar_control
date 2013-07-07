@@ -6,17 +6,29 @@
 
 #include <chsprintf.h>
 
+#include <osuar_config.h>
 #include <osuar_spi.h>
 #include <osuar_uart.h>
 
 #define MPU_SPI_BUFSIZE 20
 
-#define GYR_X_OFFSET -0.021890
-#define GYR_Y_OFFSET -0.000050
-#define GYR_Z_OFFSET -0.036700
-#define ACC_X_OFFSET  0.002
-#define ACC_Y_OFFSET  0.017
-#define ACC_Z_OFFSET -0.145
+#ifdef APOLLO
+#define GYR_X_OFFSET  0.027300
+#define GYR_Y_OFFSET -0.008620
+#define GYR_Z_OFFSET  0.040180
+#define ACC_X_OFFSET -0.022030
+#define ACC_Y_OFFSET -0.028988
+#define ACC_Z_OFFSET -0.125280
+#endif /* APOLLO */
+
+#ifdef HERMES
+#define GYR_X_OFFSET  0.011360
+#define GYR_Y_OFFSET -0.013330
+#define GYR_Z_OFFSET -0.002482
+#define ACC_X_OFFSET -0.007365
+#define ACC_Y_OFFSET -0.010660
+#define ACC_Z_OFFSET -0.038730
+#endif /* HERMES */
 
 // Register names
 #define MPU6000_AUX_VDDIO          0x01   // R/W
