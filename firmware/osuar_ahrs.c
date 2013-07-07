@@ -88,7 +88,7 @@ void setup_ahrs(void)
 
 	v_acc[0] = 0;
 	v_acc[1] = 0;
-	v_acc[2] = -1;
+	v_acc[2] = 1;
 	for (i=0; i<3; i++) {
 		v_acc_last[i] = v_acc[i];
 	}
@@ -137,7 +137,6 @@ void update_ahrs(float dt, float dcm_out[3][3], float gyr_out[3])
 	 * disregaring acceleration input can be more accurately determined.
 	 */
 	#ifdef ACC_SCALE_WEIGHT
-	// For some reason, 1 gravity has magnitude of 1.05.
 	acc_scale = (1.0 - MIN(1.0, ACC_SCALE_WEIGHT * ABS(acc_scale - 1.0)));
 	acc_weight = ACC_WEIGHT * acc_scale;
 	#else
@@ -164,8 +163,10 @@ void update_ahrs(float dt, float dcm_out[3][3], float gyr_out[3])
 	// negative of the K vector). Although we do not explicitly negate the
 	// gravity vector, the cross product below produces a rotation vector
 	// that we can later add to the angular displacement vector to correct
-	// for gyro drift in the X and Y axes.
+	// for gyro drift in the X and Y axes. Note we negate w_a because our
+	// acceleration vector is actually the negative of our gravity vector.
 	v_crossp(k_gb, v_acc, w_a);
+	v_scale(w_a, -1, w_a);
 	#endif // ACC_WEIGHT
 
 	// ========================================================================
@@ -297,6 +298,7 @@ void update_ahrs(float dt, float dcm_out[3][3], float gyr_out[3])
 	m_product(dcm_trim, dcm_gyro, dcm_out);
 	//orthonormalize(dcm_out);   // TODO: This shouldn't be necessary.
 	#else
+	static uint8_t j;
 	for (i=0; i<3; i++) {
 		for (j=0; j<3; j++) {
 			dcm_out[i][j] = dcm_gyro[i][j];
