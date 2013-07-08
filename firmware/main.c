@@ -34,7 +34,7 @@ static msg_t comm_thread(void *arg)
 	uint8_t txbuf[200];
 
 	while (TRUE) {
-		time += MS2ST(10);
+		time += MS2ST(11)-1;
 
 		clear_buffer(txbuf);
 		chsprintf(txbuf, "%9d   %5d %5d %5d   %5d %5d %5d   %5d %5d %5d\r\n",
@@ -70,7 +70,7 @@ static msg_t comm_thread_2(void *arg)
 	uint8_t txbuf[200];
 
 	while (TRUE) {
-		time += MS2ST(10);
+		time += MS2ST(11)-1;
 		counter++;
 
 		clear_buffer(txbuf);
