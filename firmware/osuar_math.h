@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-#define M_PI 3.1415926535
+#define M_PI 3.14159265358979323846
 
 #define ABS(x) (((x) < 0) ? -(x) : (x))
 #define CLAMP(x, min, max) (((x) < min) ? (min):(((x) > max) ? (max):(x)))
