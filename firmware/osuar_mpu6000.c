@@ -46,22 +46,27 @@ void setup_mpu(void)
 
 	chThdSleepMilliseconds(100);
 
-	/* Wake up device and set clock source to Gyro Z. */
-	mpu_txbuf[0] = MPU6000_PWR_MGMT_1;
-	mpu_txbuf[1] = 0x03;
-	spi_exchange(&SPID1, &mpu_hs_spicfg, mpu_txbuf, mpu_rxbuf, 2);   /* Exchange data. */
-
 	/* Set sample rate to 1 kHz. */
 	mpu_txbuf[0] = MPU6000_SMPLRT_DIV;
 	mpu_txbuf[1] = 0x00;
 	spi_exchange(&SPID1, &mpu_hs_spicfg, mpu_txbuf, mpu_rxbuf, 2);   /* Exchange data. */
 
-	/* Set gyro full range to 500 dps. We first read in the current register
+	/* Set DLPF to 4 (20 Hz gyro bandwidth, 21 Hz accelerometer bandwidth) */
+	mpu_txbuf[0] = MPU6000_CONFIG;
+	mpu_txbuf[1] = 0x04;
+	spi_exchange(&SPID1, &mpu_hs_spicfg, mpu_txbuf, mpu_rxbuf, 2);   /* Exchange data. */
+
+	/* Wake up device and set clock source to Gyro Z. */
+	mpu_txbuf[0] = MPU6000_PWR_MGMT_1;
+	mpu_txbuf[1] = 0x03;
+	spi_exchange(&SPID1, &mpu_hs_spicfg, mpu_txbuf, mpu_rxbuf, 2);   /* Exchange data. */
+
+	/* Set gyro full range to 2000 dps. We first read in the current register
 	 * value so we can change what we need and leave everything else alone. */
 	mpu_txbuf[0] = MPU6000_GYRO_CONFIG | (1<<7);
 	spi_exchange(&SPID1, &mpu_hs_spicfg, mpu_txbuf, mpu_rxbuf, 2);   /* Exchange data. */
 	mpu_txbuf[0] = MPU6000_GYRO_CONFIG;
-	mpu_txbuf[1] = (mpu_rxbuf[1] & ~0x18) | 0x08;
+	mpu_txbuf[1] = (mpu_rxbuf[1] & ~0x18) | 0x18;
 	spi_exchange(&SPID1, &mpu_hs_spicfg, mpu_txbuf, mpu_rxbuf, 2);   /* Exchange data. */
 
 	/* Set accelerometer full range to 2 g. */
@@ -79,9 +84,9 @@ void read_mpu(float gyr[3], float acc[3])
 	/* Read gyroscope. */
 	mpu_txbuf[0] = MPU6000_GYRO_XOUT_H | (1<<7);
 	spi_exchange(&SPID1, &mpu_hs_spicfg, mpu_txbuf, mpu_rxbuf, 7);
-	gyr[0] = ((int16_t) ((mpu_rxbuf[1]<<8) | mpu_rxbuf[2])) / 65.5 * 3.14159 / 180 + GYR_X_OFFSET;
-	gyr[1] = ((int16_t) ((mpu_rxbuf[3]<<8) | mpu_rxbuf[4])) / 65.5 * 3.14159 / 180 + GYR_Y_OFFSET;
-	gyr[2] = ((int16_t) ((mpu_rxbuf[5]<<8) | mpu_rxbuf[6])) / 65.5 * 3.14159 / 180 + GYR_Z_OFFSET;
+	gyr[0] = ((int16_t) ((mpu_rxbuf[1]<<8) | mpu_rxbuf[2])) / 16.384 * M_PI / 180.0 + GYR_X_OFFSET;
+	gyr[1] = ((int16_t) ((mpu_rxbuf[3]<<8) | mpu_rxbuf[4])) / 16.384 * M_PI / 180.0 + GYR_Y_OFFSET;
+	gyr[2] = ((int16_t) ((mpu_rxbuf[5]<<8) | mpu_rxbuf[6])) / 16.384 * M_PI / 180.0 + GYR_Z_OFFSET;
 
 	/* Read accelerometer. */
 	mpu_txbuf[0] = MPU6000_ACCEL_XOUT_H | (1<<7);
