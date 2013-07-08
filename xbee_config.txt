@@ -1,0 +1,51 @@
+###############################################################################
+# XBee configuration
+###############################################################################
+
+  ID: PAN ID
+  CH: channel (0x0B to 0x1A)
+  DH: destination high 32-bit
+  DL: destination low 32-bit
+  MY: own 16-bit address
+  BD: baudrate
+      0: 1200
+      1: 2400
+      2: 4800
+      3: 9600
+      4: 19200
+      5: 38400
+      6: 57600
+      7: 115200
+  RO: packetization timeout for wireless programming
+  D3: digital I/O pin 3. Modes:
+      0: Disabled
+      1: NA
+      2: ADC
+      3: DI
+      4: DO LOW
+      5: DO HIGH
+  IC: ditigal I/O change detect. 0x08 is the mask to listen on only D3 (bitfield).
+  IU: I/O output; whether or not the receiver displays the status update on the serial line.
+  IA: I/O line passing input address. 0xffff matches all addresses.
+  IR: Sampling rate in ms
+  PR: Pullup resistors (bitmask)
+
+---
+
+XBee 2.4 GHz
+
+     XBee 0   XBee 1   Factory default
+ID   3332     3332     3332
+CH   C        C        C
+DH   0        0        0
+DL   1        0        0
+MY   0        1        0
+BD   3        3        3
+RO   3        3        3
+D3   3        5        0
+IC   8        0        0
+IU   0        0        1
+IA   FFFF     FFFF     FFFFFFFFFFFFFFFF
+IR   1        1        ?
+PR   0        FF       FF
+
