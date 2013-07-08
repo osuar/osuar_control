@@ -6,6 +6,7 @@
 
 #include <chsprintf.h>
 
+#include <osuar_math.h>
 #include <osuar_config.h>
 #include <osuar_spi.h>
 #include <osuar_uart.h>
