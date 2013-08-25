@@ -23,9 +23,9 @@
 #endif /* APOLLO */
 
 #ifdef HERMES
-#define GYR_X_OFFSET  0.011360
-#define GYR_Y_OFFSET -0.013330
-#define GYR_Z_OFFSET -0.001482
+#define GYR_X_OFFSET -0.000000
+#define GYR_Y_OFFSET -0.009000
+#define GYR_Z_OFFSET -0.012000
 #define ACC_X_OFFSET -0.007365
 #define ACC_Y_OFFSET -0.010660
 #define ACC_Z_OFFSET -0.038730
