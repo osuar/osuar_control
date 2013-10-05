@@ -206,22 +206,17 @@ void update_ahrs(float dt, float dcm_out[3][3], float gyr_out[3])
 	// Scale v_gyr by elapsed time (in seconds) to get angle w*dt in
 	// radians, then compute weighted average with the accelerometer and
 	// magnetometer correction vectors to obtain final w*dt.
-	static float numerator, denominator;
+	// TODO: This is still not exactly correct.
 	for (i=0; i<3; i++) {
-		numerator   = v_gyr[i] * dt;
-		denominator = 1.0;
+		w_dt[i] = v_gyr[i] * dt;
 
 		#ifdef ACC_WEIGHT
-		numerator   += acc_weight * w_a[i];
-		//denominator += acc_weight;
+		w_dt[i] += acc_weight * w_a[i];
 		#endif // ACC_WEIGHT
 
 		#ifdef MAG_WEIGHT
-		numerator   += MAG_WEIGHT * w_m[i];
-		denominator += MAG_WEIGHT;
+		w_dt[i] += MAG_WEIGHT * w_m[i];
 		#endif // MAG_WEIGHT
-
-		w_dt[i] = numerator / denominator;
 	}
 
 	// ========================================================================
