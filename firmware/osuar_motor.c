@@ -249,13 +249,10 @@ void update_motors(float dc[4])
 	 * Calculate motor values.
 	 */
 #if (ESC_COMM == PWM)
-	/* TODO: I don't know where the magic number 7500 comes from, but this
-	 * works.
-	 */
-	pwmEnableChannel(&PWMD8, 0, PWM_PERCENTAGE_TO_WIDTH(&PWMD8, dc[0]*7500));
-	pwmEnableChannel(&PWMD8, 1, PWM_PERCENTAGE_TO_WIDTH(&PWMD8, dc[1]*7500));
-	pwmEnableChannel(&PWMD8, 2, PWM_PERCENTAGE_TO_WIDTH(&PWMD8, dc[2]*7500));
-	pwmEnableChannel(&PWMD8, 3, PWM_PERCENTAGE_TO_WIDTH(&PWMD8, dc[3]*7500));
+	pwmEnableChannel(&PWMD8, 0, PWM_PERCENTAGE_TO_WIDTH(&PWMD8, dc[0]*1000));
+	pwmEnableChannel(&PWMD8, 1, PWM_PERCENTAGE_TO_WIDTH(&PWMD8, dc[1]*1000));
+	pwmEnableChannel(&PWMD8, 2, PWM_PERCENTAGE_TO_WIDTH(&PWMD8, dc[2]*1000));
+	pwmEnableChannel(&PWMD8, 3, PWM_PERCENTAGE_TO_WIDTH(&PWMD8, dc[3]*1000));
 #endif // ESC_COMM == PWM
 
 #if (ESC_COMM == SPI)
