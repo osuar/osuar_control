@@ -119,12 +119,12 @@ void debug_mpu(uint8_t *buffer)
 	static float a0 = 0;
 	static float a1 = 0;
 	static float a2 = 0;
-	g0 = (DEBUG_CALIBRATE == 0) ? (g0*count + dbg_gyr[0] - GYR_X_OFFSET) / (count+1) : dbg_gyr[0];
-	g1 = (DEBUG_CALIBRATE == 0) ? (g1*count + dbg_gyr[1] - GYR_Y_OFFSET) / (count+1) : dbg_gyr[1];
-	g2 = (DEBUG_CALIBRATE == 0) ? (g2*count + dbg_gyr[2] - GYR_Z_OFFSET) / (count+1) : dbg_gyr[2];
-	a0 = (DEBUG_CALIBRATE == 0) ? (a0*count + dbg_acc[0] - ACC_X_OFFSET) / (count+1) : dbg_acc[0];
-	a1 = (DEBUG_CALIBRATE == 0) ? (a1*count + dbg_acc[1] - ACC_Y_OFFSET) / (count+1) : dbg_acc[1];
-	a2 = (DEBUG_CALIBRATE == 0) ? (a2*count + dbg_acc[2] - ACC_Z_OFFSET) / (count+1) : dbg_acc[2];
+	g0 = (DEBUG_CALIBRATE == 1) ? (g0*count + dbg_gyr[0] - GYR_X_OFFSET) / (count+1) : dbg_gyr[0];
+	g1 = (DEBUG_CALIBRATE == 1) ? (g1*count + dbg_gyr[1] - GYR_Y_OFFSET) / (count+1) : dbg_gyr[1];
+	g2 = (DEBUG_CALIBRATE == 1) ? (g2*count + dbg_gyr[2] - GYR_Z_OFFSET) / (count+1) : dbg_gyr[2];
+	a0 = (DEBUG_CALIBRATE == 1) ? (a0*count + dbg_acc[0] - ACC_X_OFFSET) / (count+1) : dbg_acc[0];
+	a1 = (DEBUG_CALIBRATE == 1) ? (a1*count + dbg_acc[1] - ACC_Y_OFFSET) / (count+1) : dbg_acc[1];
+	a2 = (DEBUG_CALIBRATE == 1) ? (a2*count + dbg_acc[2] - ACC_Z_OFFSET) / (count+1) : dbg_acc[2];
 
 	count += 1;
 
