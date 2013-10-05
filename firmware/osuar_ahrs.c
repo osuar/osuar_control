@@ -134,9 +134,8 @@ void update_ahrs(float dt, float dcm_out[3][3], float gyr_out[3])
 	 * Reduce accelerometer weight if the magnitude of the measured
 	 * acceleration is significantly greater than or less than 1 g.
 	 *
-	 * TODO: Magnitude of acceleration should be reported over telemetry so the
-	 * "cutoff" value (the constant before the ABS() below) for disregarding
-	 * acceleration input can be more accurately determined.
+	 * TODO: Magnitude of acceleration should be reported over telemetry so
+	 * ACC_SCALE_WEIGHT can be more accurately determined.
 	 */
 	#ifdef ACC_SCALE_WEIGHT
 	acc_scale = (1.0 - MIN(1.0, ACC_SCALE_WEIGHT * ABS(acc_scale - 1.0)));
@@ -183,14 +182,6 @@ void update_ahrs(float dt, float dcm_out[3][3], float gyr_out[3])
 	 *              codirectional with the body's i, j, and k vectors.
 	 */
 	#ifdef MAG_WEIGHT
-	//if (loopCount % COMM_LOOP_INTERVAL == 0) {
-	//	sp("M(");
-	//	sp(v_mag[0]); sp(", ");
-	//	sp(v_mag[1]); sp(", ");
-	//	sp(v_mag[2]);
-	//	spln(")");
-	//}
-
 	// Express J global unit vectory in body frame as j_gb.
 	for (i=0; i<3; i++) {
 		j_gb[i] = dcm_gyro[i][1];
