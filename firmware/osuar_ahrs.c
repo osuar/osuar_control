@@ -109,7 +109,7 @@ void update_ahrs(float dt, float dcm_out[3][3], float gyr_out[3])
 
 	/**
 	 * Accelerometer
-	 *     Frame of reference: BODY
+	 *     Frame of reference: body
 	 *     Units: G (gravitational acceleration)
 	 *     Purpose: Measure the acceleration vector v_acc with components
 	 *              codirectional with the i, j, and k vectors. Note that the
@@ -151,9 +151,9 @@ void update_ahrs(float dt, float dcm_out[3][3], float gyr_out[3])
 	#endif // ACC_SCALE_WEIGHT
 
 	/**
-	 * Express K global unit vector in BODY frame as k_gb for use in drift
-	 * correction (we need K to be described in the BODY frame because gravity
-	 * is measured by the accelerometer in the BODY frame). Technically we
+	 * Express K global unit vector in body frame as k_gb for use in drift
+	 * correction (we need K to be described in the body frame because gravity
+	 * is measured by the accelerometer in the body frame). Technically we
 	 * could just create a transpose of dcm_gyro, but since we don't (yet) have
 	 * a magnetometer, we don't need the first two rows of the transpose. This
 	 * saves a few clock cycles.
@@ -177,7 +177,7 @@ void update_ahrs(float dt, float dcm_out[3][3], float gyr_out[3])
 
 	/**
 	 * Magnetometer
-	 *     Frame of reference: BODY
+	 *     Frame of reference: body
 	 *     Units: N/A
 	 *     Purpose: Measure the magnetic north vector v_mag with components
 	 *              codirectional with the body's i, j, and k vectors.
@@ -191,7 +191,7 @@ void update_ahrs(float dt, float dcm_out[3][3], float gyr_out[3])
 	//	spln(")");
 	//}
 
-	// Express J global unit vectory in BODY frame as j_gb.
+	// Express J global unit vectory in body frame as j_gb.
 	for (i=0; i<3; i++) {
 		j_gb[i] = dcm_gyro[i][1];
 	}
@@ -202,7 +202,7 @@ void update_ahrs(float dt, float dcm_out[3][3], float gyr_out[3])
 
 	/**
 	 * Gyroscope
-	 *     Frame of reference: BODY
+	 *     Frame of reference: body
 	 *     Units: rad/s
 	 *     Purpose: Measure the rotation rate of the body about the body's i,
 	 *              j, and k axes.
@@ -226,7 +226,7 @@ void update_ahrs(float dt, float dcm_out[3][3], float gyr_out[3])
 
 	/**
 	 * Direction Cosine Matrix
-	 *     Frame of reference: GLOBAL
+	 *     Frame of reference: global
 	 *     Units: None (unit vectors)
 	 *     Purpose: Calculate the components of the body's i, j, and k unit
 	 *              vectors in the global frame of reference.
@@ -235,7 +235,7 @@ void update_ahrs(float dt, float dcm_out[3][3], float gyr_out[3])
 	 * skew symmetric matrix with the identity matrix. The math can be
 	 * summarized as follows:
 	 *
-	 * All of this is calculated in the BODY frame. If w is the angular
+	 * All of this is calculated in the body frame. If w is the angular
 	 * velocity vector, let w_dt (w*dt) be the angular displacement vector of
 	 * the DCM over a time interval dt. Let w_dt_i, w_dt_j, and w_dt_k be the
 	 * components of w_dt codirectional with the i, j, and k unit vectors,
