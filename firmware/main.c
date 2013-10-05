@@ -18,7 +18,7 @@
 
 
 float dbg_dcm[3][3];
-float throttle = 0.50;
+float throttle = 0.10;
 static uint32_t counter = 0;
 
 /*
@@ -147,10 +147,6 @@ static msg_t control_thread(void *arg)
 		}
 
 		update_motors(motor_dc);
-		// TEMP
-		for (i=0; i<4; i++) {
-			motor_dc[i] = 0.1;
-		}
 
 		palTogglePad(GPIOA, 6);
 

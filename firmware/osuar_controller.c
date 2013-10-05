@@ -11,6 +11,7 @@ static float ang_pos_xy_cap, ang_vel_xy_cap, ang_vel_z_cap;   // These aren't co
 static pid_data_t pid_data[6];
 static float dc_shift[3];
 static float des_ang_pos[3], cur_ang_pos[3], des_ang_vel[3];
+static float dbg_dc[4];
 
 void angular_position_controller(float* cur_pos, float* cur_vel, float* des_pos, float* des_vel)
 {
@@ -74,10 +75,10 @@ void calculate_dc (float dc_throttle, float* dc_shift, float* dc_final)
 #endif // NUM_ROTORS == 3
 
 #if (NUM_ROTORS == 4)
-	dc_final[0] = dc_throttle + dc_shift[1] + dc_shift[2];
-	dc_final[1] = dc_throttle - dc_shift[0] - dc_shift[2];
-	dc_final[2] = dc_throttle - dc_shift[1] + dc_shift[2];
-	dc_final[3] = dc_throttle + dc_shift[0] - dc_shift[2];
+	dc_final[0] = dc_throttle - dc_shift[1] + dc_shift[2];
+	dc_final[1] = dc_throttle + dc_shift[0] - dc_shift[2];
+	dc_final[2] = dc_throttle + dc_shift[1] + dc_shift[2];
+	dc_final[3] = dc_throttle - dc_shift[0] - dc_shift[2];
 #endif // NUM_ROTORS == 4
 
 	/* Map duty cycles. */
@@ -145,6 +146,11 @@ void run_controller(float throttle, float dcm_bg[3][3], float gyr[3], float dc[4
 
 	// Finally calculate motor duty cycles.
 	calculate_dc(throttle, dc_shift, dc);
+
+	// Debug
+	for (i=0; i<4; i++) {
+		dbg_dc[i] = dc[i];
+	}
 }
 
 void map_to_bounds(float* input, uint8_t input_size, float bound_lower, float bound_upper, float* output)
@@ -173,8 +179,12 @@ void map_to_bounds(float* input, uint8_t input_size, float bound_lower, float bo
 
 void debug_controller(uint8_t *buffer)
 {
-	chsprintf(buffer, "%8u %7d %7d\r\n",
+	chsprintf(buffer, "%8u DC(%4u %4u %4u %4u) %7d %7d\r\n",
 			chTimeNow(),
+			(uint16_t) (dbg_dc[0]*1000),
+			(uint16_t) (dbg_dc[1]*1000),
+			(uint16_t) (dbg_dc[2]*1000),
+			(uint16_t) (dbg_dc[3]*1000),
 			(int32_t) (cur_ang_pos[0]*1000000),
 			(int32_t) (cur_ang_pos[1]*1000000));
 }

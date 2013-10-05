@@ -249,10 +249,11 @@ void update_motors(float dc[4])
 	 * Calculate motor values.
 	 */
 #if (ESC_COMM == PWM)
-	pwmEnableChannel(&PWMD8, 0, PWM_PERCENTAGE_TO_WIDTH(&PWMD8, dc[0]*1000));
-	pwmEnableChannel(&PWMD8, 1, PWM_PERCENTAGE_TO_WIDTH(&PWMD8, dc[1]*1000));
-	pwmEnableChannel(&PWMD8, 2, PWM_PERCENTAGE_TO_WIDTH(&PWMD8, dc[2]*1000));
-	pwmEnableChannel(&PWMD8, 3, PWM_PERCENTAGE_TO_WIDTH(&PWMD8, dc[3]*1000));
+	// Duty cycle from 0 to 10000.
+	pwmEnableChannel(&PWMD8, 0, PWM_PERCENTAGE_TO_WIDTH(&PWMD8, dc[0]*10000));
+	pwmEnableChannel(&PWMD8, 1, PWM_PERCENTAGE_TO_WIDTH(&PWMD8, dc[1]*10000));
+	pwmEnableChannel(&PWMD8, 2, PWM_PERCENTAGE_TO_WIDTH(&PWMD8, dc[2]*10000));
+	pwmEnableChannel(&PWMD8, 3, PWM_PERCENTAGE_TO_WIDTH(&PWMD8, dc[3]*10000));
 #endif // ESC_COMM == PWM
 
 #if (ESC_COMM == SPI)
