@@ -1,5 +1,6 @@
 #include <osuar_ahrs.h>
 
+/* Some static variables */
 static float v_gyr[3];        /* Gyroscope read */
 static float v_acc[3];        /* Accelerometer read */
 static float v_acc_last[3];   /* Last accelerometer read */
@@ -16,7 +17,7 @@ static float w_dt[3];   /* Angular displacement vector = w * dt, where w is the 
 
 static float dcm_gyro[3][3];   /* DCM based on gyro readings, corrected with w_a. */
 static float trim_angle[3];   /* Euler angles to help trim. TODO: Figure this out properly. */
-static float dcm_trim[3][3];   /* DCM used to offset dcm_gyro to produce dcm_bg. */
+static float dcm_offset[3][3];   /* DCM used to offset dcm_gyro to produce dcm_bg (i.e., if the IMU isn't installed orthogonally in the robot). */
 static float dcm_d[3][3];   /* First used to store the change in DCM to update dcm_bg. Repurposed during orthonormalization to store the correction vectors for the i and j unit vectors. */
 static float dcm_err;   /* DCM error for which we need orthonormalization. */
 
@@ -41,6 +42,7 @@ static void orthonormalize(float dcm[3][3])
 
 void setup_ahrs(void)
 {
+	/* Set up IMU. */
 	setup_mpu();
 
 	/* Initialize DCMs as identity matrices. */
@@ -48,7 +50,7 @@ void setup_ahrs(void)
 	for (i=0; i<3; i++) {
 		for (j=0; j<3; j++) {
 			m_init_identity(dcm_gyro);
-			m_init_identity(dcm_trim);
+			m_init_identity(dcm_offset);
 			m_init_identity(dcm_d);
 		}
 	}
@@ -65,14 +67,14 @@ void setup_ahrs(void)
 	 *
 	 * The rotational difference between the orientations of the accelerometer
 	 * (dcm_gyro) and the chassis (dcm_out) is constant and can be approximated
-	 * by another rotation matrix we will call dcm_trim, which we populate with
+	 * by another rotation matrix we will call dcm_offset, which we populate with
 	 * trim angles obtained during hover calibration. We rotate dcm_gyro by
-	 * dcm_trim to obtain dcm_out.
+	 * dcm_offset to obtain dcm_out.
 	 *
 	 * Keep in mind, however, that we still update the IMU based on dcm_gyro and
 	 * not dcm_out. This is because it is dcm_gyro we are correcting with the
 	 * accelerometer's measurement of the gravity vector, and dcm_out is only
-	 * a transformation of that DCM based on dcm_trim. We use dcm_out for
+	 * a transformation of that DCM based on dcm_offset. We use dcm_out for
 	 * flight calculations, but dcm_gyro is what we keep track of within the
 	 * IMU.
 	 *
@@ -83,8 +85,8 @@ void setup_ahrs(void)
 	 */
 	#ifdef ACC_WEIGHT
 	// TODO: Set trim angles.
-	//trim_angle[0] = TRIM_ANGLE_X;
-	//trim_angle[1] = TRIM_ANGLE_Y;
+	trim_angle[0] = TRIM_ANGLE_X;
+	trim_angle[1] = TRIM_ANGLE_Y;
 
 	v_acc[0] = 0;
 	v_acc[1] = 0;
@@ -211,7 +213,7 @@ void update_ahrs(float dt, float dcm_out[3][3], float gyr_out[3])
 
 		#ifdef ACC_WEIGHT
 		numerator   += acc_weight * w_a[i];
-		denominator += acc_weight;
+		//denominator += acc_weight;
 		#endif // ACC_WEIGHT
 
 		#ifdef MAG_WEIGHT
@@ -284,18 +286,19 @@ void update_ahrs(float dt, float dcm_out[3][3], float gyr_out[3])
 	orthonormalize(dcm_gyro);
 
 	#ifdef ACC_WEIGHT
-	dcm_trim[0][0] =              1;
-	dcm_trim[0][1] =              0;
-	dcm_trim[0][2] = -trim_angle[1];
-	dcm_trim[1][0] =              0;
-	dcm_trim[1][1] =              1;
-	dcm_trim[1][2] =  trim_angle[0];
-	dcm_trim[2][0] =  trim_angle[1];
-	dcm_trim[2][1] = -trim_angle[0];
-	dcm_trim[2][2] =              1;
+	dcm_offset[0][0] =              1;
+	dcm_offset[0][1] =              0;
+	dcm_offset[0][2] = -trim_angle[1];
+	dcm_offset[1][0] =              0;
+	dcm_offset[1][1] =              1;
+	dcm_offset[1][2] =  trim_angle[0];
+	dcm_offset[2][0] =  trim_angle[1];
+	dcm_offset[2][1] = -trim_angle[0];
+	dcm_offset[2][2] =              1;
 
-	// Rotate dcm_gyro with dcm_trim.
-	m_product(dcm_trim, dcm_gyro, dcm_out);
+	// If the IMU can't be configured to have a rotation offset, we can do so
+	// here.
+	m_product(dcm_offset, dcm_gyro, dcm_out);
 	//orthonormalize(dcm_out);   // TODO: This shouldn't be necessary.
 	#else
 	static uint8_t j;

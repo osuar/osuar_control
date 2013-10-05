@@ -65,13 +65,11 @@ static msg_t comm_thread_2(void *arg)
 	(void) arg;
 	chRegSetThreadName("communications 2");
 	systime_t time = chTimeNow();
-	int counter = 0;
 
 	uint8_t txbuf[200];
 
 	while (TRUE) {
 		time += MS2ST(11)-1;
-		counter++;
 
 		clear_buffer(txbuf);
 		debug_mpu(txbuf);
@@ -137,6 +135,7 @@ static msg_t control_thread(void *arg)
 		counter++;
 		time += CONTROL_DT*CH_FREQUENCY;
 
+		palSetPad(GPIOA, 7);
 		update_ahrs(CONTROL_DT, dcm_bg, gyr);
 		run_controller(throttle, dcm_bg, gyr, motor_dc);
 
@@ -151,6 +150,7 @@ static msg_t control_thread(void *arg)
 
 		palTogglePad(GPIOA, 6);
 
+		palClearPad(GPIOA, 7);
 		chThdSleepUntil(time);
 	}
 

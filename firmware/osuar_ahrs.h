@@ -10,7 +10,10 @@
 #include <osuar_mpu6000.h>
 #include <osuar_math.h>
 
-#define ACC_WEIGHT 0.080   /* Accelerometer weight relative to gyro's weight of 1 */
+#define TRIM_ANGLE_X 0.0
+#define TRIM_ANGLE_Y 0.0
+
+#define ACC_WEIGHT 0.002   /* Accelerometer weight relative to gyro's weight of 1 */
 #define ACC_SCALE_WEIGHT 2   /* Gradually drive accelerometer weight to zero. For example, a value of 5 here will drive the accelerometer weight to zero if the magnitude of the measured acceleration differs by more than 1/5 gravity. */
 
 /**
