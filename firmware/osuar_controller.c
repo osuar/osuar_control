@@ -88,9 +88,11 @@ void setup_controller(void)
 {
 	static uint8_t i;
 
+	// Some constants that aren't (because we may want to change them
+	// mid-flight).
 	ang_pos_xy_cap = M_PI/4;
 	ang_vel_xy_cap = 2*M_PI;
-	ang_vel_z_cap  = M_PI/2;   // These aren't constants because we may want to change them mid-flight.
+	ang_vel_z_cap  = M_PI/2;
 
 	for (i=0; i<3; i++) {
 		pid_data[I_ANG_POS_X+i].Kp = ANG_POS_KP;
@@ -109,18 +111,21 @@ void setup_controller(void)
 void run_controller(float throttle, float dcm_bg[3][3], float gyr[3], float dc[4])
 {
 	uint8_t i;
-	// Calculate target rotation vector based on groundstation input and scale to maximum rotation of ang_pos_xy_cap.
-	// TODO
+	// TODO: Calculate target rotation vector based on groundstation input and
+	// scale to maximum rotation of ang_pos_xy_cap.
 	des_ang_pos[0] = 0; //-joy.axes[SY] * ang_pos_xy_cap;
 	des_ang_pos[1] = 0; // joy.axes[SX] * ang_pos_xy_cap;
 	des_ang_pos[2] = 0; // joy.axes[SZ] * ang_pos_z_cap * CONTROL_LOOP_INTERVAL * MASTER_DT/1000000;
 
-	// Calculate current rotation vector (Euler angles) from DCM and make appropriate modifications to make PID calculations work later.
-	// TODO
-	cur_ang_pos[0] =  arctan2(dcm_bg[2][1], dcm_bg[2][2]) * dcm_bg[0][0] - arctan2(dcm_bg[2][0], dcm_bg[2][2]) * dcm_bg[0][1];
-	cur_ang_pos[1] = -arctan2(dcm_bg[2][0], dcm_bg[2][2]) * dcm_bg[1][1] + arctan2(dcm_bg[2][1], dcm_bg[2][2]) * dcm_bg[1][0];
+	// TODO: Calculate current rotation vector (Euler angles) from DCM and make
+	// appropriate modifications to make PID calculations work later.
+	cur_ang_pos[0] =  arctan2(dcm_bg[2][1], dcm_bg[2][2]) * dcm_bg[0][0] -
+		              arctan2(dcm_bg[2][0], dcm_bg[2][2]) * dcm_bg[0][1];
+	cur_ang_pos[1] = -arctan2(dcm_bg[2][0], dcm_bg[2][2]) * dcm_bg[1][1] +
+		              arctan2(dcm_bg[2][1], dcm_bg[2][2]) * dcm_bg[1][0];
 
-	// Keep abs(target - current) within [-PI, PI]. This way, nothing bad happens as we rotate to any angle in [-PI, PI].
+	// Keep abs(target - current) within [-PI, PI]. This way, nothing bad
+	// happens as we rotate to any angle in [-PI, PI].
 	for (i=0; i<2; i++){
 		if(des_ang_pos[i] - cur_ang_pos[i] > M_PI){
 			cur_ang_pos[i] += 2*M_PI;
