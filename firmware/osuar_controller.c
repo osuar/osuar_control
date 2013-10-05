@@ -117,7 +117,7 @@ void run_controller(float throttle, float dcm_bg[3][3], float gyr[3], float dc[4
 	des_ang_pos[1] = 0; // joy.axes[SX] * ang_pos_xy_cap;
 	des_ang_pos[2] = 0; // joy.axes[SZ] * ang_pos_z_cap * CONTROL_LOOP_INTERVAL * MASTER_DT/1000000;
 
-	// TODO: Calculate current rotation vector (Euler angles) from DCM and make
+	// Calculate current rotation vector (Euler angles) from DCM and make
 	// appropriate modifications to make PID calculations work later.
 	cur_ang_pos[0] = -arctan2(dcm_bg[2][1], dcm_bg[2][2]) * dcm_bg[0][0] +
 		              arctan2(dcm_bg[2][0], dcm_bg[2][2]) * dcm_bg[0][1];
@@ -135,13 +135,15 @@ void run_controller(float throttle, float dcm_bg[3][3], float gyr[3], float dc[4
 		}
 	}
 
+	// The magic happens here.
 	angular_position_controller(cur_ang_pos, gyr, des_ang_pos, des_ang_vel);
-
 	angular_velocity_controller(gyr, des_ang_vel, dc_shift);
 
-	// Increase throttle based on tilt.
-//	throttle = throttle / MAX(dcm_bg[2][2], 0.707107);
+	// Increase throttle to compensate for tilt, but only so much, and
+	// definitely not when we're upside-down.
+	throttle = (dcm_bg[2][2] > 0) ? throttle / MAX(dcm_bg[2][2], 0.707107) : 0;
 
+	// Finally calculate motor duty cycles.
 	calculate_dc(throttle, dc_shift, dc);
 }
 
