@@ -134,9 +134,9 @@ void update_ahrs(float dt, float dcm_out[3][3], float gyr_out[3])
 	 * Reduce accelerometer weight if the magnitude of the measured
 	 * acceleration is significantly greater than or less than 1 g.
 	 *
-	 * TODO: Magnitude of acceleration should be reported over telemetry so
-	 * the "cutoff" value (the constant before the ABS() below) for
-	 * disregaring acceleration input can be more accurately determined.
+	 * TODO: Magnitude of acceleration should be reported over telemetry so the
+	 * "cutoff" value (the constant before the ABS() below) for disregarding
+	 * acceleration input can be more accurately determined.
 	 */
 	#ifdef ACC_SCALE_WEIGHT
 	acc_scale = (1.0 - MIN(1.0, ACC_SCALE_WEIGHT * ABS(acc_scale - 1.0)));
@@ -150,34 +150,38 @@ void update_ahrs(float dt, float dcm_out[3][3], float gyr_out[3])
 	}
 	#endif // ACC_SCALE_WEIGHT
 
-	// Express K global unit vector in BODY frame as k_gb for use in drift
-	// correction (we need K to be described in the BODY frame because
-	// gravity is measured by the accelerometer in the BODY frame).
-	// Technically we could just create a transpose of dcm_gyro, but since
-	// we don't (yet) have a magnetometer, we don't need the first two rows
-	// of the transpose. This saves a few clock cycles.
+	/**
+	 * Express K global unit vector in BODY frame as k_gb for use in drift
+	 * correction (we need K to be described in the BODY frame because gravity
+	 * is measured by the accelerometer in the BODY frame). Technically we
+	 * could just create a transpose of dcm_gyro, but since we don't (yet) have
+	 * a magnetometer, we don't need the first two rows of the transpose. This
+	 * saves a few clock cycles.
+	 */
 	for (i=0; i<3; i++) {
 		k_gb[i] = dcm_gyro[i][2];
 	}
 
-	// Calculate gyro drift correction rotation vector w_a, which will be
-	// used later to bring KB closer to the gravity vector (i.e., the
-	// negative of the K vector). Although we do not explicitly negate the
-	// gravity vector, the cross product below produces a rotation vector
-	// that we can later add to the angular displacement vector to correct
-	// for gyro drift in the X and Y axes. Note we negate w_a because our
-	// acceleration vector is actually the negative of our gravity vector.
+	/**
+	 * Calculate gyro drift correction rotation vector w_a, which will be used
+	 * later to bring KB closer to the gravity vector (i.e., the negative of
+	 * the K vector). Although we do not explicitly negate the gravity vector,
+	 * the cross product below produces a rotation vector that we can later add
+	 * to the angular displacement vector to correct for gyro drift in the
+	 * X and Y axes. Note we negate w_a because our acceleration vector is
+	 * actually the negative of our gravity vector.
+	 */
 	v_crossp(k_gb, v_acc, w_a);
 	v_scale(w_a, -1, w_a);
 	#endif // ACC_WEIGHT
 
-	// ========================================================================
-	// Magnetometer
-	//     Frame of reference: BODY
-	//     Units: N/A
-	//     Purpose: Measure the magnetic north vector v_mag with components
-	//              codirectional with the body's i, j, and k vectors.
-	// ========================================================================
+	/**
+	 * Magnetometer
+	 *     Frame of reference: BODY
+	 *     Units: N/A
+	 *     Purpose: Measure the magnetic north vector v_mag with components
+	 *              codirectional with the body's i, j, and k vectors.
+	 */
 	#ifdef MAG_WEIGHT
 	//if (loopCount % COMM_LOOP_INTERVAL == 0) {
 	//	sp("M(");
@@ -196,17 +200,18 @@ void update_ahrs(float dt, float dcm_out[3][3], float gyr_out[3])
 	v_crossp(j_gb, v_mag, w_m);
 	#endif // MAG_WEIGHT
 
-	// ========================================================================
-	// Gyroscope
-	//     Frame of reference: BODY
-	//     Units: rad/s
-	//     Purpose: Measure the rotation rate of the body about the body's i,
-	//              j, and k axes.
-	// ========================================================================
-	// Scale v_gyr by elapsed time (in seconds) to get angle w*dt in
-	// radians, then compute weighted average with the accelerometer and
-	// magnetometer correction vectors to obtain final w*dt.
-	// TODO: This is still not exactly correct.
+	/**
+	 * Gyroscope
+	 *     Frame of reference: BODY
+	 *     Units: rad/s
+	 *     Purpose: Measure the rotation rate of the body about the body's i,
+	 *              j, and k axes.
+	 * ========================================================================
+	 * Scale v_gyr by elapsed time (in seconds) to get angle w*dt in radians,
+	 * then compute weighted average with the accelerometer and magnetometer
+	 * correction vectors to obtain final w*dt.
+	 * TODO: This is still not exactly correct.
+	 */
 	for (i=0; i<3; i++) {
 		w_dt[i] = v_gyr[i] * dt;
 
@@ -219,53 +224,53 @@ void update_ahrs(float dt, float dcm_out[3][3], float gyr_out[3])
 		#endif // MAG_WEIGHT
 	}
 
-	// ========================================================================
-	// Direction Cosine Matrix
-	//     Frame of reference: GLOBAL
-	//     Units: None (unit vectors)
-	//     Purpose: Calculate the components of the body's i, j, and k unit
-	//              vectors in the global frame of reference.
-	// ========================================================================
-	// Skew the rotation vector and sum appropriate components by combining the
-	// skew symmetric matrix with the identity matrix. The math can be
-	// summarized as follows:
-	//
-	// All of this is calculated in the BODY frame. If w is the angular
-	// velocity vector, let w_dt (w*dt) be the angular displacement vector of
-	// the DCM over a time interval dt. Let w_dt_i, w_dt_j, and w_dt_k be the
-	// components of w_dt codirectional with the i, j, and k unit vectors,
-	// respectively. Also, let dr be the linear displacement vector of the DCM
-	// and dr_i, dr_j, and dr_k once again be the i, j, and k components,
-	// respectively.
-	//
-	// In very small dt, certain vectors approach orthogonality, so we can
-	// assume that (draw this out for yourself!):
-	//
-	//     dr_x = <    0,  dw_k, -dw_j>,
-	//     dr_y = <-dw_k,     0,  dw_i>, and
-	//     dr_z = < dw_j, -dw_i,     0>,
-	//
-	// which can be expressed as the rotation matrix:
-	//
-	//          [     0  dw_k -dw_j ]
-	//     dr = [ -dw_k     0  dw_i ]
-	//          [  dw_j -dw_i     0 ].
-	//
-	// This can then be multiplied by the current DCM and added to the current
-	// DCM to update the DCM. To minimize the number of calculations performed
-	// by the processor, however, we can combine the last two steps by
-	// combining dr with the identity matrix to produce:
-	//
-	//              [     1  dw_k -dw_j ]
-	//     dr + I = [ -dw_k     1  dw_i ]
-	//              [  dw_j -dw_i     1 ],
-	//
-	// which we multiply with the current DCM to produce the updated DCM
-	// directly.
-	//
-	// It may be helpful to read the Wikipedia pages on cross products and
-	// rotation representation.
-	// ========================================================================
+	/**
+	 * Direction Cosine Matrix
+	 *     Frame of reference: GLOBAL
+	 *     Units: None (unit vectors)
+	 *     Purpose: Calculate the components of the body's i, j, and k unit
+	 *              vectors in the global frame of reference.
+	 * ========================================================================
+	 * Skew the rotation vector and sum appropriate components by combining the
+	 * skew symmetric matrix with the identity matrix. The math can be
+	 * summarized as follows:
+	 *
+	 * All of this is calculated in the BODY frame. If w is the angular
+	 * velocity vector, let w_dt (w*dt) be the angular displacement vector of
+	 * the DCM over a time interval dt. Let w_dt_i, w_dt_j, and w_dt_k be the
+	 * components of w_dt codirectional with the i, j, and k unit vectors,
+	 * respectively. Also, let dr be the linear displacement vector of the DCM
+	 * and dr_i, dr_j, and dr_k once again be the i, j, and k components,
+	 * respectively.
+	 *
+	 * In very small dt, certain vectors approach orthogonality, so we can
+	 * assume that (draw this out for yourself!):
+	 *
+	 *     dr_x = <    0,  dw_k, -dw_j>,
+	 *     dr_y = <-dw_k,     0,  dw_i>, and
+	 *     dr_z = < dw_j, -dw_i,     0>,
+	 *
+	 * which can be expressed as the rotation matrix:
+	 *
+	 *          [     0  dw_k -dw_j ]
+	 *     dr = [ -dw_k     0  dw_i ]
+	 *          [  dw_j -dw_i     0 ].
+	 *
+	 * This can then be multiplied by the current DCM and added to the current
+	 * DCM to update the DCM. To minimize the number of calculations performed
+	 * by the processor, however, we can combine the last two steps by
+	 * combining dr with the identity matrix to produce:
+	 *
+	 *              [     1  dw_k -dw_j ]
+	 *     dr + I = [ -dw_k     1  dw_i ]
+	 *              [  dw_j -dw_i     1 ],
+	 *
+	 * which we multiply with the current DCM to produce the updated DCM
+	 * directly.
+	 *
+	 * It may be helpful to read the Wikipedia pages on cross products and
+	 * rotation representation.
+	 */
 	dcm_d[0][0] =        1;
 	dcm_d[0][1] =  w_dt[2];
 	dcm_d[0][2] = -w_dt[1];
