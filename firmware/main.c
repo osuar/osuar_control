@@ -147,6 +147,10 @@ static msg_t control_thread(void *arg)
 		}
 
 		update_motors(motor_dc);
+		// TEMP
+		for (i=0; i<4; i++) {
+			motor_dc[i] = 0.1;
+		}
 
 		palTogglePad(GPIOA, 6);
 

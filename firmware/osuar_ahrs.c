@@ -283,9 +283,12 @@ void update_ahrs(float dt, float dcm_out[3][3], float gyr_out[3])
 
 	// Multiply the current DCM with the change in DCM and update.
 	m_product(dcm_d, dcm_gyro, dcm_gyro);
+
+	// Remove any distortions introduced by the small-angle approximations.
 	orthonormalize(dcm_gyro);
 
-	#ifdef ACC_WEIGHT
+	// Apply rotational offset (in case IMU is not installed orthogonally to
+	// the airframe).
 	dcm_offset[0][0] =              1;
 	dcm_offset[0][1] =              0;
 	dcm_offset[0][2] = -trim_angle[1];
@@ -295,19 +298,7 @@ void update_ahrs(float dt, float dcm_out[3][3], float gyr_out[3])
 	dcm_offset[2][0] =  trim_angle[1];
 	dcm_offset[2][1] = -trim_angle[0];
 	dcm_offset[2][2] =              1;
-
-	// If the IMU can't be configured to have a rotation offset, we can do so
-	// here.
 	m_product(dcm_offset, dcm_gyro, dcm_out);
-	//orthonormalize(dcm_out);   // TODO: This shouldn't be necessary.
-	#else
-	static uint8_t j;
-	for (i=0; i<3; i++) {
-		for (j=0; j<3; j++) {
-			dcm_out[i][j] = dcm_gyro[i][j];
-		}
-	}
-	#endif // ACC_WEIGHT
 }
 
 void debug_ahrs(uint8_t *buffer)
