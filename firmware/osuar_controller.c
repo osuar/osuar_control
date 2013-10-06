@@ -75,10 +75,10 @@ void calculate_dc (float dc_throttle, float* dc_shift, float* dc_final)
 #endif // NUM_ROTORS == 3
 
 #if (NUM_ROTORS == 4)
-	dc_final[0] = dc_throttle - dc_shift[1] + dc_shift[2];
-	dc_final[1] = dc_throttle + dc_shift[0] - dc_shift[2];
-	dc_final[2] = dc_throttle + dc_shift[1] + dc_shift[2];
-	dc_final[3] = dc_throttle - dc_shift[0] - dc_shift[2];
+	dc_final[0] = dc_throttle - dc_shift[1] - dc_shift[2];
+	dc_final[1] = dc_throttle + dc_shift[0] + dc_shift[2];
+	dc_final[2] = dc_throttle + dc_shift[1] - dc_shift[2];
+	dc_final[3] = dc_throttle - dc_shift[0] + dc_shift[2];
 #endif // NUM_ROTORS == 4
 
 	/* Map duty cycles. */
