@@ -135,7 +135,6 @@ static msg_t control_thread(void *arg)
 		counter++;
 		time += CONTROL_DT*CH_FREQUENCY;
 
-		palSetPad(GPIOA, 7);
 		update_ahrs(CONTROL_DT, dcm_bg, gyr);
 		run_controller(throttle, dcm_bg, gyr, motor_dc);
 
@@ -146,11 +145,20 @@ static msg_t control_thread(void *arg)
 			}
 		}
 
+		if (palReadPad(GPIOA, 8) == 1) {
+			palSetPad(GPIOA, 7);
+			for (i=0; i<4; i++) {
+				motor_dc[i] = 0.35;   // TODO: put this in config.
+			}
+		}
+		else {
+			palClearPad(GPIOA, 7);
+		}
+
 		update_motors(motor_dc);
 
 		palTogglePad(GPIOA, 6);
 
-		palClearPad(GPIOA, 7);
 		chThdSleepUntil(time);
 	}
 
@@ -187,6 +195,7 @@ int main(void)
 
 	palSetPadMode(GPIOA, 6, PAL_MODE_OUTPUT_PUSHPULL);
 	palSetPadMode(GPIOA, 7, PAL_MODE_OUTPUT_PUSHPULL);
+	palSetPadMode(GPIOA, 8, PAL_MODE_INPUT_PULLUP);
 	palClearPad(GPIOA, 6);
 	palClearPad(GPIOA, 7);
 

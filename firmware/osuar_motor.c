@@ -250,10 +250,11 @@ void update_motors(float dc[4])
 	 */
 #if (ESC_COMM == PWM)
 	// Duty cycle from 0 to 10000.
-	pwmEnableChannel(&PWMD8, 0, PWM_PERCENTAGE_TO_WIDTH(&PWMD8, dc[0]*10000));
-	pwmEnableChannel(&PWMD8, 1, PWM_PERCENTAGE_TO_WIDTH(&PWMD8, dc[1]*10000));
-	pwmEnableChannel(&PWMD8, 2, PWM_PERCENTAGE_TO_WIDTH(&PWMD8, dc[2]*10000));
-	pwmEnableChannel(&PWMD8, 3, PWM_PERCENTAGE_TO_WIDTH(&PWMD8, dc[3]*10000));
+	// TODO: Put magic numbers in config.
+	pwmEnableChannel(&PWMD8, 0, PWM_PERCENTAGE_TO_WIDTH(&PWMD8, (0.35+0.50*dc[0])*10000));
+	pwmEnableChannel(&PWMD8, 1, PWM_PERCENTAGE_TO_WIDTH(&PWMD8, (0.35+0.50*dc[1])*10000));
+	pwmEnableChannel(&PWMD8, 2, PWM_PERCENTAGE_TO_WIDTH(&PWMD8, (0.35+0.50*dc[2])*10000));
+	pwmEnableChannel(&PWMD8, 3, PWM_PERCENTAGE_TO_WIDTH(&PWMD8, (0.35+0.50*dc[3])*10000));
 #endif // ESC_COMM == PWM
 
 #if (ESC_COMM == SPI)
