@@ -35,9 +35,9 @@
 #define GYR_X_OFFSET -0.029900
 #define GYR_Y_OFFSET -0.007500
 #define GYR_Z_OFFSET -0.007600
-#define ACC_X_OFFSET -0.065000
-#define ACC_Y_OFFSET -0.013000
-#define ACC_Z_OFFSET -0.544000
+#define ACC_X_OFFSET -0.057000
+#define ACC_Y_OFFSET -0.009000
+#define ACC_Z_OFFSET -0.582000
 #endif /* AEOLUS */
 
 #ifdef ZEPHYRUS
