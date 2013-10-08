@@ -113,29 +113,44 @@ void read_mpu(float gyr[3], float acc[3])
 void debug_mpu(uint8_t *buffer)
 {
 	static uint16_t count = 1;
-	static float g0 = 0;
-	static float g1 = 0;
-	static float g2 = 0;
-	static float a0 = 0;
-	static float a1 = 0;
-	static float a2 = 0;
-	g0 = (DEBUG_CALIBRATE == 1) ? (g0*count + dbg_gyr[0] - GYR_X_OFFSET) / (count+1) : dbg_gyr[0];
-	g1 = (DEBUG_CALIBRATE == 1) ? (g1*count + dbg_gyr[1] - GYR_Y_OFFSET) / (count+1) : dbg_gyr[1];
-	g2 = (DEBUG_CALIBRATE == 1) ? (g2*count + dbg_gyr[2] - GYR_Z_OFFSET) / (count+1) : dbg_gyr[2];
-	a0 = (DEBUG_CALIBRATE == 1) ? (a0*count + dbg_acc[0] - ACC_X_OFFSET) / (count+1) : dbg_acc[0];
-	a1 = (DEBUG_CALIBRATE == 1) ? (a1*count + dbg_acc[1] - ACC_Y_OFFSET) / (count+1) : dbg_acc[1];
-	a2 = (DEBUG_CALIBRATE == 1) ? (a2*count + dbg_acc[2] - ACC_Z_OFFSET) / (count+1) : dbg_acc[2];
+	static float g_avg_0 = 0;
+	static float g_avg_1 = 0;
+	static float g_avg_2 = 0;
+	static float a_avg_0 = 0;
+	static float a_avg_1 = 0;
+	static float a_avg_2 = 0;
+	g_avg_0 = (g_avg_0*count + dbg_gyr[0] - GYR_X_OFFSET) / (count+1);
+	g_avg_1 = (g_avg_1*count + dbg_gyr[1] - GYR_Y_OFFSET) / (count+1);
+	g_avg_2 = (g_avg_2*count + dbg_gyr[2] - GYR_Z_OFFSET) / (count+1);
+	a_avg_0 = (a_avg_0*count + dbg_acc[0] - ACC_X_OFFSET) / (count+1);
+	a_avg_1 = (a_avg_1*count + dbg_acc[1] - ACC_Y_OFFSET) / (count+1);
+	a_avg_2 = (a_avg_2*count + dbg_acc[2] - ACC_Z_OFFSET) / (count+1);
+
+	#if DEBUG_CALIBRATE == 1
+	dbg_gyr[0] -= GYR_X_OFFSET;
+	dbg_gyr[1] -= GYR_Y_OFFSET;
+	dbg_gyr[2] -= GYR_Z_OFFSET;
+	dbg_acc[0] -= ACC_X_OFFSET;
+	dbg_acc[1] -= ACC_Y_OFFSET;
+	dbg_acc[2] -= ACC_Z_OFFSET;
+	#endif
 
 	count += 1;
 
-	chsprintf(buffer, "%8u  G: %7d %7d %7d  A: %7d %7d %7d  T: %7d\r\n",
+	chsprintf(buffer, "%8u  G: %7d %7d %7d  A: %7d %7d %7d   G_avg: %7d %7d %7d  A_avg: %7d %7d %7d  T: %7d\r\n",
 			count,
-			(int32_t) (g0*1000000),
-			(int32_t) (g1*1000000),
-			(int32_t) (g2*1000000),
-			(int32_t) (a0*1000000),
-			(int32_t) (a1*1000000),
-			(int32_t) (a2*1000000),
+			(int32_t) (dbg_gyr[0]*1000000),
+			(int32_t) (dbg_gyr[1]*1000000),
+			(int32_t) (dbg_gyr[2]*1000000),
+			(int32_t) (dbg_acc[0]*1000000),
+			(int32_t) (dbg_acc[1]*1000000),
+			(int32_t) (dbg_acc[2]*1000000),
+			(int32_t) (g_avg_0*1000000),
+			(int32_t) (g_avg_1*1000000),
+			(int32_t) (g_avg_2*1000000),
+			(int32_t) (a_avg_0*1000000),
+			(int32_t) (a_avg_1*1000000),
+			(int32_t) (a_avg_2*1000000),
 			(int32_t) (dbg_temp*1000));
 }
 
