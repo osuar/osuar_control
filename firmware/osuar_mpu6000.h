@@ -31,6 +31,24 @@
 #define ACC_Z_OFFSET -0.038730
 #endif /* HERMES */
 
+#ifdef AEOLUS
+#define GYR_X_OFFSET -0.029900
+#define GYR_Y_OFFSET -0.007500
+#define GYR_Z_OFFSET -0.007600
+#define ACC_X_OFFSET -0.065000
+#define ACC_Y_OFFSET -0.013000
+#define ACC_Z_OFFSET -0.544000
+#endif /* AEOLUS */
+
+#ifdef ZEPHYRUS
+#define GYR_X_OFFSET  0.040300
+#define GYR_Y_OFFSET  0.021200
+#define GYR_Z_OFFSET  0.115000
+#define ACC_X_OFFSET  0.018000
+#define ACC_Y_OFFSET  0.000000
+#define ACC_Z_OFFSET  0.115000
+#endif /* ZEPHYRUS */
+
 // Register names
 #define MPU6000_AUX_VDDIO          0x01   // R/W
 #define MPU6000_SMPLRT_DIV         0x19   // R/W

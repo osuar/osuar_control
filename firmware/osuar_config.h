@@ -10,9 +10,9 @@
 #define CONFIG_H
 
 /**
- * Which quadrotor? Choose from: APOLLO, HERMES
+ * Which quadrotor? Choose from: APOLLO, HERMES, AEOLUS, ZEPHYRUS
  */
-#define HERMES
+#define AEOLUS
 
 #define NUM_ROTORS 4
 #define ESC_COMM PWM   // Set to either PWM or SPI.
