@@ -73,8 +73,8 @@ static PWMConfig pwm3cfg = {
 	{
 		{PWM_OUTPUT_DISABLED, NULL},
 		{PWM_OUTPUT_ACTIVE_HIGH, NULL},
-		{PWM_OUTPUT_ACTIVE_HIGH, NULL},
-		{PWM_OUTPUT_ACTIVE_HIGH, NULL}
+		{PWM_OUTPUT_DISABLED, NULL},
+		{PWM_OUTPUT_DISABLED, NULL}
 	},
 
 	0   // HW dependent
@@ -135,7 +135,7 @@ void setup_motors()
 	 */
 #if (NUM_ROTORS < 4)
 	pwmStart(&PWMD1, &pwm1cfg);
-	palSetPadMode(GPIOA, 8, PAL_MODE_ALTERNATE(2));
+	palSetPadMode(GPIOA, 8, PAL_MODE_ALTERNATE(1));
 #endif // NUM_ROTORS < 4
 
 #if (NUM_ROTORS < 3)
@@ -203,8 +203,8 @@ void update_motors(float dc[4])
 	// TODO: send data to motor1.
 #endif // ESC_COMM == SPI
 
-	pwmEnableChannel(&PWMD3, 2, PWM_PERCENTAGE_TO_WIDTH(&PWMD1, (SERVO_PWM_MIN + (SERVO_PWM_MAX-SERVO_PWM_MIN) * dc[2]) * 10000));
-	pwmEnableChannel(&PWMD3, 3, PWM_PERCENTAGE_TO_WIDTH(&PWMD3, (SERVO_PWM_MIN + (SERVO_PWM_MAX-SERVO_PWM_MIN) * dc[3]) * 10000));
+	pwmEnableChannel(&PWMD1, 0, PWM_PERCENTAGE_TO_WIDTH(&PWMD1, (SERVO_PWM_MIN + (SERVO_PWM_MAX-SERVO_PWM_MIN) * dc[2]) * 10000));
+	pwmEnableChannel(&PWMD3, 1, PWM_PERCENTAGE_TO_WIDTH(&PWMD3, (SERVO_PWM_MIN + (SERVO_PWM_MAX-SERVO_PWM_MIN) * dc[3]) * 10000));
 #endif // NUM_ROTORS == 2
 
 	/*
@@ -222,9 +222,10 @@ void update_motors(float dc[4])
 	servo0 = (uint16_t) d;
 
 #if (ESC_COMM == PWM)
-	pwmEnableChannel(&PWMD8, 0, PWM_FRACTION_TO_WIDTH(&PWMD8, 1000, motor0));
-	pwmEnableChannel(&PWMD8, 1, PWM_FRACTION_TO_WIDTH(&PWMD8, 1000, motor1));
-	pwmEnableChannel(&PWMD8, 2, PWM_FRACTION_TO_WIDTH(&PWMD8, 1000, motor2));
+	pwmEnableChannel(&PWMD8, 0, PWM_PERCENTAGE_TO_WIDTH(&PWMD8, (0.35+0.60*dc[0])*10000));
+	pwmEnableChannel(&PWMD8, 1, PWM_PERCENTAGE_TO_WIDTH(&PWMD8, (0.35+0.60*dc[1])*10000));
+	pwmEnableChannel(&PWMD8, 2, PWM_PERCENTAGE_TO_WIDTH(&PWMD8, (0.35+0.60*dc[2])*10000));
+	pwmEnableChannel(&PWMD1, 0, PWM_PERCENTAGE_TO_WIDTH(&PWMD1, (0.35+0.60*dc[2])*10000));
 #endif // ESC_COMM == PWM
 
 #if (ESC_COMM == SPI)
