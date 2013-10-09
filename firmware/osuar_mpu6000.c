@@ -81,19 +81,21 @@ void setup_mpu(void)
 
 void read_mpu(float gyr[3], float acc[3])
 {
+	static float raw_gyr[3], raw_acc[3];
+
 	/* Read gyroscope. */
 	mpu_txbuf[0] = MPU6000_GYRO_XOUT_H | (1<<7);
 	spi_exchange(&SPID1, &mpu_hs_spicfg, mpu_txbuf, mpu_rxbuf, 7);
-	gyr[0] = ((int16_t) ((mpu_rxbuf[1]<<8) | mpu_rxbuf[2])) / 16.384 * M_PI / 180.0 + GYR_X_OFFSET;
-	gyr[1] = ((int16_t) ((mpu_rxbuf[3]<<8) | mpu_rxbuf[4])) / 16.384 * M_PI / 180.0 + GYR_Y_OFFSET;
-	gyr[2] = ((int16_t) ((mpu_rxbuf[5]<<8) | mpu_rxbuf[6])) / 16.384 * M_PI / 180.0 + GYR_Z_OFFSET;
+	raw_gyr[0] = ((int16_t) ((mpu_rxbuf[1]<<8) | mpu_rxbuf[2])) / 16.384 * M_PI / 180.0 + GYR_X_OFFSET;
+	raw_gyr[1] = ((int16_t) ((mpu_rxbuf[3]<<8) | mpu_rxbuf[4])) / 16.384 * M_PI / 180.0 + GYR_Y_OFFSET;
+	raw_gyr[2] = ((int16_t) ((mpu_rxbuf[5]<<8) | mpu_rxbuf[6])) / 16.384 * M_PI / 180.0 + GYR_Z_OFFSET;
 
 	/* Read accelerometer. */
 	mpu_txbuf[0] = MPU6000_ACCEL_XOUT_H | (1<<7);
 	spi_exchange(&SPID1, &mpu_hs_spicfg, mpu_txbuf, mpu_rxbuf, 7);
-	acc[0] = ((int16_t) ((mpu_rxbuf[1]<<8) | mpu_rxbuf[2])) / 16384.0 + ACC_X_OFFSET;
-	acc[1] = ((int16_t) ((mpu_rxbuf[3]<<8) | mpu_rxbuf[4])) / 16384.0 + ACC_Y_OFFSET;
-	acc[2] = ((int16_t) ((mpu_rxbuf[5]<<8) | mpu_rxbuf[6])) / 16384.0 + ACC_Z_OFFSET;
+	raw_acc[0] = ((int16_t) ((mpu_rxbuf[1]<<8) | mpu_rxbuf[2])) / 16384.0 + ACC_X_OFFSET;
+	raw_acc[1] = ((int16_t) ((mpu_rxbuf[3]<<8) | mpu_rxbuf[4])) / 16384.0 + ACC_Y_OFFSET;
+	raw_acc[2] = ((int16_t) ((mpu_rxbuf[5]<<8) | mpu_rxbuf[6])) / 16384.0 + ACC_Z_OFFSET;
 
 	/* Read temperature. */
 	mpu_txbuf[0] = MPU6000_TEMP_OUT_H | (1<<7);
@@ -103,13 +105,21 @@ void read_mpu(float gyr[3], float acc[3])
 	/* Copy sensor reads to debug buffers. */
 	uint8_t i;
 	for (i=0; i<3; i++) {
-		dbg_gyr[i] = gyr[i];
-		dbg_acc[i] = acc[i];
+		dbg_gyr[i] = raw_gyr[i];
+		dbg_acc[i] = raw_acc[i];
 	}
 	dbg_temp = mpu_temp;
+
+	/* Output */
+	gyr[0] = GYR_X;
+	gyr[1] = GYR_Y;
+	gyr[2] = GYR_Z;
+	acc[0] = ACC_X;
+	acc[1] = ACC_Y;
+	acc[2] = ACC_Z;
 }
 
-#define DEBUG_CALIBRATE 1
+#define DEBUG_CALIBRATE 0
 void debug_mpu(uint8_t *buffer)
 {
 	static uint16_t count = 1;
@@ -126,7 +136,7 @@ void debug_mpu(uint8_t *buffer)
 	a_avg_1 = (a_avg_1*count + dbg_acc[1] - ACC_Y_OFFSET) / (count+1);
 	a_avg_2 = (a_avg_2*count + dbg_acc[2] - ACC_Z_OFFSET) / (count+1);
 
-	#if DEBUG_CALIBRATE == 0
+	#if DEBUG_CALIBRATE == 1
 	dbg_gyr[0] -= GYR_X_OFFSET;
 	dbg_gyr[1] -= GYR_Y_OFFSET;
 	dbg_gyr[2] -= GYR_Z_OFFSET;
