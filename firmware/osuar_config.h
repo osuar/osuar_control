@@ -12,19 +12,19 @@
 /* Loop periods */
 #define CONTROL_DT 0.001   /* Note that MS2ST won't work here. See its implementation to find out why. */
 
-#if (BOARD == APOLLO)
+#ifdef APOLLO
 #include <osuar_config_apollo.h>
 #endif
 
-#if (BOARD == HERMES)
+#ifdef HERMES
 #include <osuar_config_hermes.h>
 #endif
 
-#if (BOARD == AEOLUS)
+#ifdef AEOLUS
 #include <osuar_config_aeolus.h>
 #endif
 
-#if (BOARD == ZEPHYRUS)
+#ifdef ZEPHYRUS
 #include <osuar_config_zephyrus.h>
 #endif
 
