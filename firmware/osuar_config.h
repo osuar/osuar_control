@@ -28,33 +28,5 @@
 #include <osuar_config_zephyrus.h>
 #endif
 
-/******************************************************************************
- * 2-rotor system.
- *
- * Currently, this applies only to the robat.
- *****************************************************************************/
-#if (NUM_ROTORS == 2)
-#include <osuar_config_2_rotor.h>
-#endif // NUM_ROTORS == 2
-
-/******************************************************************************
- * 3-rotor system.
- *
- * Currently, this applies only to Soo-Hyun's tricopter.
- *****************************************************************************/
-#if (NUM_ROTORS == 3)
-#include <osuar_config_3_rotor.h>
-#endif // NUM_ROTORS == 3
-
-/******************************************************************************
- * 4-rotor system.
- *
- * Currently, we have two quadrotors. We may or may not decide to keep separate
- * config files for the two robots.
- *****************************************************************************/
-#if (NUM_ROTORS == 4)
-#include <osuar_config_4_rotor.h>
-#endif // NUM_ROTORS == 4
-
 #endif // CONFIG_H
 
