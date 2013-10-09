@@ -41,8 +41,13 @@ static PWMConfig pwm8cfg = {
 
 /*
  * PWM configuration structures for servos using one or both of:
- * PA8 - TIM1 channel 1
+ * PA8 - TIM1 channel 1 (last I checked, this doesn't work)
  * PB5 - TIM3 channel 2
+ * PB0 - TIM3 channel 3
+ * PB1 - TIM3 channel 4
+ *
+ * Channels 3 and 4 would normally be used for SPI, but currently on the
+ * dualrotor, this is not the case.
  */
 #if (NUM_ROTORS < 4)
 static PWMConfig pwm1cfg = {
@@ -68,8 +73,8 @@ static PWMConfig pwm3cfg = {
 	{
 		{PWM_OUTPUT_DISABLED, NULL},
 		{PWM_OUTPUT_ACTIVE_HIGH, NULL},
-		{PWM_OUTPUT_DISABLED, NULL},
-		{PWM_OUTPUT_DISABLED, NULL}
+		{PWM_OUTPUT_ACTIVE_HIGH, NULL},
+		{PWM_OUTPUT_ACTIVE_HIGH, NULL}
 	},
 
 	0   // HW dependent
@@ -188,19 +193,9 @@ void update_motors(float dc[4])
 	 * Commands for two-rotor system.
 	 */
 #if (NUM_ROTORS == 2)
-	uint16_t motor0, motor1, servo0, servo1;
-
-	/*
-	 * Calculate motor and servo values.
-	 */
-	motor0 = (uint16_t) a;
-	motor1 = (uint16_t) b;
-	servo0 = (uint16_t) c;
-	servo1 = (uint16_t) d;
-
 #if (ESC_COMM == PWM)
-	pwmEnableChannel(&PWMD8, 0, PWM_FRACTION_TO_WIDTH(&PWMD8, 1000, motor0));
-	pwmEnableChannel(&PWMD8, 1, PWM_FRACTION_TO_WIDTH(&PWMD8, 1000, motor1));
+	pwmEnableChannel(&PWMD8, 0, PWM_PERCENTAGE_TO_WIDTH(&PWMD8, (MOTOR_PWM_MIN + (MOTOR_PWM_MAX-MOTOR_PWM_MIN) * dc[0]) * 10000));
+	pwmEnableChannel(&PWMD8, 1, PWM_PERCENTAGE_TO_WIDTH(&PWMD8, (MOTOR_PWM_MIN + (MOTOR_PWM_MAX-MOTOR_PWM_MIN) * dc[1]) * 10000));
 #endif // ESC_COMM == PWM
 
 #if (ESC_COMM == SPI)
@@ -208,8 +203,8 @@ void update_motors(float dc[4])
 	// TODO: send data to motor1.
 #endif // ESC_COMM == SPI
 
-	pwmEnableChannel(&PWMD1, 0, PWM_FRACTION_TO_WIDTH(&PWMD1, 1000, servo0));
-	pwmEnableChannel(&PWMD3, 1, PWM_FRACTION_TO_WIDTH(&PWMD3, 1000, servo1));
+	pwmEnableChannel(&PWMD3, 2, PWM_PERCENTAGE_TO_WIDTH(&PWMD1, (SERVO_PWM_MIN + (SERVO_PWM_MAX-SERVO_PWM_MIN) * dc[2]) * 10000));
+	pwmEnableChannel(&PWMD3, 3, PWM_PERCENTAGE_TO_WIDTH(&PWMD3, (SERVO_PWM_MIN + (SERVO_PWM_MAX-SERVO_PWM_MIN) * dc[3]) * 10000));
 #endif // NUM_ROTORS == 2
 
 	/*
