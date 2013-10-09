@@ -13,42 +13,6 @@
 
 #define MPU_SPI_BUFSIZE 20
 
-#ifdef APOLLO
-#define GYR_X_OFFSET  0.029700
-#define GYR_Y_OFFSET -0.015000
-#define GYR_Z_OFFSET  0.031600
-#define ACC_X_OFFSET -0.022030
-#define ACC_Y_OFFSET -0.028988
-#define ACC_Z_OFFSET -0.125280
-#endif /* APOLLO */
-
-#ifdef HERMES
-#define GYR_X_OFFSET  0.001100
-#define GYR_Y_OFFSET -0.012500
-#define GYR_Z_OFFSET -0.013650
-#define ACC_X_OFFSET -0.007365
-#define ACC_Y_OFFSET -0.010660
-#define ACC_Z_OFFSET -0.038730
-#endif /* HERMES */
-
-#ifdef AEOLUS
-#define GYR_X_OFFSET  0.001150
-#define GYR_Y_OFFSET -0.016400
-#define GYR_Z_OFFSET -0.003040
-#define ACC_X_OFFSET -0.057000
-#define ACC_Y_OFFSET -0.009000
-#define ACC_Z_OFFSET -0.292000
-#endif /* AEOLUS */
-
-#ifdef ZEPHYRUS
-#define GYR_X_OFFSET  0.040300
-#define GYR_Y_OFFSET  0.021200
-#define GYR_Z_OFFSET  0.115000
-#define ACC_X_OFFSET  0.018000
-#define ACC_Y_OFFSET  0.000000
-#define ACC_Z_OFFSET  0.115000
-#endif /* ZEPHYRUS */
-
 // Register names
 #define MPU6000_AUX_VDDIO          0x01   // R/W
 #define MPU6000_SMPLRT_DIV         0x19   // R/W

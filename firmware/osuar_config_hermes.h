@@ -1,0 +1,10 @@
+#define NUM_ROTORS 2
+#define ESC_COMM PWM
+
+#define GYR_X_OFFSET  0.001100
+#define GYR_Y_OFFSET -0.012500
+#define GYR_Z_OFFSET -0.013650
+#define ACC_X_OFFSET -0.007365
+#define ACC_Y_OFFSET -0.010660
+#define ACC_Z_OFFSET -0.038730
+

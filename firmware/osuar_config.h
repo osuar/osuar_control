@@ -9,11 +9,24 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#define NUM_ROTORS 4
-#define ESC_COMM PWM   // Set to either PWM or SPI.
-
 /* Loop periods */
 #define CONTROL_DT 0.001   /* Note that MS2ST won't work here. See its implementation to find out why. */
+
+#if (BOARD == APOLLO)
+#include <osuar_config_apollo.h>
+#endif
+
+#if (BOARD == HERMES)
+#include <osuar_config_hermes.h>
+#endif
+
+#if (BOARD == AEOLUS)
+#include <osuar_config_aeolus.h>
+#endif
+
+#if (BOARD == ZEPHYRUS)
+#include <osuar_config_zephyrus.h>
+#endif
 
 /******************************************************************************
  * 2-rotor system.
