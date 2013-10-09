@@ -72,7 +72,7 @@ static msg_t comm_thread_2(void *arg)
 		time += MS2ST(11)-1;
 
 		clear_buffer(txbuf);
-		debug_controller(txbuf);
+		debug_mpu(txbuf);
 		uartStartSend(&UARTD3, sizeof(txbuf), txbuf);
 
 		chThdSleepUntil(time);
@@ -92,15 +92,11 @@ static msg_t adc_thread(void *arg)
 	systime_t time = chTimeNow();
 
 	while (TRUE) {
-		time += MS2ST(500);
+		time += MS2ST(50);
 
 		update_adc();
 
 		uint16_t dutyCycle = avg_ch[3] * 500/4096 + 1;   // TODO: The +1 at the end makes this work. Why?
-
-		palSetPad(GPIOD, 15);
-		chThdSleepMilliseconds(dutyCycle);
-		palClearPad(GPIOD, 15);
 
 		chThdSleepUntil(time);
 	}
@@ -134,6 +130,8 @@ static msg_t control_thread(void *arg)
 	while (TRUE) {
 		counter++;
 		time += CONTROL_DT*CH_FREQUENCY;
+
+		throttle = ((float)avg_ch[1] * 500/4096 + 1)/250;   // TODO: The +1 at the end makes this work. Why?
 
 		update_ahrs(CONTROL_DT, dcm_bg, gyr);
 		run_controller(throttle, dcm_bg, gyr, motor_dc);
