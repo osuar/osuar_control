@@ -126,7 +126,7 @@ void debug_mpu(uint8_t *buffer)
 	a_avg_1 = (a_avg_1*count + dbg_acc[1] - ACC_Y_OFFSET) / (count+1);
 	a_avg_2 = (a_avg_2*count + dbg_acc[2] - ACC_Z_OFFSET) / (count+1);
 
-	#if DEBUG_CALIBRATE == 1
+	#if DEBUG_CALIBRATE == 0
 	dbg_gyr[0] -= GYR_X_OFFSET;
 	dbg_gyr[1] -= GYR_Y_OFFSET;
 	dbg_gyr[2] -= GYR_Z_OFFSET;
