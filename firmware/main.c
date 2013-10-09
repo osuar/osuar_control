@@ -131,7 +131,7 @@ static msg_t control_thread(void *arg)
 		counter++;
 		time += CONTROL_DT*CH_FREQUENCY;
 
-		throttle = ((float)avg_ch[1] * 500/4096 + 1)/250;   // TODO: The +1 at the end makes this work. Why?
+		throttle = (((float)avg_ch[1] * 500/4096 + 1)/250 - 0.15)*1.25;   // TODO: The +1 at the end makes this work. Why?
 
 		update_ahrs(CONTROL_DT, dcm_bg, gyr);
 		run_controller(throttle, dcm_bg, gyr, motor_dc);
@@ -152,6 +152,12 @@ static msg_t control_thread(void *arg)
 		else {
 			palClearPad(GPIOA, 7);
 		}
+
+		// TESTING
+		for (i=0; i<4; i++) {
+			motor_dc[i] = throttle;   // TODO: put this in config.
+		}
+		map_to_bounds(motor_dc, 4, 0.0, 1.0, motor_dc);
 
 		update_motors(motor_dc);
 
