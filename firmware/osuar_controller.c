@@ -70,8 +70,8 @@ void calculate_dc (float dc_throttle, float* dc_shift, float* dc_final)
 #if (NUM_ROTORS == 2)
 	dc_final[0] = dc_throttle + -dc_shift[0];
 	dc_final[1] = dc_throttle +  dc_shift[0];
-	dc_final[2] = 0.5 + dc_shift[1] - dc_shift[2];
-	dc_final[3] = 0.5 + dc_shift[1] + dc_shift[2];
+	dc_final[2] = 1 - (0.5 + dc_shift[1] + dc_shift[2]);
+	dc_final[3] =      0.5 + dc_shift[1] - dc_shift[2];
 #endif // NUM_ROTORS == 2
 
 #if (NUM_ROTORS == 3)
