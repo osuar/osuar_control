@@ -18,6 +18,12 @@
 #define ACC_X_OFFSET -0.057000
 #define ACC_Y_OFFSET -0.009000
 #define ACC_Z_OFFSET -0.292000
+#define GYR_X ( raw_gyr[0])
+#define GYR_Y ( raw_gyr[1])
+#define GYR_Z ( raw_gyr[2])
+#define ACC_X ( raw_acc[0])
+#define ACC_Y ( raw_acc[1])
+#define ACC_Z ( raw_acc[2])
 
 /* PWM duty cycle constants */
 #define MOTOR_PWM_DISABLED 0.50
