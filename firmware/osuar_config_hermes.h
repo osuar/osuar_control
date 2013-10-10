@@ -12,12 +12,12 @@
 #define ANG_VEL_KD 0.0
 
 /* IMU offsets */
-#define GYR_X_OFFSET  0.001100
-#define GYR_Y_OFFSET -0.012500
-#define GYR_Z_OFFSET -0.013650
-#define ACC_X_OFFSET -0.007365
-#define ACC_Y_OFFSET -0.010660
-#define ACC_Z_OFFSET -0.038730
+#define GYR_X_OFFSET  0.021190
+#define GYR_Y_OFFSET -0.015040
+#define GYR_Z_OFFSET  0.029040
+#define ACC_X_OFFSET -0.003600
+#define ACC_Y_OFFSET -0.019000
+#define ACC_Z_OFFSET -0.007000
 #define GYR_X ( raw_gyr[0])
 #define GYR_Y (-raw_gyr[1])
 #define GYR_Z (-raw_gyr[2])
