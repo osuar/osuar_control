@@ -40,16 +40,14 @@ static PWMConfig pwm8cfg = {
 };
 
 /*
- * PWM configuration structures for servos using one or both of:
- * PA8 - TIM1 channel 1 (last I checked, this doesn't work)
- * PB5 - TIM3 channel 2
+ * PWM configuration structures for servos using:
+ * PA8 - TIM1 channel 1 (enabled always)
  * PB0 - TIM3 channel 3
  * PB1 - TIM3 channel 4
  *
  * Channels 3 and 4 would normally be used for SPI, but currently on the
  * dualrotor, this is not the case.
  */
-#if (NUM_ROTORS < 4)
 static PWMConfig pwm1cfg = {
 	50000,   // 50 kHz PWM clock frequency.
 	1000,    // PWM period 20 ms.
@@ -63,23 +61,28 @@ static PWMConfig pwm1cfg = {
 
 	0   // HW dependent
 };
-#endif // NUM_ROTORS < 4
 
-#if (NUM_ROTORS < 3)
 static PWMConfig pwm3cfg = {
 	50000,   // 50 kHz PWM clock frequency.
 	1000,    // PWM period 20 ms.
 	NULL,    // No callback.
 	{
 		{PWM_OUTPUT_DISABLED, NULL},
-		{PWM_OUTPUT_ACTIVE_HIGH, NULL},
 		{PWM_OUTPUT_DISABLED, NULL},
+
+#if (NUM_ROTORS == 2)
+		{PWM_OUTPUT_ACTIVE_HIGH, NULL},
+		{PWM_OUTPUT_ACTIVE_HIGH, NULL}
+#endif // NUM_ROTORS == 2
+
+#if (NUM_ROTORS == 3)
+		{PWM_OUTPUT_ACTIVE_HIGH, NULL},
 		{PWM_OUTPUT_DISABLED, NULL}
+#endif // NUM_ROTORS == 3
 	},
 
 	0   // HW dependent
 };
-#endif // NUM_ROTORS < 3
 
 #endif // ESC_COMM == PWM
 
@@ -133,14 +136,16 @@ void setup_motors()
 	/*
 	 * Set up servo pins.
 	 */
-#if (NUM_ROTORS < 4)
 	pwmStart(&PWMD1, &pwm1cfg);
 	palSetPadMode(GPIOA, 8, PAL_MODE_ALTERNATE(1));
+
+#if (NUM_ROTORS < 4)
+	pwmStart(&PWMD3, &pwm3cfg);
+	palSetPadMode(GPIOB, 0, PAL_MODE_ALTERNATE(2));
 #endif // NUM_ROTORS < 4
 
 #if (NUM_ROTORS < 3)
-	pwmStart(&PWMD3, &pwm3cfg);
-	palSetPadMode(GPIOB, 5, PAL_MODE_ALTERNATE(2));
+	palSetPadMode(GPIOB, 1, PAL_MODE_ALTERNATE(2));
 #endif // NUM_ROTORS < 3
 
 	/*
@@ -166,22 +171,22 @@ void setup_motors()
 
 	/*
 	 * Initialize SPI CS lines.
-	 * PB0, PB1, PC4, PC5 - slave select lines
+	 * PC4, PC5, PB0, PB1 - slave select lines
 	 */
 
-	palSetPadMode(GPIOB, 0, PAL_MODE_OUTPUT_PUSHPULL | PAL_STM32_OSPEED_HIGHEST);
-	palSetPad(GPIOB, 0);
-	palSetPadMode(GPIOB, 1, PAL_MODE_OUTPUT_PUSHPULL | PAL_STM32_OSPEED_HIGHEST);
-	palSetPad(GPIOB, 1);
-
-#if (NUM_ROTORS > 2)
 	palSetPadMode(GPIOC, 4, PAL_MODE_OUTPUT_PUSHPULL | PAL_STM32_OSPEED_HIGHEST);
 	palSetPad(GPIOC, 4);
+	palSetPadMode(GPIOC, 5, PAL_MODE_OUTPUT_PUSHPULL | PAL_STM32_OSPEED_HIGHEST);
+	palSetPad(GPIOC, 5);
+
+#if (NUM_ROTORS > 2)
+	palSetPadMode(GPIOB, 0, PAL_MODE_OUTPUT_PUSHPULL | PAL_STM32_OSPEED_HIGHEST);
+	palSetPad(GPIOB, 0);
 #endif // NUM_ROTORS > 2
 
 #if (NUM_ROTORS > 3)
-	palSetPadMode(GPIOC, 5, PAL_MODE_OUTPUT_PUSHPULL | PAL_STM32_OSPEED_HIGHEST);
-	palSetPad(GPIOC, 5);
+	palSetPadMode(GPIOB, 1, PAL_MODE_OUTPUT_PUSHPULL | PAL_STM32_OSPEED_HIGHEST);
+	palSetPad(GPIOB, 1);
 #endif // NUM_ROTORS > 3
 
 #endif // ESC_COMM == SPI
@@ -203,29 +208,18 @@ void update_motors(float dc[4])
 	// TODO: send data to motor1.
 #endif // ESC_COMM == SPI
 
-	pwmEnableChannel(&PWMD1, 0, PWM_PERCENTAGE_TO_WIDTH(&PWMD1, (SERVO_PWM_MIN + (SERVO_PWM_MAX-SERVO_PWM_MIN) * dc[2]) * 10000));
-	pwmEnableChannel(&PWMD3, 1, PWM_PERCENTAGE_TO_WIDTH(&PWMD3, (SERVO_PWM_MIN + (SERVO_PWM_MAX-SERVO_PWM_MIN) * dc[3]) * 10000));
+	pwmEnableChannel(&PWMD3, 2, PWM_PERCENTAGE_TO_WIDTH(&PWMD3, (SERVO_PWM_MIN + (SERVO_PWM_MAX-SERVO_PWM_MIN) * dc[2]) * 10000));
+	pwmEnableChannel(&PWMD3, 3, PWM_PERCENTAGE_TO_WIDTH(&PWMD3, (SERVO_PWM_MIN + (SERVO_PWM_MAX-SERVO_PWM_MIN) * dc[3]) * 10000));
 #endif // NUM_ROTORS == 2
 
 	/*
 	 * Commands for three-rotor system.
 	 */
 #if (NUM_ROTORS == 3)
-	uint16_t motor0, motor1, motor2, servo0;
-
-	/*
-	 * Calculate motor and servo values.
-	 */
-	motor0 = (uint16_t) a;
-	motor1 = (uint16_t) b;
-	motor2 = (uint16_t) c;
-	servo0 = (uint16_t) d;
-
 #if (ESC_COMM == PWM)
-	pwmEnableChannel(&PWMD8, 0, PWM_PERCENTAGE_TO_WIDTH(&PWMD8, (0.35+0.60*dc[0])*10000));
-	pwmEnableChannel(&PWMD8, 1, PWM_PERCENTAGE_TO_WIDTH(&PWMD8, (0.35+0.60*dc[1])*10000));
-	pwmEnableChannel(&PWMD8, 2, PWM_PERCENTAGE_TO_WIDTH(&PWMD8, (0.35+0.60*dc[2])*10000));
-	pwmEnableChannel(&PWMD1, 0, PWM_PERCENTAGE_TO_WIDTH(&PWMD1, (0.35+0.60*dc[2])*10000));
+	pwmEnableChannel(&PWMD8, 0, PWM_PERCENTAGE_TO_WIDTH(&PWMD8, (MOTOR_PWM_MIN + (MOTOR_PWM_MAX-MOTOR_PWM_MIN) * dc[0]) * 10000));
+	pwmEnableChannel(&PWMD8, 1, PWM_PERCENTAGE_TO_WIDTH(&PWMD8, (MOTOR_PWM_MIN + (MOTOR_PWM_MAX-MOTOR_PWM_MIN) * dc[1]) * 10000));
+	pwmEnableChannel(&PWMD8, 2, PWM_PERCENTAGE_TO_WIDTH(&PWMD8, (MOTOR_PWM_MIN + (MOTOR_PWM_MAX-MOTOR_PWM_MIN) * dc[2]) * 10000));
 #endif // ESC_COMM == PWM
 
 #if (ESC_COMM == SPI)
@@ -234,7 +228,7 @@ void update_motors(float dc[4])
 	// TODO: send data to motor2.
 #endif // ESC_COMM == SPI
 
-	pwmEnableChannel(&PWMD1, 0, PWM_FRACTION_TO_WIDTH(&PWMD1, 1000, servo0));
+	pwmEnableChannel(&PWMD1, 0, PWM_PERCENTAGE_TO_WIDTH(&PWMD1, (SERVO_PWM_MIN + (SERVO_PWM_MAX-SERVO_PWM_MIN) * dc[3]) * 10000));
 #endif // NUM_ROTORS == 3
 
 	/*
