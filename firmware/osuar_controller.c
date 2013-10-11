@@ -135,7 +135,7 @@ void run_controller(float throttle, float dcm_bg[3][3], float gyr[3], float dc[4
 
 	// Keep abs(target - current) within [-PI, PI]. This way, nothing bad
 	// happens as we rotate to any angle in [-PI, PI].
-	for (i=0; i<2; i++){
+	for (i=0; i<3; i++){
 		if(des_ang_pos[i] - cur_ang_pos[i] > M_PI){
 			cur_ang_pos[i] += 2*M_PI;
 		}
