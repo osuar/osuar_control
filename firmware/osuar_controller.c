@@ -68,17 +68,18 @@ void angular_velocity_controller(float* cur_vel, float* des_vel, float* dc_shift
 void calculate_dc (float dc_throttle, float* dc_shift, float* dc_final)
 {
 #if (NUM_ROTORS == 2)
-	dc_final[0] = dc_throttle + -dc_shift[0];
-	dc_final[1] = dc_throttle +  dc_shift[0];
+	dc_final[0] = dc_throttle - dc_shift[0];
+	dc_final[1] = dc_throttle + dc_shift[0];
 	dc_final[2] = 1 - (0.5 + dc_shift[1] + dc_shift[2]);
 	dc_final[3] =      0.5 + dc_shift[1] - dc_shift[2];
 #endif // NUM_ROTORS == 2
 
 #if (NUM_ROTORS == 3)
-	dc_final[I_ST] = 0.5 + dc_shift[2];
-	dc_final[I_RT] = (dc_throttle +  dc_shift[1]) / cos((dc_final[I_ST] - 0.5) * M_PI);
-	dc_final[I_RR] =  dc_throttle + -dc_shift[1] - dc_shift[0]*sqrt(3);
-	dc_final[I_RL] =  dc_throttle + -dc_shift[1] + dc_shift[0]*sqrt(3);
+	dc_final[3] = 0.5 - dc_shift[2];
+	//dc_final[0] = (dc_throttle +  dc_shift[1]) / cosine((dc_final[3] - 0.5) * M_PI);
+	dc_final[0] =  dc_throttle + -dc_shift[1] - dc_shift[0]*1.7320508075688772;
+	dc_final[1] =  dc_throttle + -dc_shift[1] + dc_shift[0]*1.7320508075688772;
+	dc_final[2] = (dc_throttle +  dc_shift[1]);
 #endif // NUM_ROTORS == 3
 
 #if (NUM_ROTORS == 4)
