@@ -148,9 +148,10 @@ void run_controller(float throttle, float dcm_bg[3][3], float gyr[3], float dc[4
 	angular_position_controller(cur_ang_pos, gyr, des_ang_pos, des_ang_vel);
 	angular_velocity_controller(gyr, des_ang_vel, dc_shift);
 
-	// Increase throttle to compensate for tilt, but only so much, and
-	// definitely not when we're upside-down.
-	throttle = (dcm_bg[2][2] > 0) ? throttle / MAX(dcm_bg[2][2], 0.707107) : 0;
+	// Increase throttle to compensate for tilt up to 45 degrees, but not when
+	// we're past 60 degrees past vertical.
+	// TODO: These numbers should be named sensibly and put in the config.
+	throttle = (dcm_bg[2][2] > 0.5) ? throttle / MAX(dcm_bg[2][2], 0.707107) : 0;
 
 	// Finally calculate motor duty cycles.
 	calculate_dc(throttle, dc_shift, dc);
