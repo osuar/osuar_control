@@ -103,15 +103,81 @@ void setup_controller(void)
 	ang_vel_xy_cap = 2*M_PI;
 	ang_vel_z_cap  = M_PI/2;
 
+#if (NUM_ROTORS == 2)
+	/* Motors */
+	pid_data[I_ANG_POS_X].Kp = MOTOR_ANG_POS_KP;
+	pid_data[I_ANG_POS_X].Ki = MOTOR_ANG_POS_KI;
+	pid_data[I_ANG_POS_X].Kd = MOTOR_ANG_POS_KD;
+	pid_data[I_ANG_VEL_X].Kp = MOTOR_ANG_VEL_KP;
+	pid_data[I_ANG_VEL_X].Ki = MOTOR_ANG_VEL_KI;
+	pid_data[I_ANG_VEL_X].Kd = MOTOR_ANG_VEL_KD;
+
+	/* Servos */
+	pid_data[I_ANG_POS_Y].Kp = SERVO_ANG_POS_KP;
+	pid_data[I_ANG_POS_Y].Ki = SERVO_ANG_POS_KI;
+	pid_data[I_ANG_POS_Y].Kd = SERVO_ANG_POS_KD;
+	pid_data[I_ANG_VEL_Y].Kp = SERVO_ANG_VEL_KP;
+	pid_data[I_ANG_VEL_Y].Ki = SERVO_ANG_VEL_KI;
+	pid_data[I_ANG_VEL_Y].Kd = SERVO_ANG_VEL_KD;
+	pid_data[I_ANG_POS_Z].Kp = SERVO_ANG_POS_KP;
+	pid_data[I_ANG_POS_Z].Ki = SERVO_ANG_POS_KI;
+	pid_data[I_ANG_POS_Z].Kd = SERVO_ANG_POS_KD;
+	pid_data[I_ANG_VEL_Z].Kp = SERVO_ANG_VEL_KP;
+	pid_data[I_ANG_VEL_Z].Ki = SERVO_ANG_VEL_KI;
+	pid_data[I_ANG_VEL_Z].Kd = SERVO_ANG_VEL_KD;
+#endif
+
+#if (NUM_ROTORS == 3)
+	/* Motors */
+	pid_data[I_ANG_POS_X].Kp = MOTOR_ANG_POS_KP;
+	pid_data[I_ANG_POS_X].Ki = MOTOR_ANG_POS_KI;
+	pid_data[I_ANG_POS_X].Kd = MOTOR_ANG_POS_KD;
+	pid_data[I_ANG_VEL_X].Kp = MOTOR_ANG_VEL_KP;
+	pid_data[I_ANG_VEL_X].Ki = MOTOR_ANG_VEL_KI;
+	pid_data[I_ANG_VEL_X].Kd = MOTOR_ANG_VEL_KD;
+
+	/* Servos */
+	pid_data[I_ANG_POS_Y].Kp = SERVO_ANG_POS_KP;
+	pid_data[I_ANG_POS_Y].Ki = SERVO_ANG_POS_KI;
+	pid_data[I_ANG_POS_Y].Kd = SERVO_ANG_POS_KD;
+	pid_data[I_ANG_VEL_Y].Kp = SERVO_ANG_VEL_KP;
+	pid_data[I_ANG_VEL_Y].Ki = SERVO_ANG_VEL_KI;
+	pid_data[I_ANG_VEL_Y].Kd = SERVO_ANG_VEL_KD;
+	pid_data[I_ANG_POS_Z].Kp = SERVO_ANG_POS_KP;
+	pid_data[I_ANG_POS_Z].Ki = SERVO_ANG_POS_KI;
+	pid_data[I_ANG_POS_Z].Kd = SERVO_ANG_POS_KD;
+	pid_data[I_ANG_VEL_Z].Kp = SERVO_ANG_VEL_KP;
+	pid_data[I_ANG_VEL_Z].Ki = SERVO_ANG_VEL_KI;
+	pid_data[I_ANG_VEL_Z].Kd = SERVO_ANG_VEL_KD;
+#endif
+
+#if (NUM_ROTORS == 4)
+	/* Motors */
+	pid_data[I_ANG_POS_X].Kp = MOTOR_ANG_POS_KP;
+	pid_data[I_ANG_POS_X].Ki = MOTOR_ANG_POS_KI;
+	pid_data[I_ANG_POS_X].Kd = MOTOR_ANG_POS_KD;
+	pid_data[I_ANG_VEL_X].Kp = MOTOR_ANG_VEL_KP;
+	pid_data[I_ANG_VEL_X].Ki = MOTOR_ANG_VEL_KI;
+	pid_data[I_ANG_VEL_X].Kd = MOTOR_ANG_VEL_KD;
+	pid_data[I_ANG_POS_Y].Kp = MOTOR_ANG_POS_KP;
+	pid_data[I_ANG_POS_Y].Ki = MOTOR_ANG_POS_KI;
+	pid_data[I_ANG_POS_Y].Kd = MOTOR_ANG_POS_KD;
+	pid_data[I_ANG_VEL_Y].Kp = MOTOR_ANG_VEL_KP;
+	pid_data[I_ANG_VEL_Y].Ki = MOTOR_ANG_VEL_KI;
+	pid_data[I_ANG_VEL_Y].Kd = MOTOR_ANG_VEL_KD;
+
+	/* TODO: These should use different gains */
+	pid_data[I_ANG_POS_Z].Kp = MOTOR_ANG_POS_KP;
+	pid_data[I_ANG_POS_Z].Ki = MOTOR_ANG_POS_KI;
+	pid_data[I_ANG_POS_Z].Kd = MOTOR_ANG_POS_KD;
+	pid_data[I_ANG_VEL_Z].Kp = MOTOR_ANG_VEL_KP;
+	pid_data[I_ANG_VEL_Z].Ki = MOTOR_ANG_VEL_KI;
+	pid_data[I_ANG_VEL_Z].Kd = MOTOR_ANG_VEL_KD;
+#endif
+
 	for (i=0; i<3; i++) {
-		pid_data[I_ANG_POS_X+i].Kp = ANG_POS_KP;
-		pid_data[I_ANG_POS_X+i].Ki = ANG_POS_KI;
-		pid_data[I_ANG_POS_X+i].Kd = ANG_POS_KD;
 		pid_data[I_ANG_POS_X+i].dt = CONTROL_DT;
 		pid_data[I_ANG_POS_X+i].last_val = 0.0;
-		pid_data[I_ANG_VEL_X+i].Kp = ANG_VEL_KP;
-		pid_data[I_ANG_VEL_X+i].Ki = ANG_VEL_KI;
-		pid_data[I_ANG_VEL_X+i].Kd = ANG_VEL_KD;
 		pid_data[I_ANG_VEL_X+i].dt = CONTROL_DT;
 		pid_data[I_ANG_VEL_X+i].last_val = 0.0;
 	}
