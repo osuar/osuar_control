@@ -4,16 +4,22 @@
 #define THROTTLE_CAP 1.0
 
 /* Controller gains */
-#define ANG_POS_KP 0.4
-#define ANG_POS_KI 0.0
-#define ANG_POS_KD 0.0
-#define ANG_VEL_KP 0.05
-#define ANG_VEL_KI 0.0
-#define ANG_VEL_KD 0.0
+#define MOTOR_ANG_POS_KP 3.0
+#define MOTOR_ANG_POS_KI 0.0
+#define MOTOR_ANG_POS_KD 0.0
+#define MOTOR_ANG_VEL_KP 0.35
+#define MOTOR_ANG_VEL_KI 0.0
+#define MOTOR_ANG_VEL_KD 0.0
+#define SERVO_ANG_POS_KP 25.0
+#define SERVO_ANG_POS_KI 0.0
+#define SERVO_ANG_POS_KD 0.0
+#define SERVO_ANG_VEL_KP 0.04
+#define SERVO_ANG_VEL_KI 0.0
+#define SERVO_ANG_VEL_KD 0.0
 
 /* IMU offsets */
-#define GYR_X_OFFSET  0.021190
-#define GYR_Y_OFFSET -0.015040
+#define GYR_X_OFFSET  0.018680
+#define GYR_Y_OFFSET -0.018000
 #define GYR_Z_OFFSET  0.029040
 #define ACC_X_OFFSET -0.003600
 #define ACC_Y_OFFSET -0.019000
