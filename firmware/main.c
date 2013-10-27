@@ -146,18 +146,19 @@ static msg_t control_thread(void *arg)
 		if (palReadPad(GPIOA, 10) == 1) {
 			palSetPad(GPIOA, 7);
 			for (i=0; i<4; i++) {
-				motor_dc[i] = 0.35;   // TODO: put this in config.
+				motor_dc[i] = 0.0;   // TODO: put this in config.
 			}
+#if (NUM_ROTORS < 4)
+			motor_dc[3] = 0.5;
+#endif
+
+#if (NUM_ROTORS < 3)
+			motor_dc[2] = 0.5;
+#endif
 		}
 		else {
 			palClearPad(GPIOA, 7);
 		}
-
-		// TESTING
-		for (i=0; i<4; i++) {
-			motor_dc[i] = throttle;   // TODO: put this in config.
-		}
-		map_to_bounds(motor_dc, 4, 0.0, 1.0, motor_dc);
 
 		update_motors(motor_dc);
 
