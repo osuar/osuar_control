@@ -26,7 +26,7 @@
 #define ACC_Z ( raw_acc[2])
 
 /* PWM duty cycle constants */
-#define MOTOR_PWM_DISABLED 0.50
-#define MOTOR_PWM_MIN 0.55
+#define MOTOR_PWM_DISABLED 0.40
+#define MOTOR_PWM_MIN 0.44
 #define MOTOR_PWM_MAX 0.99
 
