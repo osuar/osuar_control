@@ -57,23 +57,33 @@ static msg_t comm_thread(void *arg)
 }
 
 /*
- * Second communications loop
+ * Remote control loop
  */
 static WORKING_AREA(wa_comm_thread_2, 512);
 static msg_t comm_thread_2(void *arg)
 {
 	(void) arg;
-	chRegSetThreadName("communications 2");
+	chRegSetThreadName("remote comm");
 	systime_t time = chTimeNow();
 
 	uint8_t txbuf[200];
+	uint8_t rxbuf[200];
 
 	while (TRUE) {
 		time += MS2ST(11)-1;
 
-		clear_buffer(txbuf);
-		debug_mpu(txbuf);
+		uartStopSend(&UARTD3);
+		uartStopReceive(&UARTD3);
+
+		clear_buffer(txbuf);   // TODO(yoos): maybe check whether or not we've finished transmitting before clearing buffer
+
+		/* Receive */
+		osuar_parse_input(rxbuf);   // TODO(yoos): implement
+
+		/* Transmit */
 		uartStartSend(&UARTD3, sizeof(txbuf), txbuf);
+
+		uartStartReceive(&UARTD3, sizeof(rxbuf), rxbuf);
 
 		chThdSleepUntil(time);
 	}
