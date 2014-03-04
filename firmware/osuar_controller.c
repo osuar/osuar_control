@@ -183,14 +183,15 @@ void setup_controller(void)
 	}
 }
 
-void run_controller(float throttle, float dcm_bg[3][3], float gyr[3], float dc[4])
+void run_controller(float throttle, float dcm_bg[3][3], float gyr[3], float dc[4], float new_des_ang_pos[3])
 {
 	uint8_t i;
 	// TODO: Calculate target rotation vector based on groundstation input and
 	// scale to maximum rotation of ang_pos_xy_cap.
-	des_ang_pos[0] = 0; //-joy.axes[SY] * ang_pos_xy_cap;
-	des_ang_pos[1] = 0; // joy.axes[SX] * ang_pos_xy_cap;
-	des_ang_pos[2] = 0; // joy.axes[SZ] * ang_pos_z_cap * CONTROL_LOOP_INTERVAL * MASTER_DT/1000000;
+	des_ang_pos[0] = new_des_ang_pos[0] * ang_pos_xy_cap;
+	des_ang_pos[1] = new_des_ang_pos[1] * ang_pos_xy_cap;
+        // TODO(cesarek): handle yaw
+	// des_ang_pos[2] = new_des_ang_pos[2] * ang_pos_z_cap * CONTROL_LOOP_INTERVAL * MASTER_DT/1000000;
 
 	// Calculate current rotation vector (Euler angles) from DCM and make
 	// appropriate modifications to make PID calculations work later.

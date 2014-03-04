@@ -12,13 +12,15 @@
 
 // Flight controller
 #include <osuar_ahrs.h>   // Attitude-Heading Reference System
+#include <osuar_comm.h>   // Communication
 #include <osuar_uart.h>   // Communications code (wired and wireless)
 #include <osuar_motor.h>   // Motor control
 #include <osuar_config.h>   // General configuration
 
 
-float dbg_dcm[3][3];
-float throttle = 0.10;
+static float dbg_dcm[3][3];
+static float throttle = 0.10;
+static float new_des_ang_pos[3];
 static uint32_t counter = 0;
 
 /*
@@ -66,24 +68,24 @@ static msg_t comm_thread_2(void *arg)
 	chRegSetThreadName("remote comm");
 	systime_t time = chTimeNow();
 
-	uint8_t txbuf[200];
-	uint8_t rxbuf[200];
+	uartStartReceive(&UARTD3, sizeof(remote_comm_rxbuf), remote_comm_rxbuf);
 
 	while (TRUE) {
 		time += MS2ST(11)-1;
 
-		uartStopSend(&UARTD3);
-		uartStopReceive(&UARTD3);
-
-		clear_buffer(txbuf);   // TODO(yoos): maybe check whether or not we've finished transmitting before clearing buffer
-
 		/* Receive */
-		osuar_parse_input(rxbuf);   // TODO(yoos): implement
+		osuar_comm_parse_input(&throttle, new_des_ang_pos);
+
 
 		/* Transmit */
-		uartStartSend(&UARTD3, sizeof(txbuf), txbuf);
+		clear_buffer(remote_comm_txbuf);   // TODO(yoos): maybe check whether or not we've finished transmitting before clearing buffer
 
-		uartStartReceive(&UARTD3, sizeof(rxbuf), rxbuf);
+		chsprintf(remote_comm_txbuf, "Roll: %3d Pitch: %3d Yaw: %3d Throttle: %3d\r\n",
+				(int16_t) (new_des_ang_pos[0] * 100),
+				(int16_t) (new_des_ang_pos[1] * 100),
+				(int16_t) (new_des_ang_pos[2] * 100),
+				(int16_t) (throttle * 100));
+		uartStartSend(&UARTD3, sizeof(remote_comm_txbuf), remote_comm_txbuf);
 
 		chThdSleepUntil(time);
 	}
@@ -144,7 +146,7 @@ static msg_t control_thread(void *arg)
 		throttle = (((float)avg_ch[1] * 500/4096 + 1)/250 - 0.15)*1.25;   // TODO: The +1 at the end makes this work. Why?
 
 		update_ahrs(CONTROL_DT, dcm_bg, gyr);
-		run_controller(throttle, dcm_bg, gyr, motor_dc);
+		run_controller(throttle, dcm_bg, gyr, motor_dc, new_des_ang_pos);
 
 		static uint8_t i, j;
 		for (i=0; i<3; i++) {

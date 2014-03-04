@@ -70,7 +70,7 @@ void setup_controller(void);
  * @brief Run the flight controller.
  *
  */
-void run_controller(float throttle, float dcm_bg[3][3], float gyr[3], float dc[4]);
+void run_controller(float throttle, float dcm_bg[3][3], float gyr[3], float dc[4], float new_des_ang_pos[3]);
 
 /**
  * @brief Map input array to be within desired bounds.

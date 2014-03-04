@@ -5,6 +5,8 @@
 #include <string.h>
 #include <stdarg.h>
 
+#include <osuar_comm.h>
+
 /*
  * UART printf buffer
  */
@@ -82,7 +84,7 @@ static UARTConfig uart1cfg = {
 static UARTConfig uart3cfg = {
 	txend1,
 	txend2,
-	rxend,
+	osuar_comm_data_received,
 	rxchar,
 	rxerr,
 	460800,
