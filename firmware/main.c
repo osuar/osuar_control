@@ -143,8 +143,6 @@ static msg_t control_thread(void *arg)
 		counter++;
 		time += CONTROL_DT*CH_FREQUENCY;
 
-		throttle = (((float)avg_ch[1] * 500/4096 + 1)/250 - 0.15)*1.25;   // TODO: The +1 at the end makes this work. Why?
-
 		update_ahrs(CONTROL_DT, dcm_bg, gyr);
 		run_controller(throttle, dcm_bg, gyr, motor_dc, new_des_ang_pos);
 
