@@ -15,9 +15,9 @@
 #define GYR_X_OFFSET  0.029700
 #define GYR_Y_OFFSET -0.015000
 #define GYR_Z_OFFSET  0.031600
-#define ACC_X_OFFSET -0.022030
-#define ACC_Y_OFFSET -0.028988
-#define ACC_Z_OFFSET -0.125280
+#define ACC_X_OFFSET  0.015830
+#define ACC_Y_OFFSET -0.023488
+#define ACC_Z_OFFSET  0.085280
 #define GYR_X ( raw_gyr[0])
 #define GYR_Y ( raw_gyr[1])
 #define GYR_Z ( raw_gyr[2])
