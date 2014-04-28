@@ -15,7 +15,7 @@
 #define PACKET_BUFFER_SIZE (CONTROL_PACKET_SIZE * 2)
 
 uint8_t remote_comm_rxbuf[4];
-uint8_t remote_comm_txbuf[200];
+uint8_t remote_comm_txbuf[4];
 
 /* Circular buffer that continually takes data from the incoming rxbuf. */
 static uint8_t packetbuf[PACKET_BUFFER_SIZE];
@@ -74,6 +74,12 @@ bool osuar_comm_parse_input(float *throttle, float ang_pos[3])
 	ang_pos[1] = ((int8_t) packetbuf[(start_idx + 4) % PACKET_BUFFER_SIZE]) / 127.0;
 	ang_pos[2] = ((int8_t) packetbuf[(start_idx + 5) % PACKET_BUFFER_SIZE]) / 127.0;
 	*throttle = ((int8_t) packetbuf[(start_idx + 6) % PACKET_BUFFER_SIZE]) / 127.0;
+
+        size_t i;
+        for(i = 0; i < CONTROL_PACKET_SIZE; i++) {
+          // TODO: drops packets when setting this to 0x00, why?
+          packetbuf[(start_idx + i) % PACKET_BUFFER_SIZE] = 0x01;
+        }
 
 	// TODO(cesarek): clear this portion of the buffer?
 

@@ -38,19 +38,19 @@ static msg_t comm_thread(void *arg)
 	while (TRUE) {
 		time += MS2ST(11)-1;
 
-		clear_buffer(txbuf);
-		chsprintf(txbuf, "%9d   %5d %5d %5d   %5d %5d %5d   %5d %5d %5d\r\n",
-				counter,
-				(int16_t) (dbg_dcm[0][0]*1000),
-				(int16_t) (dbg_dcm[0][1]*1000),
-				(int16_t) (dbg_dcm[0][2]*1000),
-				(int16_t) (dbg_dcm[1][0]*1000),
-				(int16_t) (dbg_dcm[1][1]*1000),
-				(int16_t) (dbg_dcm[1][2]*1000),
-				(int16_t) (dbg_dcm[2][0]*1000),
-				(int16_t) (dbg_dcm[2][1]*1000),
-				(int16_t) (dbg_dcm[2][2]*1000));
-		uartStartSend(&UARTD1, sizeof(txbuf), txbuf);
+		// clear_buffer(txbuf);
+		// chsprintf(txbuf, "%9d   %5d %5d %5d   %5d %5d %5d   %5d %5d %5d\r\n",
+		// 		counter,
+		// 		(int16_t) (dbg_dcm[0][0]*1000),
+		// 		(int16_t) (dbg_dcm[0][1]*1000),
+		// 		(int16_t) (dbg_dcm[0][2]*1000),
+		// 		(int16_t) (dbg_dcm[1][0]*1000),
+		// 		(int16_t) (dbg_dcm[1][1]*1000),
+		// 		(int16_t) (dbg_dcm[1][2]*1000),
+		// 		(int16_t) (dbg_dcm[2][0]*1000),
+		// 		(int16_t) (dbg_dcm[2][1]*1000),
+		// 		(int16_t) (dbg_dcm[2][2]*1000));
+		// uartStartSend(&UARTD1, sizeof(txbuf), txbuf);
 
 		chThdSleepUntil(time);
 	}
@@ -61,6 +61,7 @@ static msg_t comm_thread(void *arg)
 /*
  * Remote control loop
  */
+static int ticks_since_last_comm = 0;
 static WORKING_AREA(wa_comm_thread_2, 512);
 static msg_t comm_thread_2(void *arg)
 {
@@ -74,17 +75,20 @@ static msg_t comm_thread_2(void *arg)
 		time += MS2ST(11)-1;
 
 		/* Receive */
-		osuar_comm_parse_input(&throttle, new_des_ang_pos);
+		if(osuar_comm_parse_input(&throttle, new_des_ang_pos)) {
+                  ticks_since_last_comm = 0;
+                } else {
+                  ticks_since_last_comm++;
 
+                  if(ticks_since_last_comm > 100) {
+                    throttle = 0;
+                  }
+                }
 
 		/* Transmit */
 		clear_buffer(remote_comm_txbuf);   // TODO(yoos): maybe check whether or not we've finished transmitting before clearing buffer
 
-		chsprintf(remote_comm_txbuf, "Roll: %3d Pitch: %3d Yaw: %3d Throttle: %3d\r\n",
-				(int16_t) (new_des_ang_pos[0] * 100),
-				(int16_t) (new_des_ang_pos[1] * 100),
-				(int16_t) (new_des_ang_pos[2] * 100),
-				(int16_t) (throttle * 100));
+		chsprintf(remote_comm_txbuf, "%d\r\n", ticks_since_last_comm);
 		uartStartSend(&UARTD3, sizeof(remote_comm_txbuf), remote_comm_txbuf);
 
 		chThdSleepUntil(time);
