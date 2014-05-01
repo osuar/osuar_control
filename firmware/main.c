@@ -36,9 +36,10 @@ static msg_t comm_thread(void *arg)
 	uint8_t txbuf[200];
 
 	while (TRUE) {
-		time += MS2ST(11)-1;
+		time += MS2ST(101)-1;
 
-		// clear_buffer(txbuf);
+		clear_buffer(txbuf);
+		debug_mpu(txbuf);
 		// chsprintf(txbuf, "%9d   %5d %5d %5d   %5d %5d %5d   %5d %5d %5d\r\n",
 		// 		counter,
 		// 		(int16_t) (dbg_dcm[0][0]*1000),
@@ -50,7 +51,7 @@ static msg_t comm_thread(void *arg)
 		// 		(int16_t) (dbg_dcm[2][0]*1000),
 		// 		(int16_t) (dbg_dcm[2][1]*1000),
 		// 		(int16_t) (dbg_dcm[2][2]*1000));
-		// uartStartSend(&UARTD1, sizeof(txbuf), txbuf);
+		uartStartSend(&UARTD1, sizeof(txbuf), txbuf);
 
 		chThdSleepUntil(time);
 	}

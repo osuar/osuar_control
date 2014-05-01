@@ -76,10 +76,10 @@ void calculate_dc (float dc_throttle, float* dc_shift, float* dc_final)
 
 #if (NUM_ROTORS == 3)
 	dc_final[3] = 0.5 - dc_shift[2];
-	//dc_final[0] = (dc_throttle +  dc_shift[1]) / cosine((dc_final[3] - 0.5) * M_PI);
 	dc_final[0] =  dc_throttle + -dc_shift[1] - dc_shift[0]*1.7320508075688772;
 	dc_final[1] =  dc_throttle + -dc_shift[1] + dc_shift[0]*1.7320508075688772;
 	dc_final[2] = (dc_throttle +  dc_shift[1]);
+	//dc_final[2] = (dc_throttle +  dc_shift[1]) / cosine((dc_final[3] - 0.5) * M_PI);
 #endif // NUM_ROTORS == 3
 
 #if (NUM_ROTORS == 4)
@@ -99,9 +99,9 @@ void setup_controller(void)
 
 	// Some constants that aren't (because we may want to change them
 	// mid-flight).
-	ang_pos_xy_cap = M_PI/4;
-	ang_vel_xy_cap = 2*M_PI;
-	ang_vel_z_cap  = M_PI/2;
+	ang_pos_xy_cap = M_PI/6;   /* May allocate button for position cap increase */
+	ang_vel_xy_cap = 2*M_PI;   /* May allocate button for velocity cap increase */
+	ang_vel_z_cap  = M_PI/2;   /* This will probably stay constant */
 
 #if (NUM_ROTORS == 2)
 	/* Motors */
@@ -199,6 +199,10 @@ void run_controller(float throttle, float dcm_bg[3][3], float gyr[3], float dc[4
 		              arctan2(dcm_bg[2][0], dcm_bg[2][2]) * dcm_bg[0][1];
 	cur_ang_pos[1] =  arctan2(dcm_bg[2][0], dcm_bg[2][2]) * dcm_bg[1][1] -
 		              arctan2(dcm_bg[2][1], dcm_bg[2][2]) * dcm_bg[1][0];
+
+	// Trim
+	cur_ang_pos[0] += 0.3;
+	cur_ang_pos[1] += 0.3;
 
 	// Keep abs(target - current) within [-PI, PI]. This way, nothing bad
 	// happens as we rotate to any angle in [-PI, PI].
