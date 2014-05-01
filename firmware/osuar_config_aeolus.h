@@ -1,7 +1,7 @@
 #define NUM_ROTORS 4
 #define ESC_COMM PWM
 
-#define THROTTLE_CAP 1.0
+#define MOTOR_DC_CAP 1.0
 
 /* Controller gains */
 #define ANG_POS_KP 1.0

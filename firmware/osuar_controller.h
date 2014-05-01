@@ -75,6 +75,12 @@ void run_controller(float throttle, float dcm_bg[3][3], float gyr[3], float dc[4
 /**
  * @brief Map input array to be within desired bounds.
  *
+ * If input lies outside the desired bounds, it becomes the new lower or upper
+ * bound, and all other inputs are scaled to the new bounds.
+ *
+ * TODO(yoos): Maybe we want a way to specify the input range as well so we can
+ * actually map values. This function is actually a capper, not a mapper.
+ *
  * @param input Input array of at least one element.
  * @param input_size Size of input array.
  * @param bound_lower Desired lower bound.

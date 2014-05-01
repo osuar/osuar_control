@@ -90,7 +90,7 @@ void calculate_dc (float dc_throttle, float* dc_shift, float* dc_final)
 #endif // NUM_ROTORS == 4
 
 	/* Map duty cycles. */
-	map_to_bounds(dc_final, NUM_ROTORS, 0.0, THROTTLE_CAP, dc_final);
+	map_to_bounds(dc_final, NUM_ROTORS, 0.0, MOTOR_DC_CAP, dc_final);
 }
 
 void setup_controller(void)
@@ -201,6 +201,7 @@ void run_controller(float throttle, float dcm_bg[3][3], float gyr[3], float dc[4
 		              arctan2(dcm_bg[2][1], dcm_bg[2][2]) * dcm_bg[1][0];
 
 	// Trim
+	// TODO(yoos): Set trim to TRIM_ANGLE_X and _Y in config.
 	cur_ang_pos[0] += 0.3;
 	cur_ang_pos[1] += 0.3;
 
@@ -219,8 +220,8 @@ void run_controller(float throttle, float dcm_bg[3][3], float gyr[3], float dc[4
 	angular_position_controller(cur_ang_pos, gyr, des_ang_pos, des_ang_vel);
 	angular_velocity_controller(gyr, des_ang_vel, dc_shift);
 
-	// Increase throttle to compensate for tilt up to 45 degrees, but not when
-	// we're past 60 degrees past vertical.
+	// Increase throttle to compensate for tilt up to 45 degrees. Cut throttle
+	// at 60 degrees past vertical.
 	// TODO: These numbers should be named sensibly and put in the config.
 	throttle = (dcm_bg[2][2] > 0.5) ? throttle / MAX(dcm_bg[2][2], 0.707107) : 0;
 
@@ -250,10 +251,12 @@ void map_to_bounds(float* input, uint8_t input_size, float bound_lower, float bo
 	}
 
 	/* Limit, but not fit, the inputs to the maximum and minimum values. */
-	float offset = ABS(bound_lower - map_lower);
-	float scale = 1.0 / (map_upper - map_lower);
-	for (i=0; i<input_size; i++) {
-		output[i] = (input[i] + offset) * scale;
+	float offset = bound_lower - map_lower;
+	float scale = (bound_upper - bound_lower) / (map_upper - map_lower);
+	if (scale < 1) {
+		for (i=0; i<input_size; i++) {
+			output[i] = (input[i] - map_lower) * scale + bound_lower;
+		}
 	}
 }
 

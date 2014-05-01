@@ -1,7 +1,7 @@
 #define NUM_ROTORS 4
 #define ESC_COMM PWM
 
-#define THROTTLE_CAP 0.7   // Maximum duty cycle allowed for any of the rotors.
+#define MOTOR_DC_CAP 0.7   // Maximum duty cycle allowed for any of the rotors.
 
 /* Controller gains */
 #define MOTOR_ANG_POS_KP 1.0
