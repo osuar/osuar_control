@@ -1,11 +1,4 @@
-#include <ch.h>
-#include <hal.h>
-
-#include <stdio.h>
-#include <string.h>
-#include <stdarg.h>
-
-#include <osuar_comm.h>
+#include <osuar_uart.h>
 
 /*
  * UART printf buffer
@@ -84,7 +77,7 @@ static UARTConfig uart1cfg = {
 static UARTConfig uart3cfg = {
 	txend1,
 	txend2,
-	osuar_comm_data_received,
+	osuar_comm_data_received,   /* TODO(yoos): This shouldn't be here. osuar_uart should be a driver. */
 	rxchar,
 	rxerr,
 	UART3_BAUDRATE,

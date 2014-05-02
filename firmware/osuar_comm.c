@@ -6,11 +6,6 @@
 
 #include <osuar_comm.h>
 
-#include <stdio.h>
-#include <string.h>
-
-#include <osuar_uart.h>
-
 #define CONTROL_PACKET_SIZE 10
 #define PACKET_BUFFER_SIZE (CONTROL_PACKET_SIZE * 2)
 
