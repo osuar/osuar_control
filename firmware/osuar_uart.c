@@ -72,7 +72,7 @@ static UARTConfig uart1cfg = {
 	rxend,
 	rxchar,
 	rxerr,
-	57600,
+	UART1_BAUDRATE,
 	0,
 	USART_CR2_LINEN,
 	0
@@ -87,7 +87,7 @@ static UARTConfig uart3cfg = {
 	osuar_comm_data_received,
 	rxchar,
 	rxerr,
-	57600,
+	UART3_BAUDRATE,
 	0,
 	USART_CR2_LINEN,
 	0
