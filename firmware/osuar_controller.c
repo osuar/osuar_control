@@ -68,18 +68,21 @@ void angular_velocity_controller(float* cur_vel, float* des_vel, float* dc_shift
 void calculate_dc (float dc_throttle, float* dc_shift, float* dc_final)
 {
 #if (NUM_ROTORS == 2)
-	dc_final[0] = dc_throttle - dc_shift[0];
-	dc_final[1] = dc_throttle + dc_shift[0];
-	dc_final[2] = 1 - (0.5 + dc_shift[1] + dc_shift[2]);
-	dc_final[3] =      0.5 + dc_shift[1] - dc_shift[2];
+	dc_final[0] = dc_throttle + dc_shift[0];
+	dc_final[1] = dc_throttle - dc_shift[0];
+	dc_final[2] =      0.5 + dc_shift[1] - dc_shift[2];
+	dc_final[3] = 1 - (0.5 + dc_shift[1] + dc_shift[2]);
 #endif // NUM_ROTORS == 2
 
 #if (NUM_ROTORS == 3)
 	dc_final[3] = 0.5 - dc_shift[2];
-	dc_final[0] =  dc_throttle + -dc_shift[1] - dc_shift[0]*1.7320508075688772;
-	dc_final[1] =  dc_throttle + -dc_shift[1] + dc_shift[0]*1.7320508075688772;
-	dc_final[2] = (dc_throttle +  dc_shift[1]);
-	//dc_final[2] = (dc_throttle +  dc_shift[1]) / cosine((dc_final[3] - 0.5) * M_PI);
+	dc_final[0] = dc_throttle + dc_shift[0]*0.866025 - 0.5*dc_shift[1];
+	dc_final[1] = dc_throttle + dc_shift[1];
+	dc_final[2] = dc_throttle - dc_shift[0]*0.866025 - 0.5*dc_shift[1];
+
+	// TODO(yoos): Need to account for tail rotor tilt, but cosine doensn't
+	// work right now.
+	// dc_final[1] = (dc_throttle +  dc_shift[1]) / cosine((dc_final[3] - 0.5) * M_PI);
 #endif // NUM_ROTORS == 3
 
 #if (NUM_ROTORS == 4)

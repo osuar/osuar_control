@@ -49,9 +49,24 @@ void angular_velocity_controller(float* cur_vel, float* des_vel, float* dc_shift
 /**
  * @brief Calculate PWM duty cycles.
  *
- * Note that all axes are based around the IMU. The 0th motor is in line with
- * the IMU's positive X axis, the 1st motor with the IMU's positive Y axis, and
- * so on.
+ * Note that all axes are based around the orientation matrix. The 0th motor is
+ * the first motor from the positive X axis in the positive angular direction.
+ * For a quadrotor, this is the motor on the positive X axis. For a tricopter,
+ * this is the front left motor.
+ *
+ * Generally, for a motor location given by a vector v and our X and Y axes of
+ * rotation given by unit vectors e1 and e2, respectively, the final duty cycle
+ * shift of the motor is equal to a sum of two cross products:
+ *
+ *     dc_shift_final = (e1 x v) * dc_shift[0] +
+ *                      (e2 x v) * dc_shift[1]
+ *
+ * To this, we add the throttle to calculate the final duty cycle:
+ *
+ *     dc_final = dc_throttle + dc_shift_final;
+ *
+ * If the duty cycle shift causes dc_final to exceed its sensible range of
+ * [0,1], the mapper function at the end scales all values back in line.
  *
  * @param dc_throttle Throttle duty cycle. Range [0.0, 1.0]
  * @param dc_shift Shifts in duty cycles calculated by angular position and/or
