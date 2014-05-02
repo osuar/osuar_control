@@ -25,6 +25,10 @@
 #define ACC_Y ( raw_acc[1])
 #define ACC_Z ( raw_acc[2])
 
+/* UART */
+#define UART1_BAUDRATE 57600
+#define UART3_BAUDRATE 57600
+
 /* PWM duty cycle constants */
 #define MOTOR_PWM_DISABLED 0.40
 #define MOTOR_PWM_MIN 0.44
