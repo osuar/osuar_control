@@ -1,10 +1,6 @@
 #ifndef MAG_LSM303_H
 #define MAG_LSM303_H
 
-#include <ch.h>
-#include <hal.h>
-#include <osuar_i2c.h>
-
 #define MAG_LSM303_ADDRESS 0x1e
 
 // TODO: These are calibration values from old code. Recalibrate.

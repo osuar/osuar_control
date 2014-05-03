@@ -1,5 +1,7 @@
 #include <osuar_math.h>
 
+#include <ch.h>
+
 float sine(float x)
 {
 	const float B = 4/M_PI;
@@ -171,10 +173,10 @@ int m_inverse(int n, float mat[3][3])
 	 * mat = input matrix matrix AND result matrix
 	 * n = number of rows = number of columns in mat (n x n)
 	 */
-	int pivrow;             /* keeps track of current pivot row */
-	int k,i,j;              /* k: overall index along diagonal; i: row index; j: col index */
+	int pivrow = 0;             /* keeps track of current pivot row */
+	int k,i,j = 0;              /* k: overall index along diagonal; i: row index; j: col index */
 	int pivrows[n]; /* keeps track of rows swaps to undo at end */
-	float tmp;              /* used for finding max value and making column swaps */
+	float tmp = 0;              /* used for finding max value and making column swaps */
 
 	for (k = 0; k < n; k++) {
 		/* find pivot row, the row with biggest entry in current column */

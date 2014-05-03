@@ -6,6 +6,8 @@
 
 #include <osuar_controller.h>
 
+#include <chsprintf.h>
+
 /* TODO: Make setter function. */
 static float ang_pos_xy_cap, ang_vel_xy_cap, ang_vel_z_cap;   // These aren't constants because we may want to change them mid-flight.
 static pid_data_t pid_data[6];
@@ -138,14 +140,14 @@ void setup_controller(void)
 	pid_data[I_ANG_VEL_X].Kp = MOTOR_ANG_VEL_KP;
 	pid_data[I_ANG_VEL_X].Ki = MOTOR_ANG_VEL_KI;
 	pid_data[I_ANG_VEL_X].Kd = MOTOR_ANG_VEL_KD;
+	pid_data[I_ANG_POS_Y].Kp = MOTOR_ANG_POS_KP;
+	pid_data[I_ANG_POS_Y].Ki = MOTOR_ANG_POS_KI;
+	pid_data[I_ANG_POS_Y].Kd = MOTOR_ANG_POS_KD;
+	pid_data[I_ANG_VEL_Y].Kp = MOTOR_ANG_VEL_KP;
+	pid_data[I_ANG_VEL_Y].Ki = MOTOR_ANG_VEL_KI;
+	pid_data[I_ANG_VEL_Y].Kd = MOTOR_ANG_VEL_KD;
 
 	/* Servos */
-	pid_data[I_ANG_POS_Y].Kp = SERVO_ANG_POS_KP;
-	pid_data[I_ANG_POS_Y].Ki = SERVO_ANG_POS_KI;
-	pid_data[I_ANG_POS_Y].Kd = SERVO_ANG_POS_KD;
-	pid_data[I_ANG_VEL_Y].Kp = SERVO_ANG_VEL_KP;
-	pid_data[I_ANG_VEL_Y].Ki = SERVO_ANG_VEL_KI;
-	pid_data[I_ANG_VEL_Y].Kd = SERVO_ANG_VEL_KD;
 	pid_data[I_ANG_POS_Z].Kp = SERVO_ANG_POS_KP;
 	pid_data[I_ANG_POS_Z].Ki = SERVO_ANG_POS_KI;
 	pid_data[I_ANG_POS_Z].Kd = SERVO_ANG_POS_KD;
@@ -254,7 +256,6 @@ void map_to_bounds(float* input, uint8_t input_size, float bound_lower, float bo
 	}
 
 	/* Limit, but not fit, the inputs to the maximum and minimum values. */
-	float offset = bound_lower - map_lower;
 	float scale = (bound_upper - bound_lower) / (map_upper - map_lower);
 	if (scale < 1) {
 		for (i=0; i<input_size; i++) {

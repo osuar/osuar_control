@@ -1,5 +1,7 @@
 #include <osuar_mag_lsm303.h>
 
+#include <hal.h>
+
 static uint8_t mag_tx_data[8];
 static uint8_t mag_rx_data[8];
 

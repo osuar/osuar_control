@@ -4,10 +4,10 @@
 #define MOTOR_DC_CAP 0.5
 
 /* Controller gains */
-#define MOTOR_ANG_POS_KP 0.5   /* TODO: tune these! */
+#define MOTOR_ANG_POS_KP 1.0   /* TODO: tune these! */
 #define MOTOR_ANG_POS_KI 0.0
 #define MOTOR_ANG_POS_KD 0.0
-#define MOTOR_ANG_VEL_KP 0.05
+#define MOTOR_ANG_VEL_KP 1.0
 #define MOTOR_ANG_VEL_KI 0.0
 #define MOTOR_ANG_VEL_KD 0.0
 

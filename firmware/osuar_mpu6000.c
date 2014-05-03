@@ -1,4 +1,10 @@
 #include <osuar_mpu6000.h>
+#include <osuar_config.h>
+#include <osuar_math.h>
+#include <osuar_spi.h>
+
+#include <hal.h>
+#include <chsprintf.h>
 
 static uint8_t mpu_txbuf[MPU_SPI_BUFSIZE];
 static uint8_t mpu_rxbuf[MPU_SPI_BUFSIZE];

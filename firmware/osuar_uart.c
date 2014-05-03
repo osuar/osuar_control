@@ -1,4 +1,10 @@
 #include <osuar_uart.h>
+#include <osuar_config.h>
+#include <osuar_comm.h>   /* TODO(yoos): This shouldn't be here. osuar_comm should use osuar_uart as a driver, not the other way around. */
+
+#include <stdio.h>
+#include <string.h>
+#include <stdarg.h>
 
 /*
  * UART printf buffer

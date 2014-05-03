@@ -2,13 +2,6 @@
 #define OSUAR_AHRS_H
 
 #include <ch.h>
-#include <hal.h>
-
-#include <chsprintf.h>
-
-#include <osuar_config.h>
-#include <osuar_mpu6000.h>
-#include <osuar_math.h>
 
 #define TRIM_ANGLE_X 0.0
 #define TRIM_ANGLE_Y 0.0

@@ -2,14 +2,6 @@
 #define OSUAR_MPU6000_H
 
 #include <ch.h>
-#include <hal.h>
-
-#include <chsprintf.h>
-
-#include <osuar_math.h>
-#include <osuar_config.h>
-#include <osuar_spi.h>
-#include <osuar_uart.h>
 
 #define MPU_SPI_BUFSIZE 20
 

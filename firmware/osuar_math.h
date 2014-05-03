@@ -1,8 +1,6 @@
 #ifndef OSUAR_MATH_H
 #define OSUAR_MATH_H
 
-#include <stdint.h>
-
 #define M_PI 3.14159265358979323846
 
 #define ABS(x) (((x) < 0) ? -(x) : (x))

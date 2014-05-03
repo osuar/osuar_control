@@ -1,7 +1,6 @@
 #ifndef OSUAR_ADC_H
 #define OSUAR_ADC_H
 
-#include <ch.h>
 #include <hal.h>
 
 /* Total number of channels to be sampled by a single ADC operation.*/

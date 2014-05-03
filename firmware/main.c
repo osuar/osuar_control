@@ -1,7 +1,7 @@
 // ChibiOS
 #include <ch.h>
 #include <hal.h>
-
+#include <chsprintf.h>
 #include <stdio.h>
 
 // Drivers
@@ -9,17 +9,21 @@
 #include <osuar_i2c.h>
 #include <osuar_pid.h>   // PID function definition
 #include <osuar_mpu6000.h>   // MPU-6000
+#include <osuar_comm.h>   // Communication
+#include <osuar_uart.h>   // Communications code (wired and wireless)
+#include <osuar_spi.h>
 
 // Flight controller
 #include <osuar_ahrs.h>   // Attitude-Heading Reference System
-#include <osuar_comm.h>   // Communication
-#include <osuar_uart.h>   // Communications code (wired and wireless)
 #include <osuar_motor.h>   // Motor control
+#include <osuar_controller.h>   // Motor control
 #include <osuar_config.h>   // General configuration
 
 
 static float dbg_dcm[3][3];
+static float dbg_dc[4];
 static float throttle = 0.10;
+static uint32_t adc_dc = 0.0;
 static float new_des_ang_pos[3];
 static uint32_t counter = 0;
 
@@ -36,10 +40,14 @@ static msg_t comm_thread(void *arg)
 	uint8_t txbuf[200];
 
 	while (TRUE) {
-		time += MS2ST(101)-1;
+		time += MS2ST(51)-1;
 
 		clear_buffer(txbuf);
 		debug_mpu(txbuf);
+		// chsprintf(txbuf, "%5d   %2d %2d %2d\r\n", (int32_t) adc_dc,
+		// 		(uint8_t) (dbg_dc[0]*100),
+		// 		(uint8_t) (dbg_dc[1]*100),
+		// 		(uint8_t) (dbg_dc[2]*100));
 		// chsprintf(txbuf, "%9d   %5d %5d %5d   %5d %5d %5d   %5d %5d %5d\r\n",
 		// 		counter,
 		// 		(int16_t) (dbg_dcm[0][0]*1000),
@@ -113,7 +121,7 @@ static msg_t adc_thread(void *arg)
 
 		update_adc();
 
-		uint16_t dutyCycle = avg_ch[3] * 500/4096 + 1;   // TODO: The +1 at the end makes this work. Why?
+		adc_dc = avg_ch[0] * 500/4096 + 1;   // TODO: The +1 at the end makes this work. Why?
 
 		chThdSleepUntil(time);
 	}
@@ -149,6 +157,10 @@ static msg_t control_thread(void *arg)
 		time += CONTROL_DT*CH_FREQUENCY;
 
 		update_ahrs(CONTROL_DT, dcm_bg, gyr);
+		// throttle = ((float)adc_dc-28) / 185;   // Actual max is 185
+		// dbg_dc[0] = motor_dc[0];
+		// dbg_dc[1] = motor_dc[1];
+		// dbg_dc[2] = motor_dc[2];
 		run_controller(throttle, dcm_bg, gyr, motor_dc, new_des_ang_pos);
 
 		static uint8_t i, j;

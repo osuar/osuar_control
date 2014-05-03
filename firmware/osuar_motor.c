@@ -1,5 +1,7 @@
 #include <osuar_motor.h>
 
+#include <hal.h>
+
 #if (ESC_COMM == PWM)
 
 /*
@@ -34,9 +36,9 @@ static PWMConfig pwm8cfg = {
 		{PWM_OUTPUT_ACTIVE_HIGH, NULL},
 		{PWM_OUTPUT_ACTIVE_HIGH, NULL}
 #endif // NUM_ROTORS == 4
-	},
+	},   // Channel configurations
 
-	0   // HW dependent
+	0,0   // HW dependent
 };
 
 /*
@@ -57,9 +59,9 @@ static PWMConfig pwm1cfg = {
 		{PWM_OUTPUT_DISABLED, NULL},
 		{PWM_OUTPUT_DISABLED, NULL},
 		{PWM_OUTPUT_DISABLED, NULL}
-	},
+	},   // Channel configurations
 
-	0   // HW dependent
+	0,0   // HW dependent
 };
 
 static PWMConfig pwm3cfg = {
@@ -79,9 +81,9 @@ static PWMConfig pwm3cfg = {
 		{PWM_OUTPUT_ACTIVE_HIGH, NULL},
 		{PWM_OUTPUT_DISABLED, NULL}
 #endif // NUM_ROTORS == 3
-	},
+	},   // Channel configurations
 
-	0   // HW dependent
+	0,0   // HW dependent
 };
 
 #endif // ESC_COMM == PWM
@@ -194,6 +196,7 @@ void setup_motors()
 
 void update_motors(float dc[4])
 {
+	(void) dc;
 	/*
 	 * Commands for two-rotor system.
 	 */
