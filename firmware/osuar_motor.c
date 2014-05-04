@@ -2,6 +2,8 @@
 
 #include <hal.h>
 
+#include <osuar_config.h>
+
 #if (ESC_COMM == PWM)
 
 /*
