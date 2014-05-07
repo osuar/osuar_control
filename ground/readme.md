@@ -8,7 +8,6 @@ follows:
 
 ```
   [ 4-byte header ][ 1-byte message type ID ][ 1-byte request type ID ][ C struct message ][ 32-bit CRC ]
-
 ```
 
   * 4-byte header
@@ -32,22 +31,20 @@ Uplink
 
 Command uplink at 40 Hz:
 
-```
+```c
 struct up_command_t {
   uint8_t mode;   /* Control mode (rate or position) */
   uint8_t axes[3];   /* Desired axis values (rad/s in XYZ or rad in XY) */
   uint8_t throttle;
 }
-
 ```
 
 Configuration uplink, request-reply:
 
-```
+```c
 struct up_config_t {
   float trim[2];   /* XY trim, Euler angles */
 }
-
 ```
 
 Downlink
@@ -57,30 +54,27 @@ Downlink
 
 High-frequency telemetry:
 
-```
+```c
 struct down_telem_highfreq_t {
   float dcm[9];   /* DCM, we really should be using quaternions */
 }
-
 ```
 
 Low-frequency telemetry:
 
-```
+```c
 struct down_telem_lowfreq_t {
   float dc[4];   /* Motor/servo duty cycles */
 }
-
 ```
 
 Synchronization struct, only sent on request, ensure ground software is synced
 to flight config.
 
-```
+```c
 struct down_sync_t {
   float gains[6];   /* Velocity and position PID gains */
   float trim[2];   /* XY trim */
 }
-
 ```
 
