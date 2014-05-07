@@ -29,7 +29,7 @@ At 38400 baud and 1+8+1=10 bits per UART byte, we theoretically transmit up to
 Uplink
 ------
 
-Command uplink at 40 Hz:
+Command uplink at 40 Hz, *5 bytes*:
 
 ```c
 struct up_command_t {
@@ -39,7 +39,7 @@ struct up_command_t {
 }
 ```
 
-Configuration uplink, request-reply:
+Configuration uplink, request-reply, *8 bytes*:
 
 ```c
 struct up_config_t {
@@ -52,7 +52,7 @@ Downlink
 
 (The telemetry scheme needs more thought.)
 
-High-frequency telemetry:
+High-frequency telemetry *36 bytes*:
 
 ```c
 struct down_telem_highfreq_t {
@@ -60,7 +60,7 @@ struct down_telem_highfreq_t {
 }
 ```
 
-Low-frequency telemetry:
+Low-frequency telemetry *16 bytes*:
 
 ```c
 struct down_telem_lowfreq_t {
@@ -69,7 +69,7 @@ struct down_telem_lowfreq_t {
 ```
 
 Synchronization struct, only sent on request, ensure ground software is synced
-to flight config.
+to flight config *32 bytes*.
 
 ```c
 struct down_sync_t {
