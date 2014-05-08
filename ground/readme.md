@@ -6,17 +6,14 @@ Ground control software, written in C, refers to these same structs.
 The packet-level transport protocol is as follows:
 
 ```
-  [ 4-byte header ][ 4-bit message type ID ][ 4-bit request type ID ][ C struct message ][ 32-bit CRC ]
+  [ 4-byte header ][ 1-byte message type ID ][ C struct message ][ 32-bit CRC ]
 ```
 
   * 4-byte header
     - Should never occur in any other part of packet, needs some thought.
-  * 4-bit message type ID
-    - 0: Empty message
-    - 1-15: specifies type of current message
-  * 4-bit request type ID
-    - 0: No request
-    - 1-15: Request for response, specifies type
+  * 1-byte message type ID
+    - 0: Request type
+    - 1-255: Specifies type of current message
   * C struct message
     - Binary packed message
   * 32-bit CRC
@@ -36,7 +33,7 @@ struct up_command_t {
   uint8_t mode;   /* Control mode (rate or position) */
   uint8_t axes[3];   /* Desired axis values (rad/s in XYZ or rad in XY) */
   uint8_t throttle;
-}   /* 5 bytes */
+};   /* 5 bytes */
 ```
 
 Configuration uplink, request-reply:
@@ -44,7 +41,7 @@ Configuration uplink, request-reply:
 ```c
 struct up_config_t {
   float trim[2];   /* XY trim, Euler angles */
-}   /* 8 bytes */
+};   /* 8 bytes */
 ```
 
 Downlink
@@ -56,7 +53,7 @@ High-frequency telemetry:
 ```c
 struct down_telem_highfreq_t {
   float dcm[9];   /* DCM, we really should be using quaternions */
-}   /* 36 bytes */
+};   /* 36 bytes */
 ```
 
 Low-frequency telemetry:
@@ -64,7 +61,7 @@ Low-frequency telemetry:
 ```c
 struct down_telem_lowfreq_t {
   float dc[4];   /* Motor/servo duty cycles */
-}   /* 16 bytes */
+};   /* 16 bytes */
 ```
 
 Synchronization struct, only sent on request, ensure ground software is synced
@@ -74,6 +71,6 @@ to flight config.
 struct down_sync_t {
   float gains[6];   /* Velocity and position PID gains */
   float trim[2];   /* XY trim */
-}   /* 32 bytes */
+};   /* 32 bytes */
 ```
 
