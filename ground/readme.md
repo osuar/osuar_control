@@ -7,17 +7,17 @@ The transport protocol defines two message types, config and command, as
 follows:
 
 ```
-  [ 4-byte header ][ 1-byte message type ID ][ 1-byte request type ID ][ C struct message ][ 32-bit CRC ]
+  [ 4-byte header ][ 4-bit message type ID ][ 4-bit request type ID ][ C struct message ][ 32-bit CRC ]
 ```
 
   * 4-byte header
     - Should never occur in any other part of packet, needs some thought.
-  * 1-byte message type ID
+  * 4-bit message type ID
     - 0: Empty message
-    - 1-255: specifies type of current message
-  * 1-byte request type ID
+    - 1-15: specifies type of current message
+  * 4-bit request type ID
     - 0: No request
-    - 1-255: Request for response, specifies type
+    - 1-15: Request for response, specifies type
   * C struct message
     - Binary packed message
   * 32-bit CRC
@@ -28,7 +28,6 @@ At 38400 baud and 1+8+1=10 bits per UART byte, we theoretically transmit up to
 
 Uplink
 ------
-
 Command uplink at 40 Hz:
 
 ```c
@@ -49,7 +48,6 @@ struct up_config_t {
 
 Downlink
 --------
-
 (The telemetry scheme needs more thought.)
 
 High-frequency telemetry:
