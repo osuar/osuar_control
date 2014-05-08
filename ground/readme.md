@@ -3,8 +3,7 @@ Ground control
 Firmware defines C structs that define uplink and downlink packet structure.
 Ground control software, written in C, refers to these same structs.
 
-The transport protocol defines two message types, config and command, as
-follows:
+The packet-level transport protocol is as follows:
 
 ```
   [ 4-byte header ][ 4-bit message type ID ][ 4-bit request type ID ][ C struct message ][ 32-bit CRC ]
@@ -25,6 +24,8 @@ follows:
 
 At 38400 baud and 1+8+1=10 bits per UART byte, we theoretically transmit up to
 96 bytes at 40 Hz. The packet structure above suffers 9 bytes of overhead.
+
+C struct messages are defined in `firmware/msg_types`.
 
 Uplink
 ------
