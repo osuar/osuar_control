@@ -16,7 +16,7 @@ struct osuar_msg_t {
   uint32_t magic;
   uint8_t type;
   uint16_t crc;
-  void *payload;
+  uint8_t payload[];
 };
 
 struct up_command_t {

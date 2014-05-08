@@ -1,5 +1,7 @@
 #include <osuar_protocol.h>
 
+#include <string.h>
+
 uint16_t protocol_compute_crc(void *data) {
   return 0; // ish
 }
@@ -8,9 +10,10 @@ void protocol_pack(int type, void *packet, size_t packet_size, void *data, size_
   struct osuar_msg_t msg = {
     .magic = MAGIC,
     .type  = type,
-    .payload = packet,
     .crc = protocol_compute_crc(packet)
   };
+
+  memcpy(msg.payload, packet, packet_size);
 
   data = &msg;
   *data_size = sizeof(msg) + packet_size;
