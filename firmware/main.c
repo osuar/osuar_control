@@ -85,14 +85,13 @@ static msg_t comm_thread_2(void *arg)
 
 		/* Receive */
 		if(osuar_comm_parse_input(&throttle, new_des_ang_pos)) {
-                  ticks_since_last_comm = 0;
-                } else {
-                  ticks_since_last_comm++;
-
-                  if(ticks_since_last_comm > 100) {
-                    throttle = 0;
-                  }
-                }
+			ticks_since_last_comm = 0;
+		}
+		else {
+			if(ticks_since_last_comm++ > 100) {
+				throttle = MOTOR_PWM_DISABLED;
+			}
+		}
 
 		/* Transmit */
 		clear_buffer(remote_comm_txbuf);   // TODO(yoos): maybe check whether or not we've finished transmitting before clearing buffer
@@ -157,10 +156,6 @@ static msg_t control_thread(void *arg)
 		time += CONTROL_DT*CH_FREQUENCY;
 
 		update_ahrs(CONTROL_DT, dcm_bg, gyr);
-		// throttle = ((float)adc_dc-28) / 185;   // Actual max is 185
-		// dbg_dc[0] = motor_dc[0];
-		// dbg_dc[1] = motor_dc[1];
-		// dbg_dc[2] = motor_dc[2];
 		run_controller(throttle, dcm_bg, gyr, motor_dc, new_des_ang_pos);
 
 		static uint8_t i, j;
