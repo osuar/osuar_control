@@ -6,7 +6,7 @@
 
 #define MAGIC 0x01010101
 
-#define   UP_COMMAND_TYPE            0
+#define   UP_COMMAND_TYPE            10
 #define   UP_CONFIG_TYPE             1
 #define   DOWN_TELEM_HIGHFREQ_TYPE   2
 #define   DOWN_TELEM_LOWFREQ_TYPE    3
@@ -16,7 +16,7 @@ struct osuar_msg_t {
   uint32_t magic;
   uint8_t type;
   uint16_t crc;
-  uint8_t payload[];
+  uint8_t payload[100]; // TODO(cesarek): Don't want to define size, but have to...? Research flexible arrays/struct hack.
 };
 
 struct up_command_t {
@@ -45,6 +45,6 @@ struct down_sync_t {
 uint16_t protocol_compute_crc(void *data);
 
 void protocol_pack(int type, void *packet, size_t packet_size, void *data, size_t *data_size);
-void *protocol_unpack(int *id);
+void *protocol_unpack(uint8_t *buffer, size_t buffer_size, uint8_t *id);
 
 #endif
