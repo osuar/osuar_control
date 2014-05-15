@@ -3,7 +3,8 @@
 #include <stdio.h>
 #include <string.h>
 
-int main(void) {
+void test_send(void)
+{
 	up_command_t message;
 	message.mode = 5;
 	message.axes[0] = 1;
@@ -11,20 +12,25 @@ int main(void) {
 	message.axes[2] = 3;
 	message.throttle = 50;
 
-	uint8_t data[100];
-	memset(data, 0, 100);
+	size_t msg_sz = sizeoftype(UP_CONFIG_TYPE);
+	printf("packed- size: %lu\n", msg_sz);
 
-	size_t sz = 0;
-	//protocol_pack(UP_COMMAND_TYPE, &packet, sizeof(packet), data + 10, &sz);
-	sz = sizeoftype(UP_CONFIG_TYPE);
+	uint8_t txbuf[1000];
+	memset(txbuf, 0, sizeof(txbuf));
+	uint16_t packet_sz = send(UP_COMMAND_TYPE, &message, txbuf);
+	printf("Added %d bytes (message size %d) to txbuf:\n\n", packet_sz, msg_sz);
+	uint16_t i;
+	for (i=0; i<sizeof(txbuf); i++) {
+		printf("%02x", txbuf[i]);
+	}
+	printf("\n\n");
+}
 
-	printf("packed- size: %lu\n", sz);
-
-	//send(UP_COMMAND_TYPE, &message, txbuf);
-
-	uint8_t id;
+void test_receive(void)
+{
+	uint8_t type;
 	void *d = 0;//protocol_unpack(data, 100, &id);
-	switch(id) {
+	switch(type) {
 		case UP_COMMAND_TYPE: {
 			up_command_t *in = (up_command_t *) d;
 			printf("Throttle: %d\n", in->throttle);
@@ -32,5 +38,14 @@ int main(void) {
 		}
 	}
 
-	printf("unpacked- id: %u\n", id);
+	printf("unpacked- id: %u\n", type);
+}
+
+
+int main(void)
+{
+	test_send();
+	test_receive();
+
+	return 0;
 }
