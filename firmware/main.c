@@ -27,6 +27,14 @@ static uint32_t adc_dc = 0.0;
 static float new_des_ang_pos[3];
 static uint32_t counter = 0;
 
+static float joy_left=-1;
+static float joy_right=1;
+static uint8_t dir_left=0;
+static uint8_t dir_right=0;
+static float dc_left=0.0;
+static float dc_right=0.0;
+
+
 /*
  * Communications loop
  */
@@ -169,24 +177,37 @@ static msg_t control_thread(void *arg)
 				dbg_dcm[i][j] = dcm_bg[i][j];
 			}
 		}
-
-		if (palReadPad(GPIOA, 10) == 1) {
-			palSetPad(GPIOA, 7);
-			for (i=0; i<4; i++) {
-				motor_dc[i] = 0.0;   // TODO: put this in config.
-			}
-#if (NUM_ROTORS < 4)
-			motor_dc[3] = 0.5;
-#endif
-
-#if (NUM_ROTORS < 3)
-			motor_dc[2] = 0.5;
-#endif
+		
+		if(joy_left<){
+			dir_left=0;
+			dc_left=-joy_left;
 		}
-		else {
-			palClearPad(GPIOA, 7);
+		else if(joy_left>0){
+			dir_left=1;
+			dc_left=1-joy_left;
 		}
-
+		else{
+			dir_left=0;
+			dc_left=0;
+		}
+		
+		if(joy_right<){
+			dir_right=0;
+			dc_right=-joy_right;
+		}
+		else if(joy_right>0){
+			dir_right=1;
+			dc_right=1-joy_right;
+		}
+		else{
+			dir_right=0;
+			dc_right=0;
+		}
+	
+		motor_dc[0]=dc_left;
+		motor_dc[1]=dc_right;
+		motor_dc[2]=dir_left;
+		motor_dc[3]-dir_right;
 		update_motors(motor_dc);
 
 		palTogglePad(GPIOA, 6);
