@@ -2,42 +2,46 @@
 
 #include <string.h>
 
-uint16_t protocol_compute_crc(void *data) {
-  (void) data;
+uint32_t protocol_compute_crc(void *data)
+{
+	(void) data;
 
-  return 0; // ish
+	return 0; // ish
 }
 
-void protocol_pack(int type, void *packet, size_t packet_size, void *data, size_t *data_size) {
-  struct osuar_msg_t msg = {
-    .magic = MAGIC,
-    .type  = type,
-    .crc = protocol_compute_crc(packet)
-  };
+void protocol_pack(int type, void *packet, size_t packet_size, void *data, size_t *data_size)
+{
+	struct osuar_msg_t msg = {
+		.magic = MAGIC,
+		.type  = type,
+		.crc = protocol_compute_crc(packet)
+	};
 
-  memcpy(msg.payload, packet, packet_size);
-  memcpy(data, &msg, sizeof(msg));
+	memcpy(msg.payload, packet, packet_size);
+	memcpy(data, &msg, sizeof(msg));
 
-  *data_size = sizeof(msg) - 100 + packet_size;
+	*data_size = sizeof(msg) - 100 + packet_size;
 }
 
-void *protocol_unpack(uint8_t *buffer, size_t buffer_size, uint8_t *id) {
-  // Look for magic identifier to signify beginning of packet
-  for(uint8_t i = 0; i < buffer_size - sizeof(uint32_t); i++) {
-    uint32_t *maybe_magic = (uint32_t *) (buffer + i);
+void *protocol_unpack(uint8_t *buffer, size_t buffer_size, uint8_t *id)
+{
+	// Look for magic identifier to signify beginning of packet
+	uint8_t i;
+	for(i = 0; i < buffer_size - sizeof(uint32_t); i++) {
+		uint32_t *maybe_magic = (uint32_t *) (buffer + i);
 
-    if(*maybe_magic == MAGIC) {
-      // Found start
+		if(*maybe_magic == MAGIC) {
+			// Found start
 
-      // TODO(cesarek): Bounds checking
-      struct osuar_msg_t *msg = (struct osuar_msg_t *) (buffer + i);
-      *id = msg->type;
+			// TODO(cesarek): Bounds checking
+			struct osuar_msg_t *msg = (struct osuar_msg_t *) (buffer + i);
+			*id = msg->type;
 
-      return msg->payload;
-    }
-  }
+			return msg->payload;
+		}
+	}
 
-  return 0;
+	return 0;
 }
 
 /*
