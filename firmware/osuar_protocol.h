@@ -19,7 +19,7 @@
  *
  * TODO(yoos)
  */
-struct osuar_packet_t {
+typedef struct osuar_packet_t {
 	uint32_t magic;   /* Header */
 	uint8_t type;   /* Message type, indicates payload size. TODO(yoos): Need lookup. */
 	uint8_t message[MSG_SIZE_MAX];   // TODO(cesarek): Don't want to define size, but have to...? Research flexible arrays/struct hack.
@@ -30,14 +30,14 @@ struct osuar_packet_t {
 /* Uplink message types */
 
 /* Control */
-struct up_command_t {
+typedef struct up_command_t {
 	uint8_t mode;   /* Control mode (rate or position) */
 	uint8_t axes[3];   /* Desired axis values (rad/s in XYZ or rad in XY) */
 	uint8_t throttle;
 };   /* 5 bytes */
 
 /* Configuration */
-struct up_config_t {
+typedef struct up_config_t {
 	float trim[2];   /* XY trim, Euler angles */
 };   /* 8 bytes */
 
@@ -45,26 +45,25 @@ struct up_config_t {
 /* Downlink message types */
 
 /* High-frequency telemetry */
-struct down_telem_highfreq_t {
+typedef struct down_telem_highfreq_t {
 	float dcm[9];   /* DCM, we really should be using quaternions */
 };   /* 36 bytes */
 
 /* Low-frequency, possibly on-request, telemetry */
-struct down_telem_lowfreq_t {
+typedef struct down_telem_lowfreq_t {
 	float dc[4];   /* Motor/servo duty cycles */
 };   /* 16 bytes */
 
 /* Synchronization, on request only. Used to synchronize ground station with
  * vehicle on startup. */
-struct down_sync_t {
+typedef struct down_sync_t {
 	float gains[6];   /* Velocity and position PID gains */
 	float trim[2];   /* XY trim */
 };   /* 32 bytes */
 
 
-uint32_t protocol_compute_crc(void *data);
+uint32_t protocol_compute_crc(void *data, size_t data_size);
 
-void protocol_pack(int type, void *packet, size_t packet_size, void *data, size_t *data_size);
 void *protocol_unpack(uint8_t *buffer, size_t buffer_size, uint8_t *id);
 
 #endif
