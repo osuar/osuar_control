@@ -16,15 +16,18 @@ int main(void) {
 
 	size_t sz = 0;
 	//protocol_pack(UP_COMMAND_TYPE, &packet, sizeof(packet), data + 10, &sz);
+	sz = sizeoftype(UP_CONFIG_TYPE);
 
 	printf("packed- size: %lu\n", sz);
+
+	//send(UP_COMMAND_TYPE, &message, txbuf);
 
 	uint8_t id;
 	void *d = 0;//protocol_unpack(data, 100, &id);
 	switch(id) {
 		case UP_COMMAND_TYPE: {
 			up_command_t *in = (up_command_t *) d;
-			printf("THrottle: %d\n", in->throttle);
+			printf("Throttle: %d\n", in->throttle);
 			break;
 		}
 	}
