@@ -64,6 +64,7 @@ typedef struct {
 
 
 uint32_t protocol_compute_crc(void *data, size_t data_size);
+size_t sizeoftype(uint8_t type);
 
 void *protocol_unpack(uint8_t *buffer, size_t buffer_size, uint8_t *id);
 

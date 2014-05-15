@@ -33,6 +33,24 @@ void *protocol_unpack(uint8_t *buffer, size_t buffer_size, uint8_t *id)
 }
 */
 
+size_t sizeoftype(uint8_t type)
+{
+	switch(type) {
+	case UP_COMMAND_TYPE:
+		return sizeof(up_command_t);
+	case UP_CONFIG_TYPE:
+		return sizeof(up_config_t);
+	case DOWN_TELEM_HIGHFREQ_TYPE:
+		return sizeof(down_telem_highfreq_t);
+	case DOWN_TELEM_LOWFREQ_TYPE:
+		return sizeof(down_telem_lowfreq_t);
+	case DOWN_SYNC_TYPE:
+		return sizeof(down_sync_t);
+	default:
+		return 0;
+	}
+}
+
 /*
  * @brief Put packed message on UART transmit buffer.
  *
@@ -40,16 +58,16 @@ void *protocol_unpack(uint8_t *buffer, size_t buffer_size, uint8_t *id)
  * @param message Pointer to message struct
  * @param txbuf Pointer to UART TX buffer
  *
- * @return 0 on success, 1 otherwise, for now.   TODO(yoos)
+ * @return Number of bytes added to TX buffer
  */
-uint8_t send(uint8_t type, void *message, uint8_t *txbuf)
+uint16_t send(uint8_t type, void *message, uint8_t *txbuf)
 {
 	static osuar_packet_t *packet;
 	static int16_t msg_size_diff;
 	static uint32_t crc;
 
 	/* Determine size of payload from type, for example: */
-	size_t message_size = sizeof(down_sync_t);
+	size_t message_size = sizeoftype(type);
 	msg_size_diff = message_size - MSG_SIZE_MAX;
 
 	if (msg_size_diff > 0) {
@@ -74,11 +92,10 @@ uint8_t send(uint8_t type, void *message, uint8_t *txbuf)
 		// TODO(yoos): Update buffer open_index
 	}
 	else {
-		return 1;   // TODO(yoos)
+		return 0;   // TODO(yoos)
 	}
 
-	/* On success, return 0. */
-	return 0;
+	return sizeof(osuar_packet_t) + msg_size_diff;
 }
 
 /*
