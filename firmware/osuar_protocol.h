@@ -4,6 +4,7 @@
 #include <ch.h>
 
 #define MAGIC 0x01010101   /* Header string. This should ideally never occur anywhere else in our serial stream. */
+#define MSG_SIZE_MAX 100
 
 #define UP_COMMAND_TYPE          10
 #define UP_CONFIG_TYPE           1
@@ -11,11 +12,18 @@
 #define DOWN_TELEM_LOWFREQ_TYPE  3
 #define DOWN_SYNC_TYPE           4
 
-struct osuar_msg_t {
+/*
+ * So... this is weird, but it might work. CRC at end is only there to reserve
+ * size. A single instance of this struct is statically instantiated in the
+ * sender thread, and the CRC is actually tacked onto the end of the payload.
+ *
+ * TODO(yoos)
+ */
+struct osuar_packet_t {
 	uint32_t magic;   /* Header */
 	uint8_t type;   /* Message type, indicates payload size. TODO(yoos): Need lookup. */
+	uint8_t message[MSG_SIZE_MAX];   // TODO(cesarek): Don't want to define size, but have to...? Research flexible arrays/struct hack.
 	uint32_t crc;   /* 32-bit CRC. We could probably get away with 16-bit, but the STM32F4 has a hardware CRC unit that is locked to 32-bit. */
-	uint8_t payload[100];   // TODO(cesarek): Don't want to define size, but have to...? Research flexible arrays/struct hack.
 };
 
 
