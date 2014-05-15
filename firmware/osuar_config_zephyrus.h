@@ -1,4 +1,4 @@
-#define NUM_ROTORS 3
+#define NUM_ROTORS 4
 #define ESC_COMM PWM
 
 #define MOTOR_DC_CAP 0.5
@@ -37,9 +37,6 @@
 #define UART3_BAUDRATE 38400
 
 /* PWM duty cycle constants */
-#define MOTOR_PWM_DISABLED 0.30   /* TODO: recalibrate */
-#define MOTOR_PWM_MIN 0.50   /* 1060/2000 us */
-#define MOTOR_PWM_MAX 0.95   /* 1860/2000 us */
-#define SERVO_PWM_MIN 0.0325
-#define SERVO_PWM_MAX 0.0760
+#define MOTOR_PWM_MIN 0.0   /* 1060/2000 us */
+#define MOTOR_PWM_MAX 1.0   /* 1860/2000 us */
 
