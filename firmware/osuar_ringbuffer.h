@@ -12,14 +12,9 @@ typedef struct {
 } osuar_rb_t;
 
 /*
- * Constructor
+ * Initializer
  */
-osuar_rb_t *osuar_rb_create(uint16_t size);
-
-/*
- * Destructor
- */
-void osuar_rb_destroy(osuar_rb_t *buf);
+void osuar_rb_init(osuar_rb_t *buf, uint8_t *elems, size_t size);
 
 /*
  * Adder
@@ -32,11 +27,11 @@ void osuar_rb_destroy(osuar_rb_t *buf);
 uint8_t osuar_rb_add(osuar_rb_t *buf, uint8_t *input, uint16_t input_size);
 
 /*
- * Getter
+ * Remover
  *
  * @return 0 on success, 1 otherwise.
  */
-uint8_t osuar_rb_get(osuar_rb_t *buf, uint8_t *output, uint16_t output_size);
+uint8_t osuar_rb_remove(osuar_rb_t *buf, uint8_t *output, uint16_t output_size);
 
 #endif /* OSUAR_RINGBUFFER_H */
 
