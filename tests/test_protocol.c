@@ -34,11 +34,13 @@ void test_receive(void)
 {
 	uint8_t type;
 	/* Create ring buffer */
-	osuar_rb_t *rxbuf = osuar_rb_create(50);
+	osuar_rb_t rxbuf;
+	uint8_t rxbuf_elems[50];
+	osuar_rb_init(&rxbuf, rxbuf_elems, sizeof(rxbuf_elems));
 
-	assert(rxbuf->size == 50);
-	assert(rxbuf->count == 0);
-	assert(rxbuf->head == 0);
+	assert(rxbuf.size == 50);
+	assert(rxbuf.count == 0);
+	assert(rxbuf.head == 0);
 
 	/* Create incoming packets */
 	down_sync_t msg_sync;
@@ -67,38 +69,36 @@ void test_receive(void)
 	printf("\n\n");
 
 	/* Copy data to rxbuf */
-	assert(osuar_rb_add(rxbuf, txbuf, packet_sz) == 0);
-	assert(rxbuf->count == packet_sz);
-	printf("Copied %d bytes from TX to RX buffer (buffer size %d).\n", packet_sz, rxbuf->size);
+	assert(osuar_rb_add(&rxbuf, txbuf, packet_sz) == 0);
+	assert(rxbuf.count == packet_sz);
+	printf("Copied %d bytes from TX to RX buffer (buffer size %d).\n", packet_sz, rxbuf.size);
 	printf("Contents of rxbuf:\n\n");
-	for (i=0; i<rxbuf->size; i++) {
-		printf("%02x", rxbuf->elems[i]);
+	for (i=0; i<rxbuf.size; i++) {
+		printf("%02x", rxbuf.elems[i]);
 	}
 	printf("\n\n");
 
 	/* Try to overfill buffer */
-	assert(osuar_rb_add(rxbuf, txbuf, packet_sz) == 1);
+	assert(osuar_rb_add(&rxbuf, txbuf, packet_sz) == 1);
 
 	/* Pull data from RX buffer */
 	uint8_t tmp[50];
-	assert(osuar_rb_get(rxbuf, tmp, packet_sz-2) == 0);
-	assert(rxbuf->head == packet_sz-2);
-	assert(rxbuf->count == 2);
+	assert(osuar_rb_remove(&rxbuf, tmp, packet_sz-2) == 0);
+	assert(rxbuf.head == packet_sz-2);
+	assert(rxbuf.count == 2);
 
 	/* This time, the buffer should have some room. */
-	assert(osuar_rb_add(rxbuf, txbuf, packet_sz) == 0);
-	assert(rxbuf->head == packet_sz-2);
-	assert(rxbuf->count == packet_sz+2);
+	assert(osuar_rb_add(&rxbuf, txbuf, packet_sz) == 0);
+	assert(rxbuf.head == packet_sz-2);
+	assert(rxbuf.count == packet_sz+2);
 
 	/* Attempt to get more than available. */
-	assert(osuar_rb_get(rxbuf, tmp, 30) == 0);
-	assert(rxbuf->head == (packet_sz+28) % rxbuf->size);
-	assert(rxbuf->count == (packet_sz-28) % rxbuf->size);
-	assert(osuar_rb_get(rxbuf, tmp, 30) == 1);
-	assert(rxbuf->head == (packet_sz+28) % rxbuf->size);
-	assert(rxbuf->count == (packet_sz-28) % rxbuf->size);
-
-	osuar_rb_destroy(rxbuf);
+	assert(osuar_rb_remove(&rxbuf, tmp, 30) == 0);
+	assert(rxbuf.head == (packet_sz+28) % rxbuf.size);
+	assert(rxbuf.count == (packet_sz-28) % rxbuf.size);
+	assert(osuar_rb_remove(&rxbuf, tmp, 30) == 1);
+	assert(rxbuf.head == (packet_sz+28) % rxbuf.size);
+	assert(rxbuf.count == (packet_sz-28) % rxbuf.size);
 }
 
 
