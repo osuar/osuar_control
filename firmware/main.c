@@ -11,6 +11,7 @@
 #include <osuar_mpu6000.h>   // MPU-6000
 #include <osuar_comm.h>   // Communication
 #include <osuar_spi.h>
+#include <osuar_protocol.h>
 
 // Flight controller
 #include <osuar_ahrs.h>   // Attitude-Heading Reference System
@@ -36,13 +37,23 @@ static msg_t comm_thread(void *arg)
 	chRegSetThreadName("communications");
 	systime_t time = chTimeNow();
 
+	uint8_t i, j;
 	uint8_t txbuf[200];
+	uint16_t packet_size;
+	down_telem_highfreq_t msg_dcm;
 
 	while (TRUE) {
 		time += MS2ST(51)-1;
 
-		debug_mpu(txbuf);
+		for (i=0; i<3; i++) {
+			for (j=0; j<3; j++) {
+				msg_dcm.dcm[3*i+j] = dbg_dcm[i][j];
+			}
+		}
+
+		protocol_pack(DOWN_TELEM_HIGHFREQ_TYPE, &msg_dcm, txbuf, &packet_size);
 		chprintf((BaseSequentialStream*)&SD1, "%s", txbuf);
+
 		// chsprintf(txbuf, "%5d   %2d %2d %2d\r\n", (int32_t) adc_dc,
 		// 		(uint8_t) (dbg_dc[0]*100),
 		// 		(uint8_t) (dbg_dc[1]*100),
@@ -66,6 +77,7 @@ static msg_t comm_thread(void *arg)
 	return 0;
 }
 
+#include <string.h>
 /*
  * Remote control loop
  */
@@ -77,11 +89,16 @@ static msg_t comm_thread_2(void *arg)
 	chRegSetThreadName("remote comm");
 	systime_t time = chTimeNow();
 
-	//uartStartReceive(&UARTD3, sizeof(remote_comm_rxbuf), remote_comm_rxbuf);
+	uint8_t txbuf[200];
+	uint16_t packet_size;
+
+	down_plaintext_t msg_text;
 
 	while (TRUE) {
 		time += MS2ST(11)-1;
-		chprintf((BaseSequentialStream*)&SD3, "USART3 test\r\n");
+		memcpy(&msg_text.text, "PROTOCOL FUCK YEAH\r\n", 50);
+		protocol_pack(DOWN_PLAINTEXT_TYPE, &msg_text, txbuf, &packet_size);
+		chprintf((BaseSequentialStream*)&SD3, "%s", txbuf);
 
 		/* Receive */
 		if(osuar_comm_parse_input(&throttle, new_des_ang_pos)) {
