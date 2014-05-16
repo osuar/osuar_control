@@ -72,7 +72,7 @@ void protocol_pack(uint8_t type, void *message, uint8_t *txbuf, uint16_t *packet
 	packet->magic = MAGIC;
 	packet->type = type;
 	memcpy(&packet->message, message, message_size);   /* memcpy into ringbuffer */
-	crc = protocol_compute_crc(packet, sizeof(packet->magic) + sizeof(packet->type) + message_size);
+	crc = protocol_compute_crc(packet, sizeof(packet->magic) + sizeoftype(packet->type) + message_size);
 	memcpy(&packet->crc - msg_size_diff, &crc, sizeof(packet->crc));
 
 	/*
