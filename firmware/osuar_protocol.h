@@ -66,6 +66,18 @@ typedef struct {
 uint32_t protocol_compute_crc(void *data, size_t data_size);
 size_t sizeoftype(uint8_t type);
 
+/*
+ * @brief Put packed message on UART transmit buffer.
+ *
+ * We assume txbuf has enough room to fit the largest possible packet.
+ *
+ * @param type Message type
+ * @param message Pointer to message struct
+ * @param txbuf Output buffer
+ * @param packet_size Size of packet stuffed in output buffer
+ */
+void protocol_pack(uint8_t type, void *message, uint8_t *txbuf, uint16_t *packet_size);
+
 void *protocol_unpack(uint8_t *buffer, size_t buffer_size, uint8_t *id);
 
 #endif

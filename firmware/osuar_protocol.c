@@ -1,4 +1,5 @@
 #include <osuar_protocol.h>
+#include <osuar_math.h>
 
 #include <string.h>
 
@@ -51,51 +52,32 @@ size_t sizeoftype(uint8_t type)
 	}
 }
 
-/*
- * @brief Put packed message on UART transmit buffer.
- *
- * @param type Message type
- * @param message Pointer to message struct
- * @param txbuf Pointer to UART TX buffer
- *
- * @return Number of bytes added to TX buffer
- */
-uint16_t send(uint8_t type, void *message, uint8_t *txbuf)
+#include <stdio.h>
+void protocol_pack(uint8_t type, void *message, uint8_t *txbuf, uint16_t *packet_size)
 {
 	static osuar_packet_t *packet;
+	static size_t message_size;
 	static int16_t msg_size_diff;
 	static uint32_t crc;
 
 	/* Determine size of payload from type, for example: */
-	size_t message_size = sizeoftype(type);
+	message_size = MIN(sizeoftype(type), MSG_SIZE_MAX);
 	msg_size_diff = message_size - MSG_SIZE_MAX;
 
-	if (msg_size_diff > 0) {
-		return 1;   /* This should never happen if we update MSG_SIZE_MAX appropriately after updating our message types. */
-	}
+	/*
+	 * Stuff txbuf.
+	 */
+	packet = (osuar_packet_t*) txbuf;
+	packet->magic = MAGIC;
+	packet->type = type;
+	memcpy(&packet->message, message, message_size);   /* memcpy into ringbuffer */
+	crc = protocol_compute_crc(packet, sizeof(packet->magic) + sizeof(packet->type) + message_size);
+	memcpy(&packet->crc - msg_size_diff, &crc, sizeof(packet->crc));
 
 	/*
-	 * Check that txbuf has enough room. If so, treat the first open byte as
-	 * a osuar_packet_t pointer to pass to the packer, which will then pack
-	 * txbuf with payload as if it were a dedicated osuar_packet_t struct. Note
-	 * the CRC is not necessarily stored at &packet.crc .
+	 * Calculate packet size.
 	 */
-	packet = (osuar_packet_t*) &txbuf[0];//&txbuf[open_index];
-
-	//if (txbuf.available <= (sizeof(packet) + msg_size_diff)) {
-	if (1) {
-		packet->magic = MAGIC;
-		packet->type = type;
-		memcpy(&packet->message, message, message_size);   /* memcpy into ringbuffer */
-		crc = protocol_compute_crc(packet, sizeof(packet->magic) + sizeof(packet->type) + message_size);
-		memcpy(&packet->crc - msg_size_diff, &crc, sizeof(packet->crc));
-		// TODO(yoos): Update buffer open_index
-	}
-	else {
-		return 0;   // TODO(yoos)
-	}
-
-	return sizeof(osuar_packet_t) + msg_size_diff;
+	*packet_size = sizeof(osuar_packet_t) + msg_size_diff;
 }
 
 /*
