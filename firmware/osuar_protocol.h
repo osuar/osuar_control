@@ -36,8 +36,8 @@ typedef struct {
 /* Control */
 typedef struct {
 	uint8_t mode;   /* Control mode (rate or position) */
-	uint8_t axes[3];   /* Desired axis values (rad/s in XYZ or rad in XY) */
-	uint8_t throttle;
+	float axes[3];   /* Desired axis values (rad/s in XYZ or rad in XY) */
+	float throttle;
 } up_command_t;   /* 5 bytes */
 
 /* Configuration */

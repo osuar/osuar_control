@@ -23,9 +23,7 @@
 
 
 static float dbg_dcm[3][3];
-static float throttle = 0.10;
 static uint32_t adc_dc = 0.0;
-static float new_des_ang_pos[3];
 static uint32_t counter = 0;
 
 /*
@@ -187,7 +185,7 @@ static msg_t control_thread(void *arg)
 		time += CONTROL_DT*CH_FREQUENCY;
 
 		update_ahrs(CONTROL_DT, dcm_bg, gyr);
-		run_controller(throttle, dcm_bg, gyr, motor_dc, new_des_ang_pos);
+		run_controller(g_cmd.mode, g_cmd.throttle, dcm_bg, gyr, motor_dc, g_cmd.axes);
 
 		static uint8_t i, j;
 		for (i=0; i<3; i++) {

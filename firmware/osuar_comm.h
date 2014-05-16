@@ -8,7 +8,15 @@
 #define OSUAR_COMM_H
 
 #include <osuar_ringbuffer.h>
+#include <osuar_protocol.h>
 #include <hal.h>
+
+/*
+ * Global command struct
+ *
+ * TODO(yoos): This should maybe not be global.
+ */
+extern up_command_t g_cmd;
 
 /*
  * Initialize things.

@@ -13,6 +13,9 @@
 #include <osuar_pid.h>
 #include <osuar_math.h>
 
+#define MODE_POS 0
+#define MODE_VEL 1
+
 #define I_ANG_POS_X 0
 #define I_ANG_POS_Y 1
 #define I_ANG_POS_Z 2
@@ -85,7 +88,7 @@ void setup_controller(void);
  * @brief Run the flight controller.
  *
  */
-void run_controller(float throttle, float dcm_bg[3][3], float gyr[3], float dc[4], float new_des_ang_pos[3]);
+void run_controller(uint8_t mode, float throttle, float dcm_bg[3][3], float gyr[3], float dc[4], float axes[3]);
 
 /**
  * @brief Map input array to be within desired bounds.
@@ -108,7 +111,7 @@ void map_to_bounds(float* input, uint8_t input_size, float bound_lower, float bo
 /**
  * debug
  */
-void debug_controller(uint8_t *buffer);
+void debug_controller(BaseSequentialStream *sd);
 
 #endif // OSUAR_CONTROLLER_H
 

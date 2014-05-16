@@ -5,8 +5,7 @@
  */
 
 #include <osuar_controller.h>
-
-#include <chsprintf.h>
+#include <chprintf.h>
 
 /* TODO: Make setter function. */
 static float ang_pos_xy_cap, ang_vel_xy_cap, ang_vel_z_cap;   // These aren't constants because we may want to change them mid-flight.
@@ -188,16 +187,9 @@ void setup_controller(void)
 	}
 }
 
-void run_controller(float throttle, float dcm_bg[3][3], float gyr[3], float dc[4], float new_des_ang_pos[3])
+void run_controller(uint8_t mode, float throttle, float dcm_bg[3][3], float gyr[3], float dc[4], float axes[3])
 {
 	uint8_t i;
-	// TODO: Calculate target rotation vector based on groundstation input and
-	// scale to maximum rotation of ang_pos_xy_cap.
-	des_ang_pos[0] = new_des_ang_pos[0] * ang_pos_xy_cap;
-	des_ang_pos[1] = new_des_ang_pos[1] * ang_pos_xy_cap;
-        // TODO(cesarek): handle yaw
-	// des_ang_pos[2] = new_des_ang_pos[2] * ang_pos_z_cap * CONTROL_LOOP_INTERVAL * MASTER_DT/1000000;
-
 	// Calculate current rotation vector (Euler angles) from DCM and make
 	// appropriate modifications to make PID calculations work later.
 	cur_ang_pos[0] = -arctan2(dcm_bg[2][1], dcm_bg[2][2]) * dcm_bg[0][0] +
@@ -205,24 +197,32 @@ void run_controller(float throttle, float dcm_bg[3][3], float gyr[3], float dc[4
 	cur_ang_pos[1] =  arctan2(dcm_bg[2][0], dcm_bg[2][2]) * dcm_bg[1][1] -
 		              arctan2(dcm_bg[2][1], dcm_bg[2][2]) * dcm_bg[1][0];
 
-	// Trim
-	// TODO(yoos): Set trim to TRIM_ANGLE_X and _Y in config.
-	cur_ang_pos[0] += 0.3;
-	cur_ang_pos[1] += 0.3;
+	// TODO: Calculate target rotation vector based on groundstation input and
+	// scale to maximum rotation of ang_pos_xy_cap.
+	if (mode == MODE_POS) {
+		des_ang_pos[0] = axes[0] * ang_pos_xy_cap;
+		des_ang_pos[1] = axes[1] * ang_pos_xy_cap;
+		// TODO(cesarek): handle yaw
+		// des_ang_pos[2] = axes[2] * ang_pos_z_cap * CONTROL_LOOP_INTERVAL * MASTER_DT/1000000;
 
-	// Keep abs(target - current) within [-PI, PI]. This way, nothing bad
-	// happens as we rotate to any angle in [-PI, PI].
-	for (i=0; i<3; i++){
-		if(des_ang_pos[i] - cur_ang_pos[i] > M_PI){
-			cur_ang_pos[i] += 2*M_PI;
+		// Keep abs(target - current) within [-PI, PI]. This way, nothing bad
+		// happens as we rotate to any angle in [-PI, PI].
+		for (i=0; i<3; i++){
+			if(des_ang_pos[i] - cur_ang_pos[i] > M_PI){
+				cur_ang_pos[i] += 2*M_PI;
+			}
+			else if (des_ang_pos[i] - cur_ang_pos[i] < -M_PI) {
+				cur_ang_pos[i] -= 2*M_PI;
+			}
 		}
-		else if (des_ang_pos[i] - cur_ang_pos[i] < -M_PI) {
-			cur_ang_pos[i] -= 2*M_PI;
-		}
+
+		angular_position_controller(cur_ang_pos, gyr, des_ang_pos, des_ang_vel);
+	}
+	else {
+		des_ang_vel[0] = axes[0] * ang_vel_xy_cap;
+		des_ang_vel[1] = axes[1] * ang_vel_xy_cap;
 	}
 
-	// The magic happens here.
-	angular_position_controller(cur_ang_pos, gyr, des_ang_pos, des_ang_vel);
 	angular_velocity_controller(gyr, des_ang_vel, dc_shift);
 
 	// Increase throttle to compensate for tilt up to 45 degrees. Cut throttle
@@ -264,9 +264,9 @@ void map_to_bounds(float* input, uint8_t input_size, float bound_lower, float bo
 	}
 }
 
-void debug_controller(uint8_t *buffer)
+void debug_controller(BaseSequentialStream *sd)
 {
-	chsprintf(buffer, "%8u DC(%4u %4u %4u %4u) %7d %7d\r\n",
+	chprintf(sd, "%8u DC(%4u %4u %4u %4u) %7d %7d\r\n",
 			chTimeNow(),
 			(uint16_t) (dbg_dc[0]*1000),
 			(uint16_t) (dbg_dc[1]*1000),

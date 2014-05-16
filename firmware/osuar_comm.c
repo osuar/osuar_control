@@ -6,9 +6,12 @@
 
 #include <osuar_comm.h>
 #include <osuar_protocol.h>
+#include <string.h>
 
 #define CONTROL_PACKET_SIZE 10
 #define PACKET_BUFFER_SIZE (CONTROL_PACKET_SIZE * 2)
+
+up_command_t g_cmd;
 
 void setup_comm(void)
 {
@@ -30,18 +33,12 @@ void osuar_comm_handle_receive(uint8_t *rxbuf, uint8_t num, osuar_rb_t *recv_rb)
 {
 	static osuar_packet_t packet_up;   /* Received uplink packet */
 	static uint8_t msg_type;   /* Received message type */
-	static void *msg;
 
 	osuar_rb_add(recv_rb, rxbuf, num);   /* TODO(yoos): handle failure */
 	if (protocol_get_packet(recv_rb, &packet_up, &msg_type)) {
-		msg = &packet_up.message;
 		switch(msg_type) {
 		case(UP_COMMAND_TYPE):
-			osuar_comm_parse_command(
-					((up_command_t*) msg)->mode,
-					((up_command_t*) msg)->throttle,
-					((up_command_t*) msg)->axes
-					);
+			memcpy(&g_cmd, packet_up.message, sizeoftype(msg_type));
 			break;
 		case(UP_CONFIG_TYPE):
 			/* TODO(yoos) */
