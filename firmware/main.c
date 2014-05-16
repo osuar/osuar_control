@@ -1,7 +1,7 @@
 // ChibiOS
 #include <ch.h>
 #include <hal.h>
-#include <chsprintf.h>
+#include <chprintf.h>
 #include <stdio.h>
 
 // Drivers
@@ -10,7 +10,6 @@
 #include <osuar_pid.h>   // PID function definition
 #include <osuar_mpu6000.h>   // MPU-6000
 #include <osuar_comm.h>   // Communication
-#include <osuar_uart.h>   // Communications code (wired and wireless)
 #include <osuar_spi.h>
 
 // Flight controller
@@ -42,8 +41,8 @@ static msg_t comm_thread(void *arg)
 	while (TRUE) {
 		time += MS2ST(51)-1;
 
-		clear_buffer(txbuf);
 		debug_mpu(txbuf);
+		chprintf((BaseSequentialStream*)&SD1, "%s", txbuf);
 		// chsprintf(txbuf, "%5d   %2d %2d %2d\r\n", (int32_t) adc_dc,
 		// 		(uint8_t) (dbg_dc[0]*100),
 		// 		(uint8_t) (dbg_dc[1]*100),
@@ -59,7 +58,7 @@ static msg_t comm_thread(void *arg)
 		// 		(int16_t) (dbg_dcm[2][0]*1000),
 		// 		(int16_t) (dbg_dcm[2][1]*1000),
 		// 		(int16_t) (dbg_dcm[2][2]*1000));
-		uartStartSend(&UARTD1, sizeof(txbuf), txbuf);
+		//uartStartSend(&UARTD1, sizeof(txbuf), txbuf);
 
 		chThdSleepUntil(time);
 	}
@@ -78,10 +77,11 @@ static msg_t comm_thread_2(void *arg)
 	chRegSetThreadName("remote comm");
 	systime_t time = chTimeNow();
 
-	uartStartReceive(&UARTD3, sizeof(remote_comm_rxbuf), remote_comm_rxbuf);
+	//uartStartReceive(&UARTD3, sizeof(remote_comm_rxbuf), remote_comm_rxbuf);
 
 	while (TRUE) {
 		time += MS2ST(11)-1;
+		chprintf((BaseSequentialStream*)&SD3, "USART3 test\r\n");
 
 		/* Receive */
 		if(osuar_comm_parse_input(&throttle, new_des_ang_pos)) {
@@ -94,10 +94,10 @@ static msg_t comm_thread_2(void *arg)
 		}
 
 		/* Transmit */
-		clear_buffer(remote_comm_txbuf);   // TODO(yoos): maybe check whether or not we've finished transmitting before clearing buffer
+		//clear_buffer(remote_comm_txbuf);   // TODO(yoos): maybe check whether or not we've finished transmitting before clearing buffer
 
-		chsprintf(remote_comm_txbuf, "%d\r\n", ticks_since_last_comm);
-		uartStartSend(&UARTD3, sizeof(remote_comm_txbuf), remote_comm_txbuf);
+		//chsprintf(remote_comm_txbuf, "%d\r\n", ticks_since_last_comm);
+		//uartStartSend(&UARTD3, sizeof(remote_comm_txbuf), remote_comm_txbuf);
 
 		chThdSleepUntil(time);
 	}
@@ -208,7 +208,7 @@ int main(void)
 	halInit();
 	chSysInit();
 
-	setup_uart();
+	setup_comm();
 
 	setup_adc();
 
