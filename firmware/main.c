@@ -3,6 +3,7 @@
 #include <hal.h>
 #include <chprintf.h>
 #include <stdio.h>
+#include <string.h>
 
 // Drivers
 #include <osuar_adc.h>   // ADC code
@@ -12,6 +13,7 @@
 #include <osuar_comm.h>   // Communication
 #include <osuar_spi.h>
 #include <osuar_protocol.h>
+#include <osuar_ringbuffer.h>
 
 // Flight controller
 #include <osuar_ahrs.h>   // Attitude-Heading Reference System
@@ -21,7 +23,6 @@
 
 
 static float dbg_dcm[3][3];
-static float dbg_dc[4];
 static float throttle = 0.10;
 static uint32_t adc_dc = 0.0;
 static float new_des_ang_pos[3];
@@ -34,25 +35,19 @@ static WORKING_AREA(wa_comm_thread, 1280);
 static msg_t comm_thread(void *arg)
 {
 	(void) arg;
-	chRegSetThreadName("communications");
+	chRegSetThreadName("debug comm");
 	systime_t time = chTimeNow();
 
-	uint8_t i, j;
 	uint8_t txbuf[200];
 	size_t packet_size;
-	down_telem_highfreq_t msg_dcm;
+	down_plaintext_t msg_text;
 
 	while (TRUE) {
 		time += MS2ST(51)-1;
 
-		for (i=0; i<3; i++) {
-			for (j=0; j<3; j++) {
-				msg_dcm.dcm[3*i+j] = dbg_dcm[i][j];
-			}
-		}
-
-		protocol_pack(DOWN_TELEM_HIGHFREQ_TYPE, &msg_dcm, txbuf, &packet_size);
-		chprintf((BaseSequentialStream*)&SD1, "%s", txbuf);
+		memcpy(&msg_text.text, "protocol test\r\n", 50);
+		protocol_pack(DOWN_PLAINTEXT_TYPE, &msg_text, txbuf, &packet_size);
+		chprintf((BaseSequentialStream*)&SD1, "%*.*s", packet_size, packet_size, txbuf);
 
 		// chsprintf(txbuf, "%5d   %2d %2d %2d\r\n", (int32_t) adc_dc,
 		// 		(uint8_t) (dbg_dc[0]*100),
@@ -77,38 +72,57 @@ static msg_t comm_thread(void *arg)
 	return 0;
 }
 
-#include <string.h>
 /*
  * Remote control loop
  */
-static int ticks_since_last_comm = 0;
-static WORKING_AREA(wa_comm_thread_2, 512);
+//static int ticks_since_last_comm = 0;
+static WORKING_AREA(wa_comm_thread_2, 1000);
 static msg_t comm_thread_2(void *arg)
 {
 	(void) arg;
 	chRegSetThreadName("remote comm");
 	systime_t time = chTimeNow();
 
+	uint8_t i, j;
 	uint8_t txbuf[200];
 	size_t packet_size;
+	down_telem_highfreq_t msg_dcm;
 
-	down_plaintext_t msg_text;
+	uint8_t rxbuf[10];
+	uint16_t trans_num = 0;   /* Serial receive/transmit counter */
+	osuar_rb_t recv_buf;
+	uint8_t rb_elems[200];
+	osuar_rb_init(&recv_buf, rb_elems, sizeof(rb_elems));
 
 	while (TRUE) {
 		time += MS2ST(11)-1;
-		memcpy(&msg_text.text, "PROTOCOL FUCK YEAH\r\n", 50);
-		protocol_pack(DOWN_PLAINTEXT_TYPE, &msg_text, txbuf, &packet_size);
-		chprintf((BaseSequentialStream*)&SD3, "%s", txbuf);
 
-		/* Receive */
-		if(osuar_comm_parse_input(&throttle, new_des_ang_pos)) {
-			ticks_since_last_comm = 0;
-		}
-		else {
-			if(ticks_since_last_comm++ > 100) {
-				throttle = MOTOR_PWM_DISABLED;
+		for (i=0; i<3; i++) {
+			for (j=0; j<3; j++) {
+				msg_dcm.dcm[3*i+j] = dbg_dcm[i][j];
 			}
 		}
+
+		/* Uplink */
+		trans_num = chnReadTimeout((BaseChannel*)&SD3, rxbuf, 10, MS2ST(200));
+
+		/* Store in our own circular buffer so we can wait for whole packet. */
+		osuar_comm_handle_receive(rxbuf, trans_num, &recv_buf);
+
+		/* Downlink */
+		protocol_pack(DOWN_TELEM_HIGHFREQ_TYPE, &msg_dcm, txbuf, &packet_size);
+		//protocol_write_packet(packet, size, txbuf);
+		chnWriteTimeout((BaseChannel*)&SD3, txbuf, packet_size, MS2ST(200));
+
+		/* Receive */
+		//if(osuar_comm_parse_input(&throttle, new_des_ang_pos)) {
+		//	ticks_since_last_comm = 0;
+		//}
+		//else {
+		//	if(ticks_since_last_comm++ > 100) {
+		//		throttle = MOTOR_PWM_DISABLED;
+		//	}
+		//}
 
 		/* Transmit */
 		//clear_buffer(remote_comm_txbuf);   // TODO(yoos): maybe check whether or not we've finished transmitting before clearing buffer
@@ -116,7 +130,7 @@ static msg_t comm_thread_2(void *arg)
 		//chsprintf(remote_comm_txbuf, "%d\r\n", ticks_since_last_comm);
 		//uartStartSend(&UARTD3, sizeof(remote_comm_txbuf), remote_comm_txbuf);
 
-		chThdSleepUntil(time);
+		//chThdSleepUntil(time);
 	}
 
 	return 0;
