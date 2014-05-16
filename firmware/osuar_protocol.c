@@ -47,6 +47,8 @@ size_t sizeoftype(uint8_t type)
 		return sizeof(down_telem_lowfreq_t);
 	case DOWN_SYNC_TYPE:
 		return sizeof(down_sync_t);
+	case DOWN_PLAINTEXT_TYPE:
+		return sizeof(down_plaintext_t);
 	default:
 		return 0;
 	}

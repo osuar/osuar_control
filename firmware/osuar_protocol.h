@@ -12,6 +12,7 @@
 #define DOWN_TELEM_HIGHFREQ_TYPE 2
 #define DOWN_TELEM_LOWFREQ_TYPE  3
 #define DOWN_SYNC_TYPE           4
+#define DOWN_PLAINTEXT_TYPE      5
 
 /*
  * So... this is weird, but it might work. CRC at end is only there to reserve
@@ -61,6 +62,11 @@ typedef struct {
 	float gains[6];   /* Velocity and position PID gains */
 	float trim[2];   /* XY trim */
 } down_sync_t;   /* 32 bytes */
+
+/* Plaintext for debug */
+typedef struct {
+	char text[MSG_SIZE_MAX];
+} down_plaintext_t;
 
 
 uint32_t protocol_compute_crc(void *data, size_t data_size);
