@@ -18,9 +18,25 @@ static uint8_t packetbuf[PACKET_BUFFER_SIZE];
 /* Current location of the write head in the buffer. */
 static size_t write_idx;
 
-void osuar_comm_data_received(UARTDriver *uartp)
+void setup_comm(void)
 {
-	(void) uartp;
+	/*
+	 * Activate Serial driver on USART1 and USART3
+	 * TODO(yoos): Enabling UART driver on USART2 interferes with I2C1. Need to
+	 * check if Serial driver does the same. My guess is that it will.
+	 */
+	sdStart(&SD1, NULL);
+	sdStart(&SD3, NULL);
+
+	palSetPadMode(GPIOB, 6, PAL_MODE_ALTERNATE(7));   // USART1 TX
+	palSetPadMode(GPIOB, 7, PAL_MODE_ALTERNATE(7));   // USART1 RX
+	palSetPadMode(GPIOB, 10, PAL_MODE_ALTERNATE(7));   // USART3 TX
+	palSetPadMode(GPIOB, 11, PAL_MODE_ALTERNATE(7));   // USART3 RX
+}
+
+void osuar_comm_data_received(BaseSequentialStream *sd)
+{
+	(void) sd;
 
 	size_t i;
         for(i = 0; i < sizeof(remote_comm_rxbuf); i++) {
@@ -31,7 +47,7 @@ void osuar_comm_data_received(UARTDriver *uartp)
 	// TODO(cesarek): warn if write_idx overlaps read_idx?
 
         // UART driver goes into idle mode when the buffer is filled.
-	uartStartReceive(&UARTD3, sizeof(remote_comm_rxbuf), remote_comm_rxbuf);
+	//uartStartReceive(&UARTD3, sizeof(remote_comm_rxbuf), remote_comm_rxbuf);
 }
 
 bool osuar_comm_parse_input(float *throttle, float ang_pos[3])
@@ -79,5 +95,13 @@ bool osuar_comm_parse_input(float *throttle, float ang_pos[3])
 	// TODO(cesarek): clear this portion of the buffer?
 
 	return true;
+}
+
+void clear_buffer(uint8_t *buffer)
+{
+	uint16_t i;
+	for (i=0; i<sizeof(buffer); i++) {
+		buffer[i] = 0;
+	}
 }
 
