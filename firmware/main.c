@@ -39,7 +39,7 @@ static msg_t comm_thread(void *arg)
 
 	uint8_t i, j;
 	uint8_t txbuf[200];
-	uint16_t packet_size;
+	size_t packet_size;
 	down_telem_highfreq_t msg_dcm;
 
 	while (TRUE) {
@@ -90,7 +90,7 @@ static msg_t comm_thread_2(void *arg)
 	systime_t time = chTimeNow();
 
 	uint8_t txbuf[200];
-	uint16_t packet_size;
+	size_t packet_size;
 
 	down_plaintext_t msg_text;
 
