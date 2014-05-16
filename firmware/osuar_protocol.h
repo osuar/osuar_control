@@ -1,6 +1,8 @@
 #ifndef OSUAR_PROTOCOL_H
 #define OSUAR_PROTOCOL_H
 
+#include <osuar_ringbuffer.h>
+
 #include <stdlib.h>
 #include <stdint.h>
 
@@ -65,8 +67,8 @@ typedef struct {
 
 /* Plaintext for debug */
 typedef struct {
-	char text[MSG_SIZE_MAX];
-} down_plaintext_t;
+	uint8_t text[32];
+} down_plaintext_t;   /* 32 bytes */
 
 
 uint32_t protocol_compute_crc(void *data, size_t data_size);
@@ -79,12 +81,33 @@ size_t sizeoftype(uint8_t type);
  *
  * @param type Message type
  * @param message Pointer to message struct
- * @param txbuf Output buffer
- * @param packet_size Size of packet stuffed in output buffer
- */
-void protocol_pack(uint8_t type, void *message, uint8_t *txbuf, uint16_t *packet_size);
 
-void *protocol_unpack(uint8_t *buffer, size_t buffer_size, uint8_t *id);
+ * @output txbuf Output buffer
+ * @output packet_size Size of packet stuffed in output buffer
+ */
+void protocol_pack(uint8_t type, void *message, uint8_t *txbuf, size_t *packet_size);
+
+/*
+ * @brief Unpack packet.
+ *
+ * @param packet Packet
+ * @param packet_size Size of packet
+ *
+ * @output 
+ */
+void *protocol_unpack(uint8_t *packet, size_t packet_size, uint8_t *type, void *message);
+
+/*
+ * @brief Find the first valid packet and its message type.
+ *
+ * @param buf Receive ringbuffer in which to search
+ *
+ * @output packet Packet struct to populate
+ * @output type Message type
+ *
+ * @return 1 if valid packet found, 0 otherwise.
+ */
+uint8_t protocol_get_packet(osuar_rb_t *buf, osuar_packet_t *packet, uint8_t *type);
 
 #endif
 

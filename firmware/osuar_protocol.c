@@ -11,29 +11,6 @@ uint32_t protocol_compute_crc(void *data, size_t data_size)
 	return 0; // ish
 }
 
-/*
-void *protocol_unpack(uint8_t *buffer, size_t buffer_size, uint8_t *id)
-{
-	// Look for magic identifier to signify beginning of packet
-	uint8_t i;
-	for(i = 0; i < buffer_size - sizeof(uint32_t); i++) {
-		uint32_t *maybe_magic = (uint32_t *) (buffer + i);
-
-		if(*maybe_magic == MAGIC) {
-			// Found start
-
-			// TODO(cesarek): Bounds checking
-			struct osuar_msg_t *msg = (struct osuar_msg_t *) (buffer + i);
-			*id = msg->type;
-
-			return msg->payload;
-		}
-	}
-
-	return 0;
-}
-*/
-
 size_t sizeoftype(uint8_t type)
 {
 	switch(type) {
@@ -54,7 +31,7 @@ size_t sizeoftype(uint8_t type)
 	}
 }
 
-void protocol_pack(uint8_t type, void *message, uint8_t *txbuf, uint16_t *packet_size)
+void protocol_pack(uint8_t type, void *message, uint8_t *txbuf, size_t *packet_size)
 {
 	static osuar_packet_t *packet;
 	static size_t message_size;
@@ -80,6 +57,37 @@ void protocol_pack(uint8_t type, void *message, uint8_t *txbuf, uint16_t *packet
 	 */
 	*packet_size = sizeof(osuar_packet_t) + msg_size_diff;
 }
+
+/*
+void protocol_unpack(uint8_t *rxbuf, size_t buffer_size, uint8_t *id)
+{
+	// Look for magic identifier to signify beginning of packet
+	uint8_t i;
+	for (i=0; i<buffer_size-sizeof(uint32_t); i++) {
+		uint32_t *maybe_magic = (uint32_t *) (buffer + i);
+
+		if(*maybe_magic == MAGIC) {
+			// Found start
+
+			// TODO(cesarek): Bounds checking
+			osuar_msg_t *msg = (osuar_msg_t*) (buffer + i);
+			*id = msg->type;
+
+			return msg->payload;
+		}
+	}
+}
+*/
+
+uint8_t protocol_get_packet(osuar_rb_t *buf, osuar_packet_t *packet, uint8_t *type)
+{
+	(void) buf;
+	(void) packet;
+	(void) type;
+
+	return 0;
+}
+
 
 /*
 int length;
