@@ -52,7 +52,6 @@ size_t sizeoftype(uint8_t type)
 	}
 }
 
-#include <stdio.h>
 void protocol_pack(uint8_t type, void *message, uint8_t *txbuf, uint16_t *packet_size)
 {
 	static osuar_packet_t *packet;
