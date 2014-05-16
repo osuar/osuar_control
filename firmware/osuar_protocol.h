@@ -98,16 +98,16 @@ void protocol_pack(uint8_t type, void *message, uint8_t *txbuf, size_t *packet_s
 void *protocol_unpack(uint8_t *packet, size_t packet_size, uint8_t *type, void *message);
 
 /*
- * @brief Find the first valid packet and its message type.
+ * @brief Find the first valid message and its type.
  *
  * @param buf Receive ringbuffer in which to search
  *
- * @output packet Packet struct to populate
+ * @output msg Message to populate
  * @output type Message type
  *
  * @return 1 if valid packet found, 0 otherwise.
  */
-uint8_t protocol_get_packet(osuar_rb_t *buf, osuar_packet_t *packet, uint8_t *type);
+uint8_t protocol_get_message(osuar_rb_t *buf, uint8_t *msg, uint8_t *type);
 
 #endif
 

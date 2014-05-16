@@ -31,14 +31,14 @@ void setup_comm(void)
 
 void osuar_comm_handle_receive(uint8_t *rxbuf, uint8_t num, osuar_rb_t *recv_rb)
 {
-	static osuar_packet_t packet_up;   /* Received uplink packet */
+	static uint8_t *msg;   /* Received uplink message */
 	static uint8_t msg_type;   /* Received message type */
 
 	osuar_rb_add(recv_rb, rxbuf, num);   /* TODO(yoos): handle failure */
-	if (protocol_get_packet(recv_rb, &packet_up, &msg_type)) {
+	if (protocol_get_message(recv_rb, msg, &msg_type)) {
 		switch(msg_type) {
 		case(UP_COMMAND_TYPE):
-			memcpy(&g_cmd, packet_up.message, sizeoftype(msg_type));
+			memcpy(&g_cmd, msg, sizeoftype(msg_type));
 			break;
 		case(UP_CONFIG_TYPE):
 			/* TODO(yoos) */

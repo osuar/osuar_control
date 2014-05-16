@@ -79,13 +79,23 @@ void protocol_unpack(uint8_t *rxbuf, size_t buffer_size, uint8_t *id)
 }
 */
 
-uint8_t protocol_get_packet(osuar_rb_t *buf, osuar_packet_t *packet, uint8_t *type)
+uint8_t protocol_get_message(osuar_rb_t *buf, uint8_t *msg, uint8_t *type)
 {
-	(void) buf;
-	(void) packet;
-	(void) type;
+	static uint32_t maybe_header = 0;
+	static uint32_t crc = 0;
 
-	return 0;
+	while (buf->count > 0) {
+		while (maybe_header != MAGIC) {
+			osuar_rb_remove(buf, (uint8_t*) &maybe_header, 1);
+		}
+		osuar_rb_remove(buf, type, 1);
+		osuar_rb_remove(buf, msg, sizeoftype(*type));
+		osuar_rb_remove(buf, (uint8_t*) &crc, 4);
+
+		/* TODO(yoos): Check CRC and return 0 if mismatch */
+	}
+
+	return 1;
 }
 
 
