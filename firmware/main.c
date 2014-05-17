@@ -2,6 +2,7 @@
 #include <ch.h>
 #include <hal.h>
 #include <chprintf.h>
+#include <chsprintf.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -106,11 +107,13 @@ static msg_t comm_thread_2(void *arg)
 
 		/* Store in our own circular buffer so we can wait for whole packet. */
 		osuar_comm_handle_receive(rxbuf, trans_num, &recv_buf);
+		chsprintf(txbuf, "axis 0: %d\r\n", g_cmd.mode);
+		chnWriteTimeout((BaseChannel*)&SD3, txbuf, 20, MS2ST(200));
 
 		/* Downlink */
-		protocol_pack(DOWN_TELEM_HIGHFREQ_TYPE, &msg_dcm, txbuf, &packet_size);
-		//protocol_write_packet(packet, size, txbuf);
-		chnWriteTimeout((BaseChannel*)&SD3, txbuf, packet_size, MS2ST(200));
+		//protocol_pack(DOWN_TELEM_HIGHFREQ_TYPE, &msg_dcm, txbuf, &packet_size);
+		//  protocol_write_packet(packet, size, txbuf);
+		//chnWriteTimeout((BaseChannel*)&SD3, txbuf, packet_size, MS2ST(200));
 
 		/* Receive */
 		//if(osuar_comm_parse_input(&throttle, new_des_ang_pos)) {

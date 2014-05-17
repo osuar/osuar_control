@@ -33,9 +33,11 @@ void osuar_comm_handle_receive(uint8_t *rxbuf, uint8_t num, osuar_rb_t *recv_rb)
 {
 	static uint8_t *msg;   /* Received uplink message */
 	static uint8_t msg_type;   /* Received message type */
+	static uint8_t r;
 
 	osuar_rb_add(recv_rb, rxbuf, num);   /* TODO(yoos): handle failure */
-	if (protocol_get_message(recv_rb, msg, &msg_type)) {
+	r = protocol_get_message(recv_rb, msg, &msg_type);
+	if (r) {
 		switch(msg_type) {
 		case(UP_COMMAND_TYPE):
 			memcpy(&g_cmd, msg, sizeoftype(msg_type));
@@ -46,6 +48,7 @@ void osuar_comm_handle_receive(uint8_t *rxbuf, uint8_t num, osuar_rb_t *recv_rb)
 		default:
 			break;
 		}
+		g_cmd.mode = r;
 	}
 }
 
