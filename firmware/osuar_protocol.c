@@ -79,7 +79,7 @@ void protocol_unpack(uint8_t *rxbuf, size_t buffer_size, uint8_t *id)
 }
 */
 
-uint8_t protocol_get_message(osuar_rb_t *buf, uint8_t *msg, uint8_t *type)
+uint8_t protocol_get_message(osuar_rb_t *buf, uint8_t *type, uint8_t *msg)
 {
 	/* Some variables to help parse header */
 	static uint32_t maybe_header = 0;

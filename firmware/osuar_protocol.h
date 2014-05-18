@@ -107,7 +107,7 @@ void *protocol_unpack(uint8_t *packet, size_t packet_size, uint8_t *type, void *
  *
  * @return 1 if valid packet found, 0 otherwise.
  */
-uint8_t protocol_get_message(osuar_rb_t *buf, uint8_t *msg, uint8_t *type);
+uint8_t protocol_get_message(osuar_rb_t *buf, uint8_t *type, uint8_t *msg);
 
 #endif
 
