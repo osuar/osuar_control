@@ -81,17 +81,17 @@ void protocol_unpack(uint8_t *rxbuf, size_t buffer_size, uint8_t *id)
 
 uint8_t protocol_get_message(osuar_rb_t *buf, uint8_t *msg, uint8_t *type)
 {
+	/* Some variables to help parse header */
 	static uint32_t maybe_header = 0;
 	static uint8_t tmp = 0;
-	static uint32_t crc = 0;
-	static uint8_t packet[MSG_SIZE_MAX + 5];
+
+	static uint32_t crc = 0;   /* TODO(yoos): LSB or MSB first? */
 
 	while (buf->count > 0) {
 		osuar_rb_remove(buf, &tmp, 1);
 		maybe_header = (maybe_header << 8) + tmp;
 
-		if (maybe_header == MAGIC) {
-			osuar_rb_remove(buf, ???, sizeoftype(*type) + 5);
+		if (maybe_header == MAGIC && buf->count >= sizeoftype(*type) + 5) {
 			osuar_rb_remove(buf, type, 1);
 			osuar_rb_remove(buf, msg, sizeoftype(*type));
 			osuar_rb_remove(buf, (uint8_t*) &crc, 4);
