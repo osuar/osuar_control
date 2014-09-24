@@ -2,6 +2,7 @@ CC=clang
 CFLAGS=-Wall -Wextra -lpthread
 
 all: joystick comm
+	
 
 joystick:
 	$(CC) main.c -o joystick $(CFLAGS)

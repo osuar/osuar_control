@@ -1,6 +1,8 @@
 #include <osuar_protocol.h>
 #include <osuar_ringbuffer.h>
 
+#include <serial.h>
+
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
@@ -94,8 +96,12 @@ int main(int argc, char **argv)
 		}
 
 		uint8_t printbuf[10];
-		while (osuar_rb_remove(&rxbuf, printbuf, 1)) {
-			printf("%2x: %c\n", printbuf[0], printbuf[0]);
+		int r;
+		while ((r = osuar_rb_remove(&rxbuf, printbuf, 10))) {
+			int i;
+			for (i=0; i<r; i++) {
+				printf("%2x: %c\n", printbuf[i], printbuf[i]);
+			}
 			//printf("%c", printbuf[0]);
 		}
 
