@@ -44,8 +44,9 @@ static msg_t comm_thread(void *arg)
 	while (TRUE) {
 		time += MS2ST(51)-1;
 
-		protocol_pack(DOWN_PLAINTEXT_TYPE, "protocol test 1234567890", txbuf, &packet_size);
-		chprintf((BaseChannel*)&SD1, "Text packet: <%*.*s>\r\n", packet_size, packet_size, txbuf);
+		chsprintf(&msg_text.text, "protocol test %d\r\n", 1234567890);
+		protocol_pack(DOWN_PLAINTEXT_TYPE, &msg_text, txbuf, &packet_size);
+		chnWriteTimeout((BaseChannel*)&SD1, txbuf, packet_size, MS2ST(200));
 
 		chThdSleepUntil(time);
 	}
@@ -72,8 +73,7 @@ static msg_t comm_thread_2(void *arg)
 	uint8_t rxbuf[10];
 	uint16_t trans_num = 0;   /* Serial receive/transmit counter */
 	osuar_rb_t recv_buf;
-	uint8_t rb_elems[200];
-	osuar_rb_init(&recv_buf, rb_elems, sizeof(rb_elems));
+	osuar_rb_init(&recv_buf, 200);
 
 	while (TRUE) {
 		time += MS2ST(11)-1;
