@@ -14,7 +14,12 @@ typedef struct {
 /*
  * Initializer
  */
-void osuar_rb_init(osuar_rb_t *buf, uint8_t *elems, size_t size);
+void osuar_rb_init(osuar_rb_t *buf, size_t size);
+
+/*
+ * Destructor
+ */
+void osuar_rb_destroy(osuar_rb_t *buf);
 
 /*
  * Adder
