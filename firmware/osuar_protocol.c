@@ -31,16 +31,16 @@ size_t sizeoftype(uint8_t type)
 	}
 }
 
-void protocol_pack(uint8_t type, void *message, uint8_t *txbuf, size_t *packet_size)
+void protocol_pack(uint8_t type, void *msg, uint8_t *txbuf, size_t *packet_size)
 {
 	static osuar_packet_t *packet;
-	static size_t message_size;
+	static size_t msg_size;
 	static int16_t msg_size_diff;
 	static uint32_t crc;
 
 	/* Determine size of payload from type, for example: */
-	message_size = MIN(sizeoftype(type), MSG_SIZE_MAX);
-	msg_size_diff = message_size - MSG_SIZE_MAX;
+	msg_size = MIN(sizeoftype(type), MSG_SIZE_MAX);
+	msg_size_diff = msg_size - MSG_SIZE_MAX;
 
 	/*
 	 * Stuff txbuf.
@@ -48,8 +48,8 @@ void protocol_pack(uint8_t type, void *message, uint8_t *txbuf, size_t *packet_s
 	packet = (osuar_packet_t*) txbuf;
 	packet->magic = MAGIC;
 	packet->type = type;
-	memcpy(&packet->message, message, message_size);   /* memcpy into ringbuffer */
-	crc = protocol_compute_crc(packet, sizeof(packet->magic) + sizeoftype(packet->type) + message_size);
+	memcpy(&packet->msg, msg, msg_size);   /* memcpy into ringbuffer */
+	crc = protocol_compute_crc(packet, sizeof(packet->magic) + sizeoftype(packet->type) + msg_size);
 	memcpy(&packet->crc - msg_size_diff, &crc, sizeof(packet->crc));
 
 	/*

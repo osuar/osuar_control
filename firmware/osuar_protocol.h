@@ -26,7 +26,7 @@
 typedef struct {
 	uint32_t magic;   /* Header */
 	uint8_t type;   /* Message type, indicates payload size. TODO(yoos): Need lookup. */
-	uint8_t message[MSG_SIZE_MAX];   // TODO(cesarek): Don't want to define size, but have to...? Research flexible arrays/struct hack.
+	uint8_t msg[MSG_SIZE_MAX];   // TODO(cesarek): Don't want to define size, but have to...? Research flexible arrays/struct hack.
 	uint32_t crc;   /* 32-bit CRC. We could probably get away with 16-bit, but the STM32F4 has a hardware CRC unit that is locked to 32-bit. */
 } osuar_packet_t;
 
@@ -75,17 +75,17 @@ uint32_t protocol_compute_crc(void *data, size_t data_size);
 size_t sizeoftype(uint8_t type);
 
 /*
- * @brief Put packed message on UART transmit buffer.
+ * @brief Pack message into packet.
  *
  * We assume txbuf has enough room to fit the largest possible packet.
  *
  * @param type Message type
- * @param message Pointer to message struct
+ * @param msg Message body
 
  * @output txbuf Output buffer
  * @output packet_size Size of packet stuffed in output buffer
  */
-void protocol_pack(uint8_t type, void *message, uint8_t *txbuf, size_t *packet_size);
+void protocol_pack(uint8_t type, void *msg, uint8_t *txbuf, size_t *packet_size);
 
 /*
  * @brief Unpack packet.
@@ -93,17 +93,18 @@ void protocol_pack(uint8_t type, void *message, uint8_t *txbuf, size_t *packet_s
  * @param packet Packet
  * @param packet_size Size of packet
  *
- * @output 
+ * @output type Message type
+ * @output msg Message body
  */
-void *protocol_unpack(uint8_t *packet, size_t packet_size, uint8_t *type, void *message);
+void *protocol_unpack(uint8_t *packet, size_t packet_size, uint8_t *type, void *msg);
 
 /*
  * @brief Find the first valid message and its type.
  *
- * @param buf Receive ringbuffer in which to search
+ * @param buf RX ringbuffer in which to search for packets
  *
- * @output msg Message to populate
  * @output type Message type
+ * @output msg Message body
  *
  * @return 1 if valid packet found, 0 otherwise.
  */
