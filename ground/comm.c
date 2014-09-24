@@ -4,12 +4,6 @@
 #include <serial.h>
 
 #include <stdio.h>
-#include <string.h>
-#include <assert.h>
-
-#include <errno.h>
-#include <fcntl.h>
-#include <termios.h>
 #include <unistd.h>
 #include <sys/time.h>
 
