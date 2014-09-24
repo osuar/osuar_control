@@ -17,6 +17,14 @@
 #define DOWN_PLAINTEXT_TYPE      5
 
 /*
+ * ARM memory alignment is to the most aligned member of the struct, so we
+ * explicitly ask for packing. Unfortunately, unaligned memory access is
+ * slower, so if we ever run into performance issues with serial, this could be
+ * a place to look. That said, our baudrates are slow as molasses anyway..
+ */
+#pragma pack(push, 1)
+
+/*
  * So... this is weird, but it might work. CRC at end is only there to reserve
  * size. A single instance of this struct is statically instantiated in the
  * sender thread, and the CRC is actually tacked onto the end of the payload.
@@ -69,6 +77,11 @@ typedef struct {
 typedef struct {
 	uint8_t text[32];
 } down_plaintext_t;   /* 32 bytes */
+
+/*
+ * Disable packing.
+ */
+#pragma pack(pop)
 
 
 uint32_t protocol_compute_crc(void *data, size_t data_size);
