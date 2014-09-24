@@ -6,12 +6,33 @@
 
 #include <osuar_comm.h>
 #include <osuar_protocol.h>
+#include <osuar_config.h>
 #include <string.h>
 
 #define CONTROL_PACKET_SIZE 10
 #define PACKET_BUFFER_SIZE (CONTROL_PACKET_SIZE * 2)
 
 up_command_t g_cmd;
+
+/*
+ * SD1 config structure
+ */
+static SerialConfig sd1cfg = {
+	UART1_BAUDRATE,
+	0,
+	0,
+	0
+};
+
+/*
+ * SD3 config structure
+ */
+static SerialConfig sd3cfg = {
+	UART3_BAUDRATE,
+	0,
+	0,
+	0
+};
 
 void setup_comm(void)
 {
@@ -20,8 +41,8 @@ void setup_comm(void)
 	 * TODO(yoos): Enabling UART driver on USART2 interferes with I2C1. Need to
 	 * check if Serial driver does the same. My guess is that it will.
 	 */
-	sdStart(&SD1, NULL);
-	sdStart(&SD3, NULL);
+	sdStart(&SD1, &sd1cfg);
+	sdStart(&SD3, &sd3cfg);
 
 	palSetPadMode(GPIOB, 6, PAL_MODE_ALTERNATE(7));   // USART1 TX
 	palSetPadMode(GPIOB, 7, PAL_MODE_ALTERNATE(7));   // USART1 RX
