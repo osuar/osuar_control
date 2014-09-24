@@ -1,15 +1,22 @@
-#define NUM_ROTORS 4
+#define NUM_ROTORS 3
 #define ESC_COMM PWM
 
-#define MOTOR_DC_CAP 1.0
+#define MOTOR_DC_CAP 0.5
 
 /* Controller gains */
-#define ANG_POS_KP 1.0
-#define ANG_POS_KI 0.0
-#define ANG_POS_KD 0.0
-#define ANG_VEL_KP 0.2
-#define ANG_VEL_KI 0.0
-#define ANG_VEL_KD 0.0
+#define MOTOR_ANG_POS_KP 1.0   /* TODO: tune these! */
+#define MOTOR_ANG_POS_KI 0.0
+#define MOTOR_ANG_POS_KD 0.0
+#define MOTOR_ANG_VEL_KP 1.0
+#define MOTOR_ANG_VEL_KI 0.0
+#define MOTOR_ANG_VEL_KD 0.0
+
+#define SERVO_ANG_POS_KP 0.5   /* TODO: tune these! */
+#define SERVO_ANG_POS_KI 0.0
+#define SERVO_ANG_POS_KD 0.0
+#define SERVO_ANG_VEL_KP 0.05
+#define SERVO_ANG_VEL_KI 0.0
+#define SERVO_ANG_VEL_KD 0.0
 
 /* IMU offsets */
 #define GYR_X_OFFSET  0.077500
@@ -27,10 +34,12 @@
 
 /* UART */
 #define UART1_BAUDRATE 57600
-#define UART3_BAUDRATE 57600
+#define UART3_BAUDRATE 38400   // XBee
 
 /* PWM duty cycle constants */
-#define MOTOR_PWM_DISABLED 0.50
-#define MOTOR_PWM_MIN 0.55
-#define MOTOR_PWM_MAX 0.99
+#define MOTOR_PWM_DISABLED 0.30   /* TODO: recalibrate */
+#define MOTOR_PWM_MIN 0.50   /* 1060/2000 us */
+#define MOTOR_PWM_MAX 0.95   /* 1860/2000 us */
+#define SERVO_PWM_MIN 0.0325
+#define SERVO_PWM_MAX 0.0760
 
