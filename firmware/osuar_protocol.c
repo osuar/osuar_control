@@ -8,7 +8,7 @@ uint32_t protocol_compute_crc(void *data, size_t data_size)
 	(void) data;
 	(void) data_size;
 
-	return 0; // ish
+	return 0xdeadbeef; // ish
 }
 
 size_t sizeoftype(uint8_t type)
@@ -50,7 +50,7 @@ void protocol_pack(uint8_t type, void *msg, uint8_t *txbuf, size_t *packet_size)
 	packet->type = type;
 	memcpy(&packet->msg, msg, msg_size);   /* memcpy into ringbuffer */
 	crc = protocol_compute_crc(packet, sizeof(packet->magic) + sizeoftype(packet->type) + msg_size);
-	memcpy(&packet->crc - msg_size_diff, &crc, sizeof(packet->crc));
+	memcpy((void*)&packet->crc + msg_size_diff, &crc, sizeof(packet->crc));
 
 	/*
 	 * Calculate packet size.
