@@ -53,7 +53,7 @@ void setup_comm(void)
 void osuar_comm_handle_receive(uint8_t *rxbuf, uint8_t num, osuar_rb_t *recv_rb)
 {
 	static uint8_t msg_type;   /* Received uplink message type */
-	static uint8_t *msg;   /* Received message */
+	static uint8_t msg[MSG_SIZE_MAX];   /* Received message */
 	static uint8_t r;
 
 	/* Add received bytes to ring buffer. */
