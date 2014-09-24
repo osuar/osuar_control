@@ -44,26 +44,8 @@ static msg_t comm_thread(void *arg)
 	while (TRUE) {
 		time += MS2ST(51)-1;
 
-		memcpy(&msg_text.text, "protocol test\r\n", 50);
-		protocol_pack(DOWN_PLAINTEXT_TYPE, &msg_text, txbuf, &packet_size);
-		chprintf((BaseSequentialStream*)&SD1, "%*.*s", packet_size, packet_size, txbuf);
-
-		// chsprintf(txbuf, "%5d   %2d %2d %2d\r\n", (int32_t) adc_dc,
-		// 		(uint8_t) (dbg_dc[0]*100),
-		// 		(uint8_t) (dbg_dc[1]*100),
-		// 		(uint8_t) (dbg_dc[2]*100));
-		// chsprintf(txbuf, "%9d   %5d %5d %5d   %5d %5d %5d   %5d %5d %5d\r\n",
-		// 		counter,
-		// 		(int16_t) (dbg_dcm[0][0]*1000),
-		// 		(int16_t) (dbg_dcm[0][1]*1000),
-		// 		(int16_t) (dbg_dcm[0][2]*1000),
-		// 		(int16_t) (dbg_dcm[1][0]*1000),
-		// 		(int16_t) (dbg_dcm[1][1]*1000),
-		// 		(int16_t) (dbg_dcm[1][2]*1000),
-		// 		(int16_t) (dbg_dcm[2][0]*1000),
-		// 		(int16_t) (dbg_dcm[2][1]*1000),
-		// 		(int16_t) (dbg_dcm[2][2]*1000));
-		//uartStartSend(&UARTD1, sizeof(txbuf), txbuf);
+		protocol_pack(DOWN_PLAINTEXT_TYPE, "protocol test 1234567890", txbuf, &packet_size);
+		chprintf((BaseChannel*)&SD1, "Text packet: <%*.*s>\r\n", packet_size, packet_size, txbuf);
 
 		chThdSleepUntil(time);
 	}
@@ -85,7 +67,7 @@ static msg_t comm_thread_2(void *arg)
 	uint8_t i, j;
 	uint8_t txbuf[200];
 	size_t packet_size;
-	down_telem_highfreq_t msg_dcm;
+	down_telem_highfreq_t msg_telem_hf;
 
 	uint8_t rxbuf[10];
 	uint16_t trans_num = 0;   /* Serial receive/transmit counter */
@@ -96,9 +78,10 @@ static msg_t comm_thread_2(void *arg)
 	while (TRUE) {
 		time += MS2ST(11)-1;
 
+		// Pack downlink message first because it's time-critical.
 		for (i=0; i<3; i++) {
 			for (j=0; j<3; j++) {
-				msg_dcm.dcm[3*i+j] = dbg_dcm[i][j];
+				msg_telem_hf.dcm[3*i+j] = dbg_dcm[i][j];
 			}
 		}
 
@@ -111,9 +94,8 @@ static msg_t comm_thread_2(void *arg)
 		chnWriteTimeout((BaseChannel*)&SD3, txbuf, 20, MS2ST(200));
 
 		/* Downlink */
-		//protocol_pack(DOWN_TELEM_HIGHFREQ_TYPE, &msg_dcm, txbuf, &packet_size);
-		//  protocol_write_packet(packet, size, txbuf);
-		//chnWriteTimeout((BaseChannel*)&SD3, txbuf, packet_size, MS2ST(200));
+		protocol_pack(DOWN_TELEM_HIGHFREQ_TYPE, &msg_telem_hf, txbuf, &packet_size);
+		chnWriteTimeout((BaseChannel*)&SD3, txbuf, packet_size, MS2ST(200));
 
 		/* Receive */
 		//if(osuar_comm_parse_input(&throttle, new_des_ang_pos)) {
