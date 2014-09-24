@@ -46,7 +46,7 @@ static msg_t comm_thread(void *arg)
 
 		chsprintf(&msg_text.text, "protocol test %d\r\n", 1234567890);
 		protocol_pack(DOWN_PLAINTEXT_TYPE, &msg_text, txbuf, &packet_size);
-		chnWriteTimeout((BaseChannel*)&SD1, txbuf, packet_size, MS2ST(200));
+		chnWriteTimeout((BaseChannel*)&SD1, txbuf, packet_size, MS2ST(20));
 
 		chThdSleepUntil(time);
 	}
