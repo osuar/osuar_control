@@ -27,14 +27,14 @@ void osuar_rb_destroy(osuar_rb_t *buf);
  * If there is not enough room in buffer to accomodate all data, no data will
  * be written.
  *
- * @return 0 on success, 1 otherwise.
+ * @return 1 on success, 0 otherwise.
  */
 uint8_t osuar_rb_add(osuar_rb_t *buf, uint8_t *input, uint16_t input_size);
 
 /*
  * Remover
  *
- * @return 0 on success, 1 otherwise.
+ * @return 1 on success, 0 otherwise.
  */
 uint8_t osuar_rb_remove(osuar_rb_t *buf, uint8_t *output, uint16_t output_size);
 

@@ -100,7 +100,7 @@ uint8_t protocol_get_message(osuar_rb_t *buf, uint8_t *type, uint8_t *msg)
 		}
 	}
 
-	return 0;
+	return 0;   // Fail
 }
 
 

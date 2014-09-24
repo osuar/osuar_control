@@ -94,14 +94,10 @@ int main(int argc, char **argv)
 		}
 
 		uint8_t printbuf[10];
-		int r = osuar_rb_remove(&rxbuf, printbuf, 1);
-		//if (r != 1) printf("%c", printbuf[0]);
-		while (r != 1) {
-			r = osuar_rb_remove(&rxbuf, printbuf, 1);
-			//printf("%c", printbuf[0]);
+		while (osuar_rb_remove(&rxbuf, printbuf, 1)) {
 			printf("%2x: %c\n", printbuf[0], printbuf[0]);
+			//printf("%c", printbuf[0]);
 		}
-
 
 		/* Don't peg the CPU. */
 		usleep(1000);
