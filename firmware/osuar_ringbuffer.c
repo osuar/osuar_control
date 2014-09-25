@@ -15,43 +15,43 @@ void osuar_rb_destroy(osuar_rb_t *buf)
 	free(buf);
 }
 
-uint8_t osuar_rb_add(osuar_rb_t *buf, uint8_t *input, uint16_t input_size)
+uint16_t osuar_rb_add(osuar_rb_t *buf, uint16_t num_bytes, uint8_t *input)
 {
 	/* Check if buffer is too full. */
-	if (buf->size < buf->count + input_size) {
-		return 0;
+	if (buf->size - buf->count < num_bytes) {
+		num_bytes = buf->size - buf->count;
 	}
 
 	/* Copy data. */
 	static uint16_t i;
 	static uint16_t tail;
 	tail = (buf->head + buf->count) % buf->size;
-	for (i=0; i<input_size; i++) {
+	for (i=0; i<num_bytes; i++) {
 		buf->elems[tail++] = input[i];
 		if (tail == buf->size) tail = 0;
 	}
 
-	buf->count += input_size;
+	buf->count += num_bytes;
 
-	return 1;
+	return num_bytes;
 }
 
-uint8_t osuar_rb_remove(osuar_rb_t *buf, uint8_t *output, uint16_t output_size)
+uint16_t osuar_rb_remove(osuar_rb_t *buf, uint16_t num_bytes, uint8_t *output)
 {
 	/* Check if buffer does not contain enough data. */
-	if (buf->count < output_size) {
-		return 0;
+	if (buf->count < num_bytes) {
+		num_bytes = buf->count;
 	}
 
 	/* Copy data. */
 	static uint16_t i;
-	for (i=0; i<output_size; i++) {
+	for (i=0; i<num_bytes; i++) {
 		output[i] = buf->elems[buf->head++];
 		if (buf->head == buf->size) buf->head = 0;
 	}
 
-	buf->count -= output_size;
+	buf->count -= num_bytes;
 
-	return 1;
+	return num_bytes;
 }
 

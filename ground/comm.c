@@ -20,7 +20,7 @@ void rx(int ser, osuar_rb_t *buf)
 	int serlen;
 	uint8_t serbuf[50];
 	serlen = read(ser, serbuf, 1);
-	osuar_rb_add(buf, serbuf, serlen);
+	osuar_rb_add(buf, serlen, serbuf);
 
 	//uint8_t r = 1;
 	//uint8_t msg_type;
@@ -91,12 +91,12 @@ int main(int argc, char **argv)
 
 		uint8_t printbuf[10];
 		int r;
-		while ((r = osuar_rb_remove(&rxbuf, printbuf, 10))) {
+		while ((r = osuar_rb_remove(&rxbuf, 10, printbuf))) {
 			int i;
 			for (i=0; i<r; i++) {
-				printf("%2x: %c\n", printbuf[i], printbuf[i]);
+				//printf("%2x: %c\n", printbuf[i], printbuf[i]);
+				printf("%c", printbuf[i]);
 			}
-			//printf("%c", printbuf[0]);
 		}
 
 		/* Don't peg the CPU. */

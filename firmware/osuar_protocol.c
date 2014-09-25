@@ -88,13 +88,13 @@ uint8_t protocol_get_message(osuar_rb_t *buf, uint8_t *type, uint8_t *msg)
 	static uint32_t crc = 0;   /* TODO(yoos): LSB or MSB first? */
 
 	while (buf->count > 0) {
-		osuar_rb_remove(buf, &tmp, 1);
+		osuar_rb_remove(buf, 1, &tmp);
 		maybe_header = (maybe_header << 8) + tmp;
 
 		if (maybe_header == MAGIC && buf->count >= sizeoftype(*type) + 5) {
-			osuar_rb_remove(buf, type, 1);
-			osuar_rb_remove(buf, msg, sizeoftype(*type));
-			osuar_rb_remove(buf, (uint8_t*) &crc, 4);
+			osuar_rb_remove(buf, 1, type);
+			osuar_rb_remove(buf, sizeoftype(*type), msg);
+			osuar_rb_remove(buf, 4, (uint8_t*) &crc);
 			/* TODO(yoos): Check CRC and return 0 if mismatch */
 			return 1;
 		}

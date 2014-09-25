@@ -57,7 +57,7 @@ void osuar_comm_handle_receive(uint8_t *rxbuf, uint8_t num, osuar_rb_t *recv_rb)
 	static uint8_t r;
 
 	/* Add received bytes to ring buffer. */
-	osuar_rb_add(recv_rb, rxbuf, num);   /* TODO(yoos): handle failure */
+	osuar_rb_add(recv_rb, num, rxbuf);   /* TODO(yoos): handle failure */
 
 	/* Try to parse message */
 	r = protocol_get_message(recv_rb, &msg_type, msg);
