@@ -1,18 +1,11 @@
 #include <osuar_ringbuffer.h>
 
-void osuar_rb_init(osuar_rb_t *buf, size_t size)
+void osuar_rb_init(osuar_rb_t *buf, size_t size, uint8_t *elems)
 {
 	buf->size = size;
 	buf->count = 0;
 	buf->head = 0;
-	uint8_t elems[size];
 	buf->elems = elems;
-}
-
-void osuar_rb_destroy(osuar_rb_t *buf)
-{
-	free(buf->elems);
-	free(buf);
 }
 
 uint16_t osuar_rb_add(osuar_rb_t *buf, uint16_t num_bytes, uint8_t *input)

@@ -73,7 +73,8 @@ static msg_t comm_thread_2(void *arg)
 	uint8_t rxbuf[10];
 	uint16_t trans_num = 0;   /* Serial receive/transmit counter */
 	osuar_rb_t recv_buf;
-	osuar_rb_init(&recv_buf, 200);
+	uint8_t _recv_buf[200];
+	osuar_rb_init(&recv_buf, sizeof(_recv_buf), _recv_buf);
 
 	while (TRUE) {
 		time += MS2ST(11)-1;
