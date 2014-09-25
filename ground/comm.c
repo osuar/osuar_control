@@ -7,6 +7,8 @@
 #include <unistd.h>
 #include <sys/time.h>
 
+#include <assert.h>
+
 
 down_telem_highfreq_t msg_telem_hf;
 
@@ -18,9 +20,9 @@ void rx(int ser, osuar_rb_t *buf)
 {
 	/* Read from serial device. */
 	int serlen;
-	uint8_t serbuf[50];
-	serlen = read(ser, serbuf, 1);
-	osuar_rb_add(buf, serlen, serbuf);
+	uint8_t serbuf[100];   // TODO(syoo): magic number
+	serlen = read(ser, serbuf, 100);
+	assert(osuar_rb_add(buf, serlen, serbuf) == serlen);
 
 	//uint8_t r = 1;
 	//uint8_t msg_type;
@@ -70,7 +72,8 @@ int main(int argc, char **argv)
 
 	/* Ring buffer */
 	osuar_rb_t rxbuf;
-	osuar_rb_init(&rxbuf, 50);
+	uint8_t _rxbuf[200];
+	osuar_rb_init(&rxbuf, sizeof(_rxbuf), _rxbuf);
 
 	while(1) {
 		/* Update current time */
@@ -85,10 +88,10 @@ int main(int argc, char **argv)
 		/* RX */
 		if (timercmp(&tm_cur, &tm_rx, >) != 0) {
 			rx(ser, &rxbuf);
-
 			timeradd(&tm_rx, &RX_DT, &tm_rx);
 		}
 
+		/* Print */
 		uint8_t printbuf[10];
 		int r;
 		while ((r = osuar_rb_remove(&rxbuf, 10, printbuf))) {
