@@ -44,5 +44,15 @@ uint16_t osuar_rb_add(osuar_rb_t *buf, uint16_t num_bytes, uint8_t *input);
  */
 uint16_t osuar_rb_remove(osuar_rb_t *buf, uint16_t num_bytes, uint8_t *output);
 
+/*
+ * Peeker
+ *
+ * @param buf Ringbuffer
+ * @param num_bytes Number of bytes to fetch
+ *
+ * @return Number of bytes actually fetched
+ */
+uint16_t osuar_rb_peek(osuar_rb_t *buf, uint16_t num_bytes, uint8_t *output);
+
 #endif /* OSUAR_RINGBUFFER_H */
 

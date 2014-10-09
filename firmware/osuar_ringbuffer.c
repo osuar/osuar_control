@@ -48,3 +48,21 @@ uint16_t osuar_rb_remove(osuar_rb_t *buf, uint16_t num_bytes, uint8_t *output)
 	return num_bytes;
 }
 
+uint16_t osuar_rb_peek(osuar_rb_t *buf, uint16_t num_bytes, uint8_t *output)
+{
+	/* Check if buffer does not contain enough data. */
+	if (buf->count < num_bytes) {
+		num_bytes = buf->count;
+	}
+
+	/* Copy data. */
+	static uint16_t i;
+	uint16_t idx = buf->head;
+	for (i=0; i<num_bytes; i++) {
+		output[i] = buf->elems[idx++];
+		if (idx == buf->size) idx = 0;
+	}
+
+	return num_bytes;
+}
+
