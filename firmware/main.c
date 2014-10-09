@@ -72,9 +72,11 @@ static msg_t comm_thread_2(void *arg)
 
 	uint8_t rxbuf[10];
 	uint16_t trans_num = 0;   /* Serial receive/transmit counter */
+	uint8_t recv_type;
 	osuar_rb_t recv_buf;
 	uint8_t _recv_buf[200];
 	osuar_rb_init(&recv_buf, sizeof(_recv_buf), _recv_buf);
+	uint8_t recv_msg[MSG_SIZE_MAX];
 
 	while (TRUE) {
 		time += MS2ST(11)-1;
@@ -88,11 +90,19 @@ static msg_t comm_thread_2(void *arg)
 
 		/* Uplink */
 		trans_num = chnReadTimeout((BaseChannel*)&SD3, rxbuf, 10, MS2ST(200));
+		osuar_rb_add(&recv_buf, trans_num, rxbuf);
 
-		/* Store in our own circular buffer so we can wait for whole packet. */
-		osuar_comm_handle_receive(rxbuf, trans_num, &recv_buf);
-		chsprintf(txbuf, "axis 0: %d\r\n", g_cmd.mode);
-		chnWriteTimeout((BaseChannel*)&SD3, txbuf, 20, MS2ST(200));
+		/* Process RX (TODO(yoos): clean up hack and put in comm) */
+		if (recv_buf.size >= 120) {
+			protocol_unpack(&recv_buf, &recv_type, recv_msg);
+			switch(recv_type) {
+			case UP_COMMAND_TYPE:
+				memcpy(&g_cmd, recv_msg, sizeoftype(UP_COMMAND_TYPE));
+				break;
+			default:
+				break;
+			}
+		}
 
 		/* Downlink */
 		protocol_pack(DOWN_TELEM_HIGHFREQ_TYPE, &msg_telem_hf, txbuf, &packet_size);

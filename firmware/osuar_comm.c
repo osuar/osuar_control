@@ -6,13 +6,14 @@
 
 #include <osuar_comm.h>
 #include <osuar_protocol.h>
+#include <osuar_controller.h>
 #include <osuar_config.h>
 #include <string.h>
 
 #define CONTROL_PACKET_SIZE 10
 #define PACKET_BUFFER_SIZE (CONTROL_PACKET_SIZE * 2)
 
-up_command_t g_cmd;
+up_command_t g_cmd = {MODE_VEL, {0, 0, 0}, 0};
 
 /*
  * SD1 config structure
@@ -60,7 +61,7 @@ void osuar_comm_handle_receive(uint8_t *rxbuf, uint8_t num, osuar_rb_t *recv_rb)
 	osuar_rb_add(recv_rb, num, rxbuf);   /* TODO(yoos): handle failure */
 
 	/* Try to parse message */
-	r = protocol_get_message(recv_rb, &msg_type, msg);
+	r = protocol_unpack(recv_rb, &msg_type, msg);
 	if (r) {
 		switch(msg_type) {
 		case(UP_COMMAND_TYPE):

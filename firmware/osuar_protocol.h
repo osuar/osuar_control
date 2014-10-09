@@ -101,17 +101,6 @@ size_t sizeoftype(uint8_t type);
 void protocol_pack(uint8_t type, void *msg, uint8_t *txbuf, size_t *packet_size);
 
 /*
- * @brief Unpack packet.
- *
- * @param packet Packet
- * @param packet_size Size of packet
- *
- * @output type Message type
- * @output msg Message body
- */
-void *protocol_unpack(uint8_t *packet, size_t packet_size, uint8_t *type, void *msg);
-
-/*
  * @brief Find the first valid message and its type.
  *
  * @param buf RX ringbuffer in which to search for packets
@@ -121,7 +110,7 @@ void *protocol_unpack(uint8_t *packet, size_t packet_size, uint8_t *type, void *
  *
  * @return 1 if valid packet found, 0 otherwise.
  */
-uint8_t protocol_get_message(osuar_rb_t *buf, uint8_t *type, uint8_t *msg);
+uint8_t protocol_unpack(osuar_rb_t *buf, uint8_t *type, uint8_t *msg);
 
 #endif
 
