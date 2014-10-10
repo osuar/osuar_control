@@ -2,18 +2,33 @@
 #include <osuar_ringbuffer.h>
 
 #include <serial.h>
+#include <joystick.h>
 
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/time.h>
+#include <pthread.h>
 
 #include <assert.h>
 
 
 down_telem_highfreq_t msg_telem_hf;
 
-void tx(void)
+void tx(int ser)
 {
+	if (armed) {
+		uint8_t txbuf[200];
+		size_t pkt_size;
+		protocol_pack(UP_COMMAND_TYPE, &msg_cmd, txbuf, &pkt_size);
+		//printf("----------------------------\n");
+		//printf("%d\n", msg_cmd.throttle);
+		//for (int i=0; i<20; i++) {
+		//	printf("%x ", txbuf[i]);
+		//}
+		//printf("\n");
+		//printf("----------------------------\n");
+		write(ser, txbuf, pkt_size);
+	}
 }
 
 void rx(int ser, osuar_rb_t *buf)
@@ -22,7 +37,12 @@ void rx(int ser, osuar_rb_t *buf)
 	int serlen;
 	uint8_t serbuf[100];   // TODO(syoo): magic number
 	serlen = read(ser, serbuf, 100);
-	assert(osuar_rb_add(buf, serlen, serbuf) == serlen);
+	if (serlen > 0) {
+		assert(osuar_rb_add(buf, serlen, serbuf) == serlen);
+	}
+
+	// TODO(yoos): use protocol_unpack and display the data in a GUI or
+	// something.
 
 	//uint8_t r = 1;
 	//uint8_t msg_type;
@@ -42,24 +62,11 @@ void rx(int ser, osuar_rb_t *buf)
 	//}
 }
 
-int main(int argc, char **argv)
+void *comm(void *param)
 {
-	printf("OSUAR groundstation starting\n");
-
-	/* Usage */
-	if (argc < 2) {
-		printf("Usage:\n  %s <serial device>\n", argv[0]);
-		exit(1);
-	}
-
-	/* Open serial device. */
-	char *portname = argv[1];
-	int ser = open(portname, O_RDWR);
-	if (ser < 0) {
-		printf("error %d opening %s: %s\n", errno, portname, strerror (errno));
-		return 1;
-	}
-	set_interface_attribs(ser, B57600, 0);   // No parity
+	/* Configure serial device. */
+	int ser = *((int*) param);
+	set_interface_attribs(ser, B38400, 0);   // No parity
 	set_blocking(ser, 0);
 
 	/* Timer stuff. NOTE: not monotonic. */
@@ -81,7 +88,7 @@ int main(int argc, char **argv)
 
 		/* TX */
 		if (timercmp(&tm_cur, &tm_tx, >) != 0) {
-			tx();
+			tx(ser);
 			timeradd(&tm_tx, &TX_DT, &tm_tx);
 		}
 
@@ -105,6 +112,39 @@ int main(int argc, char **argv)
 		/* Don't peg the CPU. */
 		usleep(1000);
 	}
+}
+
+int main(int argc, char **argv)
+{
+	printf("OSUAR groundstation starting\n");
+
+	/* Usage */
+	if (argc < 3) {
+		printf("Usage:\n  %s <joystick> <serial>\n", argv[0]);
+		exit(1);
+	}
+
+	char *jspath = argv[1];
+	int joydev = open(jspath, O_RDONLY);
+	if (joydev == -1) {
+		perror("Error opening joystick");
+		exit(EXIT_FAILURE);
+	}
+
+	char *serpath = argv[2];
+	int serdev = open(serpath, O_RDWR);
+	if (serdev == -1) {
+		perror("Error opening serial");
+		exit(EXIT_FAILURE);
+	}
+
+	pthread_t joy_th, comm_th;
+
+	pthread_create(&joy_th, NULL, joy, &joydev);
+	pthread_create(&comm_th, NULL, comm, &serdev);
+
+	pthread_join(joy_th, NULL);
+	pthread_join(comm_th, NULL);
 
 	return 0;
 }
