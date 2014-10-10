@@ -1,3 +1,6 @@
+#ifndef JOYSTICK_H
+#define JOYSTICK_H
+
 #include <fcntl.h>
 #include <linux/joystick.h>
 #include <stdbool.h>
@@ -19,11 +22,11 @@
 #define BUTTON_ANG_VEL_P_GAIN      6
 #define BUTTON_ANG_VEL_D_GAIN      7
 #define BUTTON_Z_MOD               8   // Modify PPD gains for Z axis instead of XY.
-#define BUTTON_UNDEFINED           9
-#define BUTTON_UNDEFINED           10
+//#define BUTTON_UNDEFINED           9
+//#define BUTTON_UNDEFINED           10
 #define BUTTON_INCREMENT_GAIN      11
 #define BUTTON_DECREMENT_GAIN      12
-#define BUTTON_UNDEFINED           13
+//#define BUTTON_UNDEFINED           13
 
 up_command_t msg_cmd;
 
@@ -36,3 +39,4 @@ static int bf = 0x7fff;
 
 void *joy(void *param);
 
+#endif // JOYSTICK_H

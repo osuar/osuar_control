@@ -43,10 +43,22 @@ void *joy(void *param)
 			case BUTTON_ZERO_THROTTLE:
 				break;
 			case BUTTON_SOFT_ACRO_MODE:
+				if (e.value == 1) {
+					msg_cmd.mode = 1;
+				}
+				else {
+					msg_cmd.mode = 0;
+				}
 				break;
 			case BUTTON_INC_ANG_POS_CAP:
 				break;
 			case BUTTON_HARD_ACRO_MODE:
+				if (e.value == 1) {
+					msg_cmd.mode = 1;
+				}
+				else {
+					msg_cmd.mode = 0;
+				}
 				break;
 			case BUTTON_RESET_YAW:
 				break;
