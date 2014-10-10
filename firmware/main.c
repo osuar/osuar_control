@@ -104,7 +104,7 @@ static msg_t comm_thread_2(void *arg)
 				break;
 			}
 
-			chsprintf(txbuf, "[FC] Command: %d %d %d %u %x\r\n", g_cmd.axes[0], g_cmd.axes[1], g_cmd.axes[2], g_cmd.throttle, g_cmd.mode);
+			chsprintf(txbuf, "[FC] cmd: %d %d %d %u %x\r\n", g_cmd.axes[0], g_cmd.axes[1], g_cmd.axes[2], g_cmd.throttle, g_cmd.mode);
 			chnWriteTimeout((BaseChannel*)&SD3, txbuf, strlen(txbuf), MS2ST(1));
 		}
 
@@ -121,12 +121,6 @@ static msg_t comm_thread_2(void *arg)
 		//		throttle = MOTOR_PWM_DISABLED;
 		//	}
 		//}
-
-		/* Transmit */
-		//clear_buffer(remote_comm_txbuf);   // TODO(yoos): maybe check whether or not we've finished transmitting before clearing buffer
-
-		//chsprintf(remote_comm_txbuf, "%d\r\n", ticks_since_last_comm);
-		//uartStartSend(&UARTD3, sizeof(remote_comm_txbuf), remote_comm_txbuf);
 
 		//chThdSleepUntil(time);
 	}
