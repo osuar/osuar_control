@@ -58,38 +58,17 @@ void protocol_pack(uint8_t type, void *msg, uint8_t *txbuf, size_t *packet_size)
 	*packet_size = sizeof(osuar_packet_t) + msg_size_diff;
 }
 
-/*
-void protocol_unpack(uint8_t *rxbuf, size_t buffer_size, uint8_t *id)
-{
-	// Look for magic identifier to signify beginning of packet
-	uint8_t i;
-	for (i=0; i<buffer_size-sizeof(uint32_t); i++) {
-		uint32_t *maybe_magic = (uint32_t *) (buffer + i);
-
-		if(*maybe_magic == MAGIC) {
-			// Found start
-
-			// TODO(cesarek): Bounds checking
-			osuar_msg_t *msg = (osuar_msg_t*) (buffer + i);
-			*id = msg->type;
-
-			return msg->payload;
-		}
-	}
-}
-*/
-
 uint8_t protocol_unpack(osuar_rb_t *buf, uint8_t *type, uint8_t *msg)
 {
 	/* Some variables to help parse header */
 	static uint32_t maybe_header = 0;
 	static uint8_t tmp = 0;
 
-	static uint32_t crc = 0;   /* TODO(yoos): LSB or MSB first? */
+	static uint32_t crc = 0;   /* TODO(yoos): LSB first? */
 
 	while (buf->count > 0) {
 		osuar_rb_remove(buf, 1, &tmp);
-		maybe_header = (maybe_header << 8) + tmp;
+		maybe_header = (tmp << 24) + (maybe_header >> 8);
 
 		if (maybe_header == MAGIC && buf->count >= sizeoftype(*type) + 5) {
 			osuar_rb_remove(buf, 1, type);
@@ -103,25 +82,3 @@ uint8_t protocol_unpack(osuar_rb_t *buf, uint8_t *type, uint8_t *msg)
 	return 0;   // Fail
 }
 
-
-/*
-int length;
-void *data;
-protocol_pack(UP_COMMAND_TYPE, my_packet, sizeof(my_packet), &data, &length);
-*/
-
-/*
-send(REQ_MSG_TYPE, myreq);
-
-int id;
-void *data = read(&id);
-
-switch(id) {
-  case CONTROL_MSG_TYPE:
-    struct osuar_control_msg_t mything = (osuar_control_msg_t) data;
-    bla
-  case: TELEM_MSG_TYPE:
-    struct osuar_telem_msg_t mything = (osuar_telem_msg_t) data;
-    bla
-}
-*/

@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#define MAGIC 0x01010101   /* Header string. This should ideally never occur anywhere else in our serial stream. */
+#define MAGIC 0xFE81A535   /* Header string. This should ideally never occur anywhere else in our serial stream. */
 #define MSG_SIZE_MAX 100
 
 #define UP_COMMAND_TYPE          10
@@ -43,10 +43,11 @@ typedef struct {
 
 /* Control */
 typedef struct {
-	uint8_t mode;   /* Control mode (rate or position) */
-	float axes[3];   /* Desired axis values (rad/s in XYZ or rad in XY) */
-	float throttle;
-} up_command_t;   /* 5 bytes */
+	int16_t axes[3];   /* Desired axis values (rad/s in XYZ or rad in XY) */
+	uint16_t throttle;
+	int mode : 1;   /* Control mode (rate or position) */
+	int bf : 15;
+} up_command_t;   /* 10 bytes */
 
 /* Configuration */
 typedef struct {

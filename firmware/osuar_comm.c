@@ -13,7 +13,7 @@
 #define CONTROL_PACKET_SIZE 10
 #define PACKET_BUFFER_SIZE (CONTROL_PACKET_SIZE * 2)
 
-up_command_t g_cmd = {MODE_VEL, {0, 0, 0}, 0};
+up_command_t g_cmd = {{0, 0, 0}, 0, MODE_VEL, 0};
 
 /*
  * SD1 config structure

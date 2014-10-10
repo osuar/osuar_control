@@ -89,24 +89,28 @@ static msg_t comm_thread_2(void *arg)
 		}
 
 		/* Uplink */
-		trans_num = chnReadTimeout((BaseChannel*)&SD3, rxbuf, 10, MS2ST(200));
+		trans_num = chnReadTimeout((BaseChannel*)&SD3, rxbuf, 10, 0);
 		osuar_rb_add(&recv_buf, trans_num, rxbuf);
 
 		/* Process RX (TODO(yoos): clean up hack and put in comm) */
-		if (recv_buf.size >= 120) {
+		while (recv_buf.count >= 20) {
 			protocol_unpack(&recv_buf, &recv_type, recv_msg);
 			switch(recv_type) {
 			case UP_COMMAND_TYPE:
 				memcpy(&g_cmd, recv_msg, sizeoftype(UP_COMMAND_TYPE));
 				break;
 			default:
+				// TODO(yoos): ESTOP
 				break;
 			}
+
+			chsprintf(txbuf, "[FC] Command: %d %d %d %u %x\r\n", g_cmd.axes[0], g_cmd.axes[1], g_cmd.axes[2], g_cmd.throttle, g_cmd.mode);
+			chnWriteTimeout((BaseChannel*)&SD3, txbuf, strlen(txbuf), MS2ST(1));
 		}
 
 		/* Downlink */
-		protocol_pack(DOWN_TELEM_HIGHFREQ_TYPE, &msg_telem_hf, txbuf, &packet_size);
-		chnWriteTimeout((BaseChannel*)&SD3, txbuf, packet_size, MS2ST(200));
+		//protocol_pack(DOWN_TELEM_HIGHFREQ_TYPE, &msg_telem_hf, txbuf, &packet_size);
+		//chnWriteTimeout((BaseChannel*)&SD3, txbuf, packet_size, MS2ST(200));
 
 		/* Receive */
 		//if(osuar_comm_parse_input(&throttle, new_des_ang_pos)) {
@@ -160,6 +164,7 @@ static WORKING_AREA(wa_control_thread, 1280);
 static msg_t control_thread(void *arg)
 {
 	(void) arg;
+	uint8_t i;
 	chRegSetThreadName("control");
 	systime_t time = chTimeNow();
 
@@ -181,7 +186,13 @@ static msg_t control_thread(void *arg)
 		time += CONTROL_DT*CH_FREQUENCY;
 
 		update_ahrs(CONTROL_DT, dcm_bg, gyr);
-		run_controller(g_cmd.mode, g_cmd.throttle, dcm_bg, gyr, motor_dc, g_cmd.axes);
+
+		float cmd_throttle = g_cmd.throttle / 65534.0f;
+		float cmd_axes[3];
+		for (i=0; i<3; i++) {
+			cmd_axes[i] = g_cmd.axes[i] / 32767.0f;
+		}
+		run_controller(g_cmd.mode, cmd_throttle, dcm_bg, gyr, motor_dc, cmd_axes);
 
 		static uint8_t i, j;
 		for (i=0; i<3; i++) {
