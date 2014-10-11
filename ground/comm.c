@@ -65,7 +65,7 @@ void *comm(void *param)
 
 	/* Timer stuff. NOTE: not monotonic. */
 	static struct timeval tm_cur, tm_rx, tm_tx;
-	static struct timeval TX_DT = {0, 20000};   // 50 Hz
+	static struct timeval TX_DT = {0, 25000};   // 50 Hz
 	static struct timeval RX_DT = {0, 10000};   // 100 Hz poll
 	gettimeofday(&tm_cur, NULL);
 	timeradd(&tm_cur, &TX_DT, &tm_tx);
