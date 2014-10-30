@@ -1,6 +1,7 @@
 #include <osuar_ahrs.h>
 #include <osuar_mpu6000.h>
 #include <osuar_math.h>
+#include <osuar_config.h>
 
 /* Some static variables */
 static float v_gyr[3];        /* Gyroscope read */
