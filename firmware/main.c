@@ -78,6 +78,7 @@ static msg_t comm_thread_2(void *arg)
 	osuar_rb_init(&recv_buf, sizeof(_recv_buf), _recv_buf);
 	uint8_t recv_msg[MSG_SIZE_MAX];
 
+	up_request_t req;
 	while (TRUE) {
 		time += MS2ST(11)-1;
 
@@ -98,6 +99,30 @@ static msg_t comm_thread_2(void *arg)
 			switch(recv_type) {
 			case UP_COMMAND_TYPE:
 				memcpy(&g_cmd, recv_msg, sizeoftype(UP_COMMAND_TYPE));
+				break;
+			case UP_REQUEST_TYPE:
+				memcpy(&req, recv_msg, sizeoftype(UP_REQUEST_TYPE));
+				switch (req.type) {
+				case DOWN_SYNC_TYPE:
+					down_sync_t msg_down = {{MOTOR_ANG_POS_KP, MOTOR_ANG_VEL_KP,
+						MOTOR_ANG_VEL_KD, SERVO_ANG_POS_KP, SERVO_ANG_VEL_KP,
+						SERVO_ANG_VEL_KD}, {TRIM_ANGLE_X, TRIM_ANGLE_Y}};
+					protocol_pack(DOWN_SYNC_TYPE, &msg_down, txbuf, &packet_size);
+					break;
+				}
+				chnWriteTimeout((BaseChannel*)&SD3, txbuf, packet_size, MS2ST(1));
+				break;
+			case UP_CONFIG_TYPE:
+				up_config_t cfg;
+				memcpy(&cfg, recv_msg, sizeoftype(UP_CONFIG_TYPE));
+				MOTOR_ANG_POS_KP = cfg.gains[0];
+				MOTOR_ANG_VEL_KP = cfg.gains[1];
+				MOTOR_ANG_VEL_KD = cfg.gains[2];
+				MOTOR_ANG_POS_KP = cfg.gains[3];
+				MOTOR_ANG_VEL_KP = cfg.gains[4];
+				MOTOR_ANG_VEL_KD = cfg.gains[5];
+				TRIM_ANGLE_X     = cfg.trim[0];
+				TRIM_ANGLE_Y     = cfg.trim[1];
 				break;
 			default:
 				// TODO(yoos): ESTOP
