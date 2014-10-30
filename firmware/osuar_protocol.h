@@ -6,10 +6,13 @@
 #include <stdlib.h>
 #include <stdint.h>
 
+#define PROTOCOL_VERSION "0.1"
+
 #define MAGIC 0xFE81A535   /* Header string. This should ideally never occur anywhere else in our serial stream. */
 #define MSG_SIZE_MAX 100
 
 #define UP_COMMAND_TYPE          10
+#define UP_REQUEST_TYPE          11
 #define UP_CONFIG_TYPE           1
 #define DOWN_TELEM_HIGHFREQ_TYPE 2
 #define DOWN_TELEM_LOWFREQ_TYPE  3
@@ -49,10 +52,18 @@ typedef struct {
 	int bf : 15;
 } up_command_t;   /* 10 bytes */
 
-/* Configuration */
+/* Request */
 typedef struct {
+	uint8_t type;   /* Message type to request */
+} up_request_t;   /* 1 byte */
+
+/* Configuration */
+/* TODO(yoos): Inefficient because only one field changes at a time. Need some
+ * sort of field-indexing system. */
+typedef struct {
+	float gains[6];   /* Velocity and position PID gains */
 	float trim[2];   /* XY trim, Euler angles */
-} up_config_t;   /* 8 bytes */
+} up_config_t;   /* 32 bytes */
 
 
 /* Downlink message types */
